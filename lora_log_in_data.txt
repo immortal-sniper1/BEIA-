@@ -1,0 +1,24 @@
+Application ID
+test1_lora_beia
+Device ID
+sacrifice1
+Activation Method
+OTAA
+Device EUI
+
+
+665E12DE765CFCFA
+
+Application EUI
+
+
+70B3D57ED003A4E5
+
+App Key
+
+
+
+7C65CB276FBDD5E8A31AC324D9397D49
+
+Status
+never seen
