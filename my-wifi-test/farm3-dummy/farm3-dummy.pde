@@ -73,7 +73,7 @@ float concCH4;
 int OPC_status;
 int OPC_measure;
 
-char node_ID[] = "FARM2";
+char node_ID[] = "FARM3";
 
 void setup()
 {
@@ -326,7 +326,7 @@ void loop()
   // 5. Sleep
   ////////////////////////////////////////////////
   USB.println(F("5. Enter deep sleep..."));
-  PWR.deepSleep("00:00:08:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  PWR.deepSleep("00:00:03:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
 
   USB.ON();
   USB.println(F("----------------------------------------------------------------------------------------------"));
