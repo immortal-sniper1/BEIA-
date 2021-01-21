@@ -1,0 +1,1 @@
+[{"id":"208bc278.c62b1e","type":"function","z":"ffdf5b80.3f8018","name":"ceva aici32","func":"\nmsg.payload= msg.payload*2+13;\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","x":530,"y":800,"wires":[["2c4bb6ff.b5f8aa","9d22ca3f.436858"]]}]

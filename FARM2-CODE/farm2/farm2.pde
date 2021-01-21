@@ -326,7 +326,7 @@ void loop()
   // 5. Sleep
   ////////////////////////////////////////////////
   USB.println(F("5. Enter deep sleep..."));
-  PWR.deepSleep("00:00:08:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  PWR.deepSleep("00:00:10:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
 
   USB.ON();
   USB.println(F("----------------------------------------------------------------------------------------------"));
