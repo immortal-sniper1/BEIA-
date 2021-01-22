@@ -37,8 +37,8 @@ uint8_t socket = SOCKET1;
 
 // WiFi AP settings (CHANGE TO USER'S AP)
 ///////////////////////////////////////
-char ESSID[] = "LANCOMBEIA";
-char PASSW[] = "beialancom";
+char ESSID[] = "FARM";
+char PASSW[] = "beiafarm";
 ///////////////////////////////////////
 
 // define variables
