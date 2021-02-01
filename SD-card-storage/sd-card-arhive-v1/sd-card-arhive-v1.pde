@@ -4,8 +4,6 @@
 // define variable
 uint8_t error;
 
-// messure every 10 minutes
-unsigned long delay_interval = 900000;
 
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[]="FILE1.TXT";
@@ -36,10 +34,6 @@ void setup()
     //ceva primire de data aici
   }
 
-
-
-
-  
   USB.println(F("SD_arhive_V1"));
   
   // Set SD ON
@@ -73,8 +67,6 @@ void setup()
     }
       sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
 
-
-
 //pm
 USB.ON();
 }
@@ -85,37 +77,7 @@ void loop()
   USB.ON();
   SD.ON();
 
-  
- // data=PWR.getBatteryLevel();
-  //itoa(data , data2 , 10);
-  /*
-  USB.print("data: "); 
-  USB.println(data); 
-  USB.print("data2: "); 
-  USB.println(data2); 
-  */
-  
-/*
-  if( sd_answer =! 1 )
-  {
-    USB.println(F("\n2 - append error"));
-  }
 
-  
-      USB.print("battery: "); 
-      USB.println(PWR.getBatteryLevel(), DEC);
-
-/*
-
-
- 
- */
-  ///////////////////////////////////////////
-  // 1. Turn on sensors and wait
-  ///////////////////////////////////////////
- // Power on the OPC_N2 sensor. 
-    // If the gases PRO board is off, turn it on automatically.
-  
   // create new frame
   frame.createFrame(BINARY, "ceva id");  // farame de trimis 
   
@@ -148,10 +110,8 @@ void loop()
   SD.OFF();
   USB.OFF();
   
-  ///////////////////////////////////////////
-  // 2. Send packet
-  ///////////////////////////////////////////  
-delay(8000);
+
+delay(66600);
   
 
   //PWR.deepSleep("00:00:00:20", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
