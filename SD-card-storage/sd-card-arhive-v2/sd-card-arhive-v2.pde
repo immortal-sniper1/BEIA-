@@ -16,7 +16,7 @@ char y[3];
 uint8_t sd_answer;
 int sentence=0;   // 1 for deletion on reboot  , anything else for data appended to fiel only
 bool IRL_time= true;  //  true for no external data source
-int cycle_time=197;  // in seconds
+int cycle_time=13;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
 
 
@@ -140,7 +140,7 @@ void loop()
 
     USB.println(rtc_str);
 
-x=cycle_time%60;
+x=cycle_time%60;  // sec
 itoa(x, y, 10);
 if(x<10)
 {
@@ -150,17 +150,24 @@ if(x<10)
 rtc_str[9]=y[0];
 rtc_str[10]=y[1];
   USB.println(rtc_str);
-x=cycle_time/60%60;
+x=cycle_time/60%60;  // min
 itoa(x, y, 10);
 if(x<10)
 {
   y[1]=y[0];
   y[0]='0';
 }
-  USB.print("y=");
-  USB.print(y);     USB.println("X");
 rtc_str[6]=y[0];
 rtc_str[7]=y[1];
+x=cycle_time/3600%3600;  // h
+itoa(x, y, 10);
+if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+rtc_str[3]=y[0];
+rtc_str[4]=y[1];
 
 
 
