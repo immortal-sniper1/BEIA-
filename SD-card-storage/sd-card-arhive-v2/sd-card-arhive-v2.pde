@@ -9,7 +9,7 @@ uint8_t error;
 char filename[]="FILE1.TXT";
 char* time_date; // stores curent date + time
 // define an example string
-int data, first_lost,x;
+int data, first_lost,x,b;
 char y[3];
 
 // define variable
@@ -18,7 +18,7 @@ int sentence=0;   // 1 for deletion on reboot  , anything else for data appended
 bool IRL_time= true;  //  true for no external data source
 int cycle_time=25;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
-
+unsigned long prev;
 
 void setup()
 {
@@ -68,7 +68,8 @@ void setup()
            USB.println(F("file NOT created"));  
          } 
   
-
+       USB.print("loop cycle time[s]:= ");
+       USB.println(cycle_time );
       sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
 
 //pm
@@ -78,6 +79,7 @@ USB.ON();
 
 void loop()
 {
+  prev=millis();
   USB.ON();
   SD.ON();
 
@@ -157,7 +159,7 @@ void loop()
   y[0]='0';
 }
   sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
+
 
 
   //USB.println("random1");
@@ -169,9 +171,12 @@ void loop()
 
 
 
+b=(millis()-prev)/1000;
+  USB.print("loop execution time[s]: ");
+  USB.println(b);
 
 x=cycle_time%60;  // sec
-itoa(x, y, 10);
+itoa(x-b-1, y, 10);
 if(x<10)
 {
   y[1]=y[0];
