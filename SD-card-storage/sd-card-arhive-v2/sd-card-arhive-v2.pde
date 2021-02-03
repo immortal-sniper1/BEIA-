@@ -16,7 +16,7 @@ char y[3];
 uint8_t sd_answer;
 int sentence=0;   // 1 for deletion on reboot  , anything else for data appended to fiel only
 bool IRL_time= true;  //  true for no external data source
-int cycle_time=13;  // in seconds
+int cycle_time=25;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
 
 
@@ -106,26 +106,56 @@ void loop()
   
   x=RTC.year;
   itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
   sd_answer = SD.append(filename,  y  );
   sd_answer = SD.append(filename, ".");
   x=RTC.month;
   itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
   sd_answer = SD.append(filename,  y  );
   sd_answer = SD.append(filename, ".");
   x=RTC.day;
   itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
   sd_answer = SD.append(filename,  y  );
   sd_answer = SD.append(filename, ".");
   x=RTC.hour;
   itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
   sd_answer = SD.append(filename,  y  );
   sd_answer = SD.append(filename, ".");
   x=RTC.minute;
   itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
   sd_answer = SD.append(filename,  y  );
   sd_answer = SD.append(filename, ".");
   x=RTC.second;
   itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
   sd_answer = SD.append(filename,  y  );
   sd_answer = SD.append(filename, ".");
 
@@ -138,7 +168,7 @@ void loop()
   sd_answer = SD.appendln(filename,  "ceva date de scris vin aici " );
 
 
-    USB.println(rtc_str);
+
 
 x=cycle_time%60;  // sec
 itoa(x, y, 10);
@@ -149,7 +179,6 @@ if(x<10)
 }
 rtc_str[9]=y[0];
 rtc_str[10]=y[1];
-  USB.println(rtc_str);
 x=cycle_time/60%60;  // min
 itoa(x, y, 10);
 if(x<10)
@@ -171,7 +200,6 @@ rtc_str[4]=y[1];
 
 
 
-  USB.println(rtc_str);
 
   USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   SD.OFF();
