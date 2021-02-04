@@ -65,7 +65,7 @@ float concCH4;
 int OPC_status;
 int OPC_measure;
 
-char node_ID[] = "FARM1";
+char node_ID[] = "FARM2";
 
 
 
