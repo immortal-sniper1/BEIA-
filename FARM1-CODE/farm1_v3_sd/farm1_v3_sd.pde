@@ -18,13 +18,13 @@
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[]="FILE1.TXT";
+
+
 char* time_date; // stores curent date + time
-// define an example string
 int data, first_lost,x,b;
-char y[3],ssent[50];
-// define variable
+char y[3],ssent[7];
 uint8_t sd_answer;
-int sentence=0;   // 1 for deletion on reboot  , anything else for data appended to fiel only
+bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
 int cycle_time=1000;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
@@ -96,7 +96,7 @@ void setup()
   // Set SD ON
   SD.ON();
 
-    if ( sentence==1) 
+    if ( sentence) 
     {
         // Delete file
         sd_answer = SD.del(filename);
@@ -248,6 +248,7 @@ void loop()
   // check connectivity
   status =  WIFI_PRO.isConnected();
 
+
   // check if module is connected
   if (status == true)
   {    
@@ -258,18 +259,6 @@ void loop()
 
     RTC.ON();
     RTC.getTime();
-
-
-
-
-
-
-
-
-
-
-
-
     
   // create new frame1
   frame.createFrame(ASCII, node_ID);  // frame1 de trimis & stocat
@@ -291,8 +280,6 @@ void loop()
     frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
 
 
-
-
 ////////////////////////////////////////////////////////////
     frame.showFrame();
  // data is sent here
@@ -306,9 +293,9 @@ void loop()
     if (error == 0)
     {
       USB.println(F("HTTP OK")); 
-      for (x=0;x<7;x++)
+      for (x=0;x<4;x++)
       {
-        ssent[x]="HTTP OK"[x];
+        ssent[x]="true"[x];
       }
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
@@ -321,9 +308,9 @@ void loop()
     else
     {
       USB.println(F("Error calling 'getURL' function"));
-      for (x=0;x<32;x++)
+      for (x=0;x<5;x++)
       {
-        ssent[x]="Error calling 'getURL' function"[x];
+        ssent[x]="false"[x];
       }
       WIFI_PRO.printErrorCode();
     }
@@ -394,8 +381,6 @@ void loop()
   y[0]='0';
 }
   sd_answer = SD.append(filename,  y  );
-
-
   sd_answer = SD.append(filename,  "  " );
   sd_answer = SD.append(filename,  frame.buffer , frame.length );
   sd_answer = SD.append(filename,  "  " );
@@ -431,9 +416,9 @@ void loop()
     if (error == 0)
     {
       USB.println(F("HTTP OK")); 
-      for (x=0;x<7;x++)
+      for (x=0;x<4;x++)
       {
-        ssent[x]="HTTP OK"[x];
+        ssent[x]="true"[x];
       }
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
@@ -446,26 +431,13 @@ void loop()
     else
     {
       USB.println(F("Error calling 'getURL' function"));
-      for (x=0;x<32;x++)
+      for (x=0;x<5;x++)
       {
-        ssent[x]="Error calling 'getURL' function"[x];
+        ssent[x]="false"[x];
       }
       WIFI_PRO.printErrorCode();
     }
-  }
-  else
-  {
-    USB.print(F("WiFi is connected ERROR")); 
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);  
-  }
-    //now storeing it locally 
 
-
-  time_date = RTC.getTime(); 
-  USB.print(F("time: "));
-  USB.println(time_date);  
-  
   x=RTC.year;
   itoa(x, y, 10);
   if(x<10)
@@ -526,26 +498,6 @@ void loop()
   sd_answer = SD.append(filename,  "  " );
   sd_answer = SD.appendln(filename,  ssent );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 b=(millis()-prev)/1000;
   USB.print("loop execution time[s]: ");
   USB.println(b);
@@ -578,7 +530,7 @@ if(x<10)
 rtc_str[3]=y[0];
 rtc_str[4]=y[1];
 
-
+///-------------
 
 
 
