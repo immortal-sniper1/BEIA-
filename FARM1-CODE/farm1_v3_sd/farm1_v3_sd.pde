@@ -21,7 +21,7 @@ char filename[]="FILE1.TXT";
 
 
 char* time_date; // stores curent date + time
-int data, first_lost,x,b;
+int first_lost,x,b;
 char y[3],ssent[7];
 uint8_t sd_answer;
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
