@@ -22,11 +22,11 @@ char filename[]="FILE1.TXT";
 
 char* time_date; // stores curent date + time
 int first_lost,x,b;
-char y[3],ssent[7];
+char y[3],ssent[7],ssent2[7];
 uint8_t sd_answer;
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
-int  cycle_time,cycle_time2=1000;  // in seconds
+int  cycle_time,cycle_time2=10;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
 unsigned long prev,previous;
 
@@ -124,8 +124,8 @@ void setup()
          } 
   
        USB.print("loop cycle time[s]:= ");
-       USB.println(cycle_time );
-      sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
+       USB.println(cycle_time2 );
+      sd_answer = SD.appendln(filename,  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" );
 
     USB.println(F("Frame Utility Example for Gases Pro Sensor Board"));
     USB.println(F("Sensors used:"));
@@ -156,7 +156,7 @@ void loop()
 {
   prev=millis();
   USB.ON();
-  SD.ON();
+
       ///////////////////////////////////////////
     // 0. Turn on sensors and wait
     ///////////////////////////////////////////
@@ -172,9 +172,7 @@ void loop()
     // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
     USB.println(RTC.getTime());
     USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-    USB.OFF();
-    PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
-    USB.ON();
+    PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
     USB.println(RTC.getTime());
     USB.println(F("wake up!!\r\n"));
 
@@ -227,11 +225,187 @@ void loop()
     PM.OFF();
 
 
+
+
+
+    //now storeing it locally 
+  SD.ON();
+
+  frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
+    // Add temperature
+    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+    // Add humidity
+    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+    // Add pressure value
+    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
+    // Add CO value
+    frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
+    // Add NH3 value
+    frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
+
+  //  USB.println(F("cadru de stocet:")); 
+  //  frame.showFrame();
+    
+
+  time_date = RTC.getTime(); 
+  USB.print(F("time: "));
+  USB.println(time_date);  
+  
+  x=RTC.year;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.month;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.day;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.hour;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.minute;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.second;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename,  "  " );
+  sd_answer = SD.append(filename,  frame.buffer , frame.length );
+  sd_answer = SD.append(filename,  "  " );
+  sd_answer = SD.appendln(filename,  ssent );
+// frame 1 is stored 
+
+
+
+
+// frame2
+
+
+      frame.createFrame(ASCII);
+        // Add PM1
+      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
+      // Add PM2.5
+      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
+      // Add PM10
+      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
+      // Add BAT level
+      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+      // Add CH4 value
+      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+ 
+
+
+  x=RTC.year;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.month;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.day;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.hour;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.minute;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+  sd_answer = SD.append(filename, ".");
+  x=RTC.second;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename,  y  );
+
+
+  sd_answer = SD.append(filename,  "  " );
+  sd_answer = SD.append(filename,  frame.buffer , frame.length );
+  sd_answer = SD.append(filename,  "  " );
+  sd_answer = SD.appendln(filename,  ssent );
+
+
+
+
+  SD.OFF();
+
+
+
+
+
+
   // get actual time
   previous = millis();
   //////////////////////////////////////////////////
   // 4. Switch ON
   //////////////////////////////////////////////////  
+
   error = WIFI_PRO.ON(socket);
 
   if (error == 0)
@@ -319,71 +493,11 @@ void loop()
     USB.print(F(" Time(ms):"));    
     USB.println(millis()-previous);  
   }
-    //now storeing it locally 
 
 
-  time_date = RTC.getTime(); 
-  USB.print(F("time: "));
-  USB.println(time_date);  
-  
-  x=RTC.year;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.month;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.day;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.hour;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.minute;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.second;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.appendln(filename,  ssent );
-// frame 1 is sent and stored 
+
+
+
 
 //frame2
 
@@ -418,7 +532,7 @@ void loop()
       USB.println(F("HTTP OK")); 
       for (x=0;x<4;x++)
       {
-        ssent[x]="true"[x];
+        ssent2[x]="true"[x];
       }
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
@@ -433,70 +547,17 @@ void loop()
       USB.println(F("Error calling 'getURL' function"));
       for (x=0;x<5;x++)
       {
-        ssent[x]="false"[x];
+        ssent2[x]="false"[x];
       }
       WIFI_PRO.printErrorCode();
     }
 
-  x=RTC.year;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.month;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.day;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.hour;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.minute;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.second;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
+
+  //////////////////////////////////////////////////
+  // 3. Switch OFF
+  //////////////////////////////////////////////////  
 
 
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.appendln(filename,  ssent );
 
 b=(millis()-prev)/1000;
   USB.print("loop execution time[s]: ");
@@ -504,6 +565,10 @@ b=(millis()-prev)/1000;
 
   
 cycle_time=cycle_time2-b-1;
+if ( cycle_time <10)
+{
+  cycle_time=15;
+}
   USB.println(cycle_time);
 
   
@@ -542,12 +607,9 @@ rtc_str[4]=y[1];
 ///-------------
 
 
-
-  //////////////////////////////////////////////////
-  // 3. Switch OFF
-  //////////////////////////////////////////////////  
   WIFI_PRO.OFF(socket);
   USB.println(F("WiFi switched OFF\n\n")); 
+
   // Go to deepsleep  
 
   ////////////////////////////////////////////////
@@ -557,12 +619,11 @@ rtc_str[4]=y[1];
   USB.print("X");USB.print(rtc_str);USB.println("X");
 
   USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-  SD.OFF();
   USB.OFF();
 
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-  USB.ON();
-  USB.println(F("----------------------------------------------------------------------------------------------"));
+
+  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
 
 }
