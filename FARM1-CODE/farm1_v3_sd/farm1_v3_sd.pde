@@ -107,7 +107,7 @@ void setup()
        }
        else 
        {
-        USB.println(F("file NOT deleted"));  
+        USB.println(F("file NOT deleted"));   
        }
 
     }
@@ -120,7 +120,8 @@ void setup()
          }
          else 
          {
-           USB.println(F("file NOT created"));  
+           USB.println(F("file NOT created"));
+           USB.println(SD.getFileSize(filename) );
          } 
   
        USB.print("loop cycle time[s]:= ");

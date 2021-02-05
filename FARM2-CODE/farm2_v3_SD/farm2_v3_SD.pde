@@ -322,6 +322,7 @@ void loop()
     //now storeing it locally 
 
 
+
   time_date = RTC.getTime(); 
   USB.print(F("time: "));
   USB.println(time_date);  

@@ -107,7 +107,7 @@ void setup()
        }
        else 
        {
-        USB.println(F("file NOT deleted")); 
+        USB.println(F("file NOT deleted"));   
        }
 
     }
@@ -120,7 +120,7 @@ void setup()
          }
          else 
          {
-           USB.println(F("file NOT created"));  
+           USB.println(F("file NOT created"));
            USB.println(SD.getFileSize(filename) );
          } 
   
@@ -143,13 +143,6 @@ void setup()
 //pm
 USB.ON();
 }
-
-
-
-
-
-
-
 
 
 
@@ -229,228 +222,6 @@ void loop()
 
 
 
-  // get actual time
-  previous = millis();
-  //////////////////////////////////////////////////
-  // 4. Switch ON
-  //////////////////////////////////////////////////  
-
-  error = WIFI_PRO.ON(socket);
-
-  if (error == 0)
-  {    
-    USB.println(F("WiFi switched ON"));
-  }
-  else
-  {
-    USB.println(F("WiFi did not initialize correctly"));
-  }
-  //////////////////////////////////////////////////
-  // 5. Join AP
-  //////////////////////////////////////////////////  
-  // check connectivity
-  status =  WIFI_PRO.isConnected();
-
-
-  // check if module is connected
-  if (status == true)
-  {    
-    USB.print(F("WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);
-  
-
-
-    RTC.getTime();
-    
-  // create new frame 1
-  frame.createFrame(ASCII, node_ID);  // frame1 de trimis & stocat
- 
-  // add frame fields
-////////////////////////////////////////////////////////////
-
-    // Add temperature
-    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-    // Add humidity
-    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-    // Add pressure value
-    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-    // Add CO value
-    frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-    // Add NH3 value
-    frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
-
-
-////////////////////////////////////////////////////////////
-    frame.showFrame();
- // data is sent here
-
- // 3.2. Send Frame to Meshlium
-    ///////////////////////////////
-    // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 1
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("HTTP OK")); 
-      for (x=0;x<4;x++)
-      {
-        ssent[x]="true"[x];
-      }
-      
-      USB.print(F("HTTP Time from OFF state (ms):"));    
-      USB.println(millis()-previous); 
-      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
-      USB.println(F("ASCII FRAME 1 SEND OK")); 
-
-
-    }
-    else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-      for (x=0;x<5;x++)
-      {
-        ssent[x]="false"[x];
-      }
-      WIFI_PRO.printErrorCode();
-    }
-  }
-  else
-  {
-    USB.print(F("WiFi is connected ERROR")); 
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);  
-  }
-
-
-
-
-//frame2
-
-      frame.createFrame(ASCII);
-        // Add PM1
-      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-      // Add PM2.5
-      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-      // Add PM10
-      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-      // Add BAT level
-      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-      // Add CH4 value
-      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
-
-    
-      frame.showFrame();
-      error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2 is made
-
-
-
-////////////////////////////////////////////////////////////
-
- // 3.2. Send Frame to Meshlium
-    ///////////////////////////////
-    // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("HTTP OK")); 
-      for (x=0;x<4;x++)
-      {
-        ssent2[x]="true"[x];
-      }
-      
-      USB.print(F("HTTP Time from OFF state (ms):"));    
-      USB.println(millis()-previous); 
-      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
-      USB.println(F("ASCII FRAME 2 SEND OK")); 
-
-
-    }
-    else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-      for (x=0;x<5;x++)
-      {
-        ssent2[x]="false"[x];
-      }
-      WIFI_PRO.printErrorCode();
-    }
-
-
-  //////////////////////////////////////////////////
-  // 3. Switch OFF
-  //////////////////////////////////////////////////  
-
-  WIFI_PRO.OFF(socket);
-  USB.println(F("WiFi switched OFF\n\n")); 
-
-b=(millis()-prev)/1000;
-  USB.print("loop execution time[s]: ");
-  USB.println(b);
-
-  
-cycle_time=cycle_time2-b-1;
-if ( cycle_time <10)
-{
-  cycle_time=15;
-}
-  USB.println(cycle_time);
-
-  
-x=cycle_time%60;  // sec
-itoa(x, y, 10);
-if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-rtc_str[9]=y[0];
-rtc_str[10]=y[1];
-
-
-x=cycle_time/60%60;  // min
-itoa(x, y, 10);
-if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-rtc_str[6]=y[0];
-rtc_str[7]=y[1];
-
-
-x=cycle_time/3600%3600;  // h
-itoa(x, y, 10);
-if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-rtc_str[3]=y[0];
-rtc_str[4]=y[1];
-
-///-------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
     //now storeing it locally 
   SD.ON();
 
@@ -614,6 +385,8 @@ rtc_str[4]=y[1];
   sd_answer = SD.appendln(filename,  ssent2 );
 
 
+
+
   SD.OFF();
 
 
@@ -621,8 +394,215 @@ rtc_str[4]=y[1];
 
 
 
+  // get actual time
+  previous = millis();
+  //////////////////////////////////////////////////
+  // 4. Switch ON
+  //////////////////////////////////////////////////  
+
+  error = WIFI_PRO.ON(socket);
+
+  if (error == 0)
+  {    
+    USB.println(F("WiFi switched ON"));
+  }
+  else
+  {
+    USB.println(F("WiFi did not initialize correctly"));
+  }
+  //////////////////////////////////////////////////
+  // 5. Join AP
+  //////////////////////////////////////////////////  
+  // check connectivity
+  status =  WIFI_PRO.isConnected();
 
 
+  // check if module is connected
+  if (status == true)
+  {    
+    USB.print(F("WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);
+  
+
+    RTC.ON();
+    RTC.getTime();
+     get_timer();
+  // create new frame1
+  frame.createFrame(ASCII, node_ID);  // frame1 de trimis & stocat
+ 
+  // add frame fields
+////////////////////////////////////////////////////////////
+
+    // Add temperature
+    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+    // Add humidity
+    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+    // Add pressure value
+    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
+    // Add CO value
+    frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
+    // Add NH3 value
+    frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
+
+
+////////////////////////////////////////////////////////////
+    frame.showFrame();
+ // data is sent here
+
+ // 3.2. Send Frame to Meshlium
+    ///////////////////////////////
+    // http frame
+    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 1
+
+    // check response
+    if (error == 0)
+    {
+      USB.println(F("HTTP OK")); 
+      for (x=0;x<4;x++)
+      {
+        ssent[x]="true"[x];
+      }
+      
+      USB.print(F("HTTP Time from OFF state (ms):"));    
+      USB.println(millis()-previous); 
+      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
+      USB.println(F("ASCII FRAME 1 SEND OK")); 
+
+
+    }
+    else
+    {
+      USB.println(F("Error calling 'getURL' function"));
+      for (x=0;x<5;x++)
+      {
+        ssent[x]="false"[x];
+      }
+      WIFI_PRO.printErrorCode();
+    }
+  }
+  else
+  {
+    USB.print(F("WiFi is connected ERROR")); 
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);  
+  }
+
+
+
+
+
+
+//frame2
+
+      frame.createFrame(ASCII);
+        // Add PM1
+      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
+      // Add PM2.5
+      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
+      // Add PM10
+      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
+      // Add BAT level
+      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+      // Add CH4 value
+      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+
+    
+      frame.showFrame();
+      error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2 is made
+
+
+
+////////////////////////////////////////////////////////////
+
+ // 3.2. Send Frame to Meshlium
+    ///////////////////////////////
+    // http frame
+    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2
+
+    // check response
+    if (error == 0)
+    {
+      USB.println(F("HTTP OK")); 
+      for (x=0;x<4;x++)
+      {
+        ssent2[x]="true"[x];
+      }
+      
+      USB.print(F("HTTP Time from OFF state (ms):"));    
+      USB.println(millis()-previous); 
+      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
+      USB.println(F("ASCII FRAME 2 SEND OK")); 
+
+
+    }
+    else
+    {
+      USB.println(F("Error calling 'getURL' function"));
+      for (x=0;x<5;x++)
+      {
+        ssent2[x]="false"[x];
+      }
+      WIFI_PRO.printErrorCode();
+    }
+
+
+  //////////////////////////////////////////////////
+  // 3. Switch OFF
+  //////////////////////////////////////////////////  
+
+
+
+b=(millis()-prev)/1000;
+  USB.print("loop execution time[s]: ");
+  USB.println(b);
+
+  
+cycle_time=cycle_time2-b-1;
+if ( cycle_time <10)
+{
+  cycle_time=15;
+}
+  USB.println(cycle_time);
+
+  
+x=cycle_time%60;  // sec
+itoa(x, y, 10);
+if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+rtc_str[9]=y[0];
+rtc_str[10]=y[1];
+
+
+x=cycle_time/60%60;  // min
+itoa(x, y, 10);
+if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+rtc_str[6]=y[0];
+rtc_str[7]=y[1];
+
+
+x=cycle_time/3600%3600;  // h
+itoa(x, y, 10);
+if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+rtc_str[3]=y[0];
+rtc_str[4]=y[1];
+
+///-------------
+
+
+  WIFI_PRO.OFF(socket);
+  USB.println(F("WiFi switched OFF\n\n")); 
 
   // Go to deepsleep  
 
