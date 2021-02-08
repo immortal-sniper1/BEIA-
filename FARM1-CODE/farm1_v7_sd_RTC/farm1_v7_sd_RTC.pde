@@ -26,7 +26,7 @@ char y[3];
 uint8_t sd_answer,ssent,ssent2;
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
-int  cycle_time,cycle_time2=10;  // in seconds
+int  cycle_time,cycle_time2=1100;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
 unsigned long prev,previous;
 
@@ -440,13 +440,13 @@ void setup()
   RTC.ON(); // Executes the init process
 //  USB.print(F("Current RTC settings:"));
 //  USB.println(RTC.getTime());
-  IRL_time=false;
+ // IRL_time=false;
 
   
   if( IRL_time)
   {
     // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
-    RTC.setTime("19:01:01:00:00:00:00");
+    RTC.setTime("19:01:01:03:00:00:00");
   }
   else
   {
@@ -521,14 +521,7 @@ void setup()
        USB.println(cycle_time2 );
       sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
 
-      //!!!!!!!!!!!!!!!!!!!!!!!
-      //Se va inlocui cu 
-      // check connectivity
-  /*status =  WIFI_PRO.isConnected();
-  if (status==false)
-  {sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" )};*/
 
-//pm
 USB.ON();
 }
 
@@ -562,7 +555,7 @@ void loop()
     // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
     USB.println(RTC.getTime());
     USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-    PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+    PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
     USB.println(RTC.getTime());
     USB.println(F("wake up!!\r\n"));
 
@@ -687,7 +680,6 @@ void loop()
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
       USB.println(millis()-previous); 
-      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
       USB.println(F("ASCII FRAME 1 SEND OK")); 
 
 
@@ -774,7 +766,6 @@ delay(5000);
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
       USB.println(millis()-previous); 
-      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
       USB.println(F("ASCII FRAME 2 SEND OK")); 
     }
     else
@@ -805,7 +796,7 @@ b=(millis()-prev)/1000;
   USB.println(b);
 
   
-cycle_time=cycle_time2-b-1;
+cycle_time=cycle_time2-b-2;
 if ( cycle_time <10)
 {
   cycle_time=15;
@@ -882,7 +873,6 @@ rtc_str[4]=y[1];
   //  USB.println(F("cadru de stocet:")); 
   //  frame.showFrame();
     
-  USB.println(F("HHHHHHHHHHHHHHHHHHHHHHHHHH"));
   time_date = RTC.getTime(); 
   USB.print(F("time: "));
   USB.println(time_date);  
