@@ -538,10 +538,9 @@ void setup()
 
   
 
-   USB.print(F("Current RTC settings:"));
+  USB.print(F("Current RTC settings:"));
   USB.println(RTC.getTime());
-
-  USB.println(F("SD_arhive_V2"));
+  USB.println(F("SD_CARD_ARHIVE_V4_RTC_ON_BAREBONES"));
   
   // Set SD ON
   SD.ON();
