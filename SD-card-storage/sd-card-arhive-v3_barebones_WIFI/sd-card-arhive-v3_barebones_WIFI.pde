@@ -87,7 +87,7 @@ void scriitor_SD( char filename_a[] ,uint8_t ssent_a=0)
   coruption=coruption+sd_answer;
   sd_answer = SD.append(filename_a, ".");
   coruption=coruption+sd_answer;
-  x=RTC.day;
+  x=RTC.date;
   itoa(x, y, 10);
   if(x<10)
 {
