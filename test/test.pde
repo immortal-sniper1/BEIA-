@@ -1,512 +1,324 @@
-/*  
- *  ------ LoRaWAN Code Example -------- 
- *  
- *  Explanation: This example shows how to configure the module
- *  and all general settings related to back-end registration
- *  process.
- *  
- *  Copyright (C) 2018 Libelium Comunicaciones Distribuidas S.L. 
- *  http://www.libelium.com 
- *  
- *  This program is free software: you can redistribute it and/or modify  
- *  it under the terms of the GNU General Public License as published by  
- *  the Free Software Foundation, either version 3 of the License, or  
- *  (at your option) any later version.  
- *   
- *  This program is distributed in the hope that it will be useful,  
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of  
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
- *  GNU General Public License for more details.  
- *   
- *  You should have received a copy of the GNU General Public License  
- *  along with this program.  If not, see .
- *  
- *  Version:           3.4
- *  Design:            David Gascon
- *  Implementation:    Luismi Marti
+/*
+ *  ------------  [GP_v30_08] - Frame Class Utility  --------------
+ *
+ *  Explanation: This is the basic code to create a frame with some
+ *   Gases Pro Sensor Board sensors
+ *
+ *  Copyright (C) 2019 Libelium Comunicaciones Distribuidas S.L.
+ *  http://www.libelium.com
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Version:        3.2
+ *  Design:             David Gascón
+ *  Implementation:     Alejandro Gállego
  */
 
-#include <WaspLoRaWAN.h>
+#include <WaspSensorGas_Pro.h>
+#include <WaspFrame.h>
+//#include <WaspPM.h>
+#include <WaspWIFI_PRO.h> 
+#include "WaspFrameConstantsv15.h"
 
-//////////////////////////////////////////////
+
+// choose socket (SELECT USER'S SOCKET)
+///////////////////////////////////////
 uint8_t socket = SOCKET0;
-//////////////////////////////////////////////
+///////////////////////////////////////
 
-// Device parameters for Back-End registration
-////////////////////////////////////////////////////////////
-char DEVICE_EUI[]  = "665E12DE765CFCFA";
-char DEVICE_ADDR[] = "05060708";
-char NWK_SESSION_KEY[] = "01020304050607080910111213141516";
-char APP_SESSION_KEY[] = "000102030405060708090A0B0C0D0E0F";
-char APP_KEY[] = "7C65CB276FBDD5E8A31AC324D9397D49";
-////////////////////////////////////////////////////////////
 
-// variable
+// choose URL settings
+///////////////////////////////////////
+char type[] = "http";
+char host[] = "82.78.81.171";
+char port[] = "80";
+///////////////////////////////////////
+
 uint8_t error;
+uint8_t status;
+unsigned long previous;
+
+float VOLT;
+uint16_t CHRG;
 
 
+Gas CH4(SOCKET_1);
+Gas H2(SOCKET_2);
+Gas O3(SOCKET_3);
+Gas NO2(SOCKET_4);
+Gas CO(SOCKET_5);
+Gas SO2(SOCKET_6);
 
-void setup() 
+
+float temperature;
+float humidity;
+float pressure;
+
+float concO3;
+float concSO2;
+float concNO2;
+float concCH4;
+float concCO;
+float concH2;
+
+char node_ID[] = "T4ME2";
+
+
+void setup()
 {
-  USB.ON();
-  USB.println(F("LoRaWAN example - Module configuration"));
+    USB.ON();
+    USB.println(F("Frame Utility Example for Gases Pro Sensor Board"));
 
- 
-  USB.println(F(" _____________________________________________________"));
-  USB.println(F("|                                                     |"));
-  USB.println(F("| It is not mandatory to configure channel parameters.|"));
-  USB.println(F("| Server should configure the module during the       |"));
-  USB.println(F("| Over The Air Activation process.                    |"));
-  USB.println(F("|_____________________________________________________|"));
-  USB.println();
-  
-  //////////////////////////////////////////////
-  // 1. switch on
-  //////////////////////////////////////////////
-
-  error = LoRaWAN.ON(socket);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("1. Switch ON OK"));     
-  }
-  else 
-  {
-    USB.print(F("1. Switch ON error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 2. Reset to factory default values
-  //////////////////////////////////////////////
-
-  error = LoRaWAN.factoryReset();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("2. Reset to factory default values OK"));     
-  }
-  else 
-  {
-    USB.print(F("2. Reset to factory error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 3. Set/Get Device EUI
-  //////////////////////////////////////////////
-
-  // Set Device EUI
-  error = LoRaWAN.setDeviceEUI(DEVICE_EUI);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("3.1. Set Device EUI OK"));     
-  }
-  else 
-  {
-    USB.print(F("3.1. Set Device EUI error = ")); 
-    USB.println(error, DEC);
-  }
-
-  // Get Device EUI
-  error = LoRaWAN.getDeviceEUI();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.print(F("3.2. Get Device EUI OK. ")); 
-    USB.print(F("Device EUI: "));
-    USB.println(LoRaWAN._devEUI);
-  }
-  else 
-  {
-    USB.print(F("3.2. Get Device EUI error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 4. Set/Get Device Address
-  //////////////////////////////////////////////
-
-  // Set Device Address
-  error = LoRaWAN.setDeviceAddr(DEVICE_ADDR);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("4.1. Set Device address OK"));     
-  }
-  else 
-  {
-    USB.print(F("4.1. Set Device address error = ")); 
-    USB.println(error, DEC);
-  }
-  
-  // Get Device Address
-  error = LoRaWAN.getDeviceAddr();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.print(F("4.2. Get Device address OK. ")); 
-    USB.print(F("Device address: "));
-    USB.println(LoRaWAN._devAddr);
-  }
-  else 
-  {
-    USB.print(F("4.2. Get Device address error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 5. Set Network Session Key
-  //////////////////////////////////////////////
- 
-  error = LoRaWAN.setNwkSessionKey(NWK_SESSION_KEY);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("5. Set Network Session Key OK"));     
-  }
-  else 
-  {
-    USB.print(F("5. Set Network Session Key error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 6. Set Application Session Key
-  //////////////////////////////////////////////
-
-  error = LoRaWAN.setAppSessionKey(APP_SESSION_KEY);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("6. Set Application Session Key OK"));     
-  }
-  else 
-  {
-    USB.print(F("6. Set Application Session Key error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 7. Set retransmissions for uplink confirmed packet
-  //////////////////////////////////////////////
-
-  // set retries
-  error = LoRaWAN.setRetries(7);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("7.1. Set Retransmissions for uplink confirmed packet OK"));     
-  }
-  else 
-  {
-    USB.print(F("7.1. Set Retransmissions for uplink confirmed packet error = ")); 
-    USB.println(error, DEC);
-  }
-  
-  // Get retries
-  error = LoRaWAN.getRetries();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.print(F("7.2. Get Retransmissions for uplink confirmed packet OK. ")); 
-    USB.print(F("TX retries: "));
-    USB.println(LoRaWAN._retries, DEC);
-  }
-  else 
-  {
-    USB.print(F("7.2. Get Retransmissions for uplink confirmed packet error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 8. Set application key
-  //////////////////////////////////////////////
-
-  error = LoRaWAN.setAppKey(APP_KEY);
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("8. Application key set OK"));     
-  }
-  else 
-  {
-    USB.print(F("8. Application key set error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  ////////////////////////////////////////////////////////
-  //  ______________________________________________________
-  // |                                                      |
-  // |  It is not mandatory to configure channel parameters.|
-  // |  Server should configure the module during the       |
-  // |  Over The Air Activation process. If channels aren't |
-  // |  configured, please uncomment channel configuration  |
-  // |  functions below these lines.                        |
-  // |______________________________________________________|
-  //
-  ////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////
-  // 9. Channel configuration. (Recommended)
-  // Consult your Network Operator and Backend Provider
-  //////////////////////////////////////////////
-
-  /////////////////////////////
-  // EU module
-  /////////////////////////////
-  // Set channel 3 -> 867.1 MHz
-  // Set channel 4 -> 867.3 MHz
-  // Set channel 5 -> 867.5 MHz
-  // Set channel 6 -> 867.7 MHz
-  // Set channel 7 -> 867.9 MHz
-  /////////////////////////////
-  // ASIA-PAC / LATAM module
-  /////////////////////////////
-  // Set channel 2 -> 923.6 MHz
-  // Set channel 3 -> 923.8 MHz
-  // Set channel 4 -> 924.0 MHz
-  // Set channel 5 -> 924.2 MHz
-  // Set channel 6 -> 924.4 MHz
-  /////////////////////////////
-
-//  uint32_t freq = 867100000;
-//  
-//  for (uint8_t ch = 3; ch <= 7; ch++)
-//  {
-//    error = LoRaWAN.setChannelFreq(ch, freq);
-//    freq += 200000;
-//    
-//    // Check status
-//    if( error == 0 ) 
-//    {
-//      USB.println(F("9. Frequency channel set OK"));     
-//    }
-//    else 
-//    {
-//      USB.print(F("9. Frequency channel set error = ")); 
-//      USB.println(error, DEC);
-//    }
-//    
-//    
-//  }
-  
-  
-
-  //////////////////////////////////////////////
-  // 10. Set Duty Cycle for specific channel. (Recommended)
-  // Consult your Network Operator and Backend Provider
-  //////////////////////////////////////////////
-
-//  for (uint8_t ch = 0; ch <= 2; ch++)
-//  {
-//    error = LoRaWAN.setChannelDutyCycle(ch, 33333);
-//    
-//    // Check status
-//    if( error == 0 ) 
-//    {
-//      USB.println(F("10. Duty cycle channel set OK"));     
-//    }
-//    else 
-//    {
-//      USB.print(F("10. Duty cycle channel set error = ")); 
-//      USB.println(error, DEC);
-//    }
-//  }
-//
-//  for (uint8_t ch = 3; ch <= 7; ch++)
-//  {
-//    error = LoRaWAN.setChannelDutyCycle(ch, 40000);
-//    
-//    // Check status
-//    if( error == 0 ) 
-//    {
-//      USB.println(F("10. Duty cycle channel set OK"));     
-//    }
-//    else 
-//    {
-//      USB.print(F("10. Duty cycle channel set error = ")); 
-//      USB.println(error, DEC);
-//    }
-//  }
-
-  //////////////////////////////////////////////
-  // 11. Set Data Range for specific channel. (Recommended)
-  // Consult your Network Operator and Backend Provider
-  //////////////////////////////////////////////
-
-//  for (int ch = 0; ch <= 7; ch++)
-//  {
-//    error = LoRaWAN.setChannelDRRange(ch, 0, 5);
-//  
-//    // Check status
-//    if( error == 0 ) 
-//    {
-//      USB.println(F("11. Data rate range channel set OK"));     
-//    }
-//    else 
-//    {
-//      USB.print(F("11. Data rate range channel set error = ")); 
-//      USB.println(error, DEC);
-//    }
-//  }
-
-  
-
-  //////////////////////////////////////////////
-  // 12. Set Data rate range for specific channel. (Recommended)
-  // Consult your Network Operator and Backend Provider
-  //////////////////////////////////////////////
-
-//  for (int ch = 0; ch <= 7; ch++)
-//  {
-//    error = LoRaWAN.setChannelStatus(ch, "on");
-//    
-//    // Check status
-//    if( error == 0 ) 
-//    {
-//      USB.println(F("12. Channel status set OK"));     
-//    }
-//    else 
-//    {
-//      USB.print(F("12. Channel status set error = ")); 
-//      USB.println(error, DEC);
-//    }
-//  }
-
-
-  //////////////////////////////////////////////
-  // 13. Set Adaptive Data Rate (recommended)
-  //////////////////////////////////////////////
-
-  // set ADR
-  error = LoRaWAN.setADR("on");
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("13.1. Set Adaptive data rate status to on OK"));     
-  }
-  else 
-  {
-    USB.print(F("13.1. Set Adaptive data rate status to on error = ")); 
-    USB.println(error, DEC);
-  }
-  
-  // Get ADR
-  error = LoRaWAN.getADR();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.print(F("13.2. Get Adaptive data rate status OK. ")); 
-    USB.print(F("Adaptive data rate status: "));
-    if (LoRaWAN._adr == true)
-    {
-      USB.println("on");      
-    }
-    else
-    {
-      USB.println("off");
-    }
-  }
-  else 
-  {
-    USB.print(F("13.2. Get Adaptive data rate status error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  //////////////////////////////////////////////
-  // 14. Set Automatic Reply
-  //////////////////////////////////////////////
-
-  // set AR
-  error = LoRaWAN.setAR("on");
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("14.1. Set automatic reply status to on OK"));     
-  }
-  else 
-  {
-    USB.print(F("14.1. Set automatic reply status to on error = ")); 
-    USB.println(error, DEC);
-  }
-  
-  // Get AR
-  error = LoRaWAN.getAR();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.print(F("14.2. Get automatic reply status OK. ")); 
-    USB.print(F("Automatic reply status: "));
-    if (LoRaWAN._ar == true)
-    {
-      USB.println("on");      
-    }
-    else
-    {
-      USB.println("off");
-    }
-  }
-  else 
-  {
-    USB.print(F("14.2. Get automatic reply status error = ")); 
-    USB.println(error, DEC);
-  }
-
-  
-  //////////////////////////////////////////////
-  // 15. Save configuration
-  //////////////////////////////////////////////
-  
-  error = LoRaWAN.saveConfig();
-
-  // Check status
-  if( error == 0 ) 
-  {
-    USB.println(F("15. Save configuration OK"));     
-  }
-  else 
-  {
-    USB.print(F("15. Save configuration error = ")); 
-    USB.println(error, DEC);
-  }
-
-
-  USB.println(F("------------------------------------"));
-  USB.println(F("Now the LoRaWAN module is ready for"));
-  USB.println(F("joining networks and send messages."));
-  USB.println(F("Please check the next examples..."));
-  USB.println(F("------------------------------------\n"));
-
+    // Set the Waspmote ID
+    frame.setID(node_ID);
+  USB.println(F("Frame Gases_Pro_Board"));
+  USB.println(F("Sensors used:"));
+  USB.println(F("- SOCKET_1: CH4 sensor"));
+  USB.println(F("- SOCKET_2: H2 sensor)"));
+  USB.println(F("- SOCKET_3: O3 sensor"));
+  USB.println(F("- SOCKET_4: NO2 sensor"));
+  USB.println(F("- SOCKET_5: CO sensor"));
+  USB.println(F("- SOCKET_6: SO2 sensor"));
+  USB.println(F("- SOCKET_7: sensor"));
+  USB.println(F("- SOCKET_8: BME280 sensor (temperature, humidity & pressure"));
 }
 
-
-void loop() 
+void loop()
 {
-  // do nothing
+  // get actual time
+  previous = millis();
+  //////////////////////////////////////////////////
+  // 1. Switch ON
+  //////////////////////////////////////////////////  
+  error = WIFI_PRO.ON(socket);
+
+  if (error == 0)
+  {    
+    USB.println(F("WiFi switched ON"));
+  }
+  else
+  {
+    USB.println(F("WiFi did not initialize correctly"));
+  }
+  //////////////////////////////////////////////////
+  // 2. Join AP
+  //////////////////////////////////////////////////  
+  // check connectivity
+  status =  WIFI_PRO.isConnected();
+
+  // check if module is connected
+  if (status == true)
+  {    
+    USB.print(F("WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);
+    
+    ///////////////////////////////////////////
+    // 1. Turn on sensors and wait
+    ///////////////////////////////////////////
+
+    //Power on gas sensors
+    CH4.ON();
+    O3.ON();
+    SO2.ON();
+    NO2.ON();
+    CO.ON();
+    H2.ON();
+    USB.print(F("Heating sensors for 2 minutes"));
+
+    // Sensors need time to warm up and get a response from gas
+    // To reduce the battery consumption, use deepSleep instead delay
+    // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
+    PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+
+
+    ///////////////////////////////////////////
+    // 2. Read sensors
+    ///////////////////////////////////////////
+
+    // Read the sensors and compensate with the temperature internally
+    concO3 = O3.getConc();
+    concSO2 = SO2.getConc();
+    concCH4 = CH4.getConc();
+    concNO2 = NO2.getConc();
+    concH2 = H2.getConc();
+    concCO = CO.getConc();
+    
+    // Read enviromental variables
+    temperature = NO2.getTemp();
+    humidity = NO2.getHumidity();
+    pressure = NO2.getPressure();
+
+    VOLT = PWR.getBatteryVolts();
+    
+    ///////////////////////////////////////////
+    // 3. Turn off the sensors
+    ///////////////////////////////////////////
+
+    //Power off sensors
+    O3.OFF();
+    SO2.OFF();
+    NO2.OFF();
+    CH4.OFF();
+    CO.OFF();
+    H2.OFF();
+
+   // Print of the results
+    USB.print(F("Temperature: "));
+    USB.print(temperature);
+    USB.println(F(" Celsius Degrees"));
+    
+    USB.print(F("Humidity : "));
+    USB.print(humidity);
+    USB.println(F(" %RH"));
+  
+    USB.print(F("Pressure : "));
+    USB.print(pressure);
+    USB.println(F(" Pa"));
+    
+      // Print of the results
+     USB.print(F("NO2 concentration : "));
+     USB.print(concNO2);
+     USB.println(F(" PPM"));
+     
+      // Print of the results
+     USB.print(F("SO2 concentration : "));
+     USB.print(concSO2);
+     USB.println(F(" PPM"));
+
+       // Print of the results
+     USB.print(F("O3 concentration : "));
+     USB.print(concO3);
+     USB.println(F(" PPM"));
+
+        // Print of the results
+     USB.print(F("CO concentration : "));
+     USB.print(concCO);
+     USB.println(F(" PPM"));
+
+      // Print of the results
+     USB.print(F("CH4 concentration : "));
+     USB.print(concCH4);
+     USB.println(F(" % LEL"));
+    
+
+     // Print of the results
+     USB.print(F("H2 concentration : "));
+     USB.print(concH2);
+     USB.println(F(" PPM"));
+
+      // Show the remaining battery level
+    USB.print(F("Battery Level: "));
+    USB.print(PWR.getBatteryLevel(),DEC);
+    USB.println(F(" %"));
+    
+    // Show the battery Volts
+    USB.print(F("Battery (Volts): "));
+    USB.print(PWR.getBatteryVolts());
+    USB.println(F(" V"));
+     
+    ///////////////////////////////////////////
+    // 5. Create ASCII frame
+    ///////////////////////////////////////////
+
+    // Create new frame (ASCII)
+    frame.createFrame(BINARY);
+
+    // Add temperature
+    frame.addSensor(SENSOR_GASES_PRO_TC, temperature);
+    // Add humidity
+    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity);
+    // Add pressure value
+    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure);
+    // Add O3 value
+    frame.addSensor(SENSOR_GASES_PRO_O3, concO3);
+    // Add SO2 value
+    frame.addSensor(SENSOR_GASES_PRO_SO2, concSO2);
+    // Add CO value
+    frame.addSensor(SENSOR_GASES_PRO_CO, concCO);
+    // Add H2 value
+    frame.addSensor(SENSOR_GASES_PRO_H2, concH2);
+    // Add CH4 value
+    frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4);
+    // Add NO2 value
+    frame.addSensor(SENSOR_GASES_PRO_NO2, concNO2);
+    // Show the frame
+    frame.showFrame();
+
+
+    // 3.2. Send Frame to Meshlium
+    ///////////////////////////////
+
+    // http frame
+    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
+
+    // check response
+    if (error == 0)
+    {
+      USB.println(F("HTTP OK"));          
+      USB.print(F("HTTP Time from OFF state (ms):"));    
+      USB.println(millis()-previous);
+ 
+      frame.createFrame(ASCII, node_ID);
+      frame.addSensor(SENSOR_BAT_VOLT, VOLT);
+      frame.addSensor(SENSOR_BAT_CURR, CHRG); 
+      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());   
+      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
+      USB.println(F("ASCII FRAME SEND OK")); 
+    
+    }
+    else
+    {
+      USB.println(F("Error calling 'getURL' function"));
+      WIFI_PRO.printErrorCode();
+    }
+  }
+  else
+  {
+    USB.print(F("WiFi is connected ERROR")); 
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);  
+  }
+  //////////////////////////////////////////////////
+  // 3. Switch OFF
+  //////////////////////////////////////////////////  
+  WIFI_PRO.OFF(socket);
+  USB.println(F("WiFi switched OFF\n\n")); 
+  // Go to deepsleep  
+    // After 30 seconds, Waspmote wakes up thanks to the RTC Alarm
+   USB.println(F("enter deep sleep"));
+  // Go to sleep disconnecting all switches and modules
+  // After 10 seconds, Waspmote wakes up thanks to the RTC Alarm
+    USB.println(RTC.getTime());
+
+  PWR.deepSleep("00:00:18:10",RTC_OFFSET,RTC_ALM1_MODE1,ALL_ON);
+       USB.ON();
+       USB.println(RTC.getTime());
+  USB.println(F("\nwake up"));
+
+  // After wake up check interruption source
+  if( intFlag & RTC_INT )
+  {
+    // clear interruption flag
+    intFlag &= ~(RTC_INT);
+    
+    USB.println(F("---------------------"));
+    USB.println(F("RTC INT captured"));
+    USB.println(F("---------------------"));
+    Utils.blinkLEDs(300);
+    Utils.blinkLEDs(300);
+    Utils.blinkLEDs(300);
+  }
+ //delay (60000);
 }

@@ -65,7 +65,7 @@ float concCH4;
 int OPC_status;
 int OPC_measure;
 
-char node_ID[] = "FARM1";
+char node_ID[] = "FARM2";
 
 
 
@@ -326,6 +326,38 @@ void loop()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+delay(5000);
+
+  status =  WIFI_PRO.isConnected();
+
+
+  // check if module is connected
+  if (status == true)
+  {    
+    USB.print(F("WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);
+  
+
+
+
+
+
 //frame2
 
       frame.createFrame(ASCII);
@@ -339,11 +371,11 @@ void loop()
       frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
       // Add CH4 value
       frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+// frame 2 is made
 
     
       frame.showFrame();
-      error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2 is made
-
+   
 
 
 ////////////////////////////////////////////////////////////
@@ -378,6 +410,14 @@ void loop()
       }
       WIFI_PRO.printErrorCode();
     }
+  }
+  else
+  {
+    USB.print(F("WiFi is connected ERROR")); 
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);  
+  }
+
 
 
   //////////////////////////////////////////////////
@@ -652,42 +692,6 @@ rtc_str[4]=y[1];
 
 
 
-
-
-
-
-
-
-
-
-
-
-/*
-
-void lost_frames( int x)
-{
-  if(first_lost<x and first_lost != -7)
-  first_lost=first_lost;
-  else
-  first_lost=x;
-};
-
-*/
-
-//     first_lost++;
-//     USB.println( SD.cat( filename, 13 , 53 ) );  citeste de le linia  13  53  de caractere
-
-/* 
-int data_resender ( char filename , int first_lost )
-{
-   USB.println( SD.cat( filename, first_lost , frame.length ) );
-
-
-
-  return 1;
-}
-
-*/
 
 
 
