@@ -11,7 +11,7 @@ char filename[]="FILE1.TXT";
 
 
 char* time_date; // stores curent date + time
-int first_lost,x,b;
+int x,b;
 char y[3];
 uint8_t sd_answer,ssent;
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
@@ -40,8 +40,7 @@ char port[] = "80";
 uint8_t error;
 uint8_t status;
 
-
-char node_ID[] = "FARM2";
+char node_ID[] = "cevax";
 
 
 
@@ -55,6 +54,11 @@ void setup()
 {
   // open USB port
   USB.ON();
+  USB.println(F("SD_arhive_V3_RTC"));
+
+
+
+
   RTC.ON(); // Executes the init process
   first_lost=-7;
   if( IRL_time)
@@ -67,8 +71,10 @@ void setup()
     //ceva primire de data aici
   }
 
-  USB.println(F("SD_arhive_V2"));
+
   
+
+
   // Set SD ON
   SD.ON();
 
@@ -107,9 +113,6 @@ void setup()
 
     // Set the Waspmote ID
     frame.setID(node_ID);
-    //USB.OFF();
-
-//pm
 USB.ON();
 }
 
@@ -124,6 +127,7 @@ USB.ON();
 
 void loop()
 {
+    // get actual time before loop
   prev=millis();
   USB.ON();
 
@@ -133,7 +137,7 @@ void loop()
 
 
 
-  // get actual time
+  // get actual time before wifi
   previous = millis();
   //////////////////////////////////////////////////
   // 4. Switch ON
@@ -149,74 +153,42 @@ void loop()
   {
     USB.println(F("WiFi did not initialize correctly"));
   }
-  //////////////////////////////////////////////////
-  // 5. Join AP
-  //////////////////////////////////////////////////  
-  // check connectivity
   status =  WIFI_PRO.isConnected();
-
-
   // check if module is connected
   if (status == true)
   {    
     USB.print(F("WiFi is connected OK"));
     USB.print(F(" Time(ms):"));    
     USB.println(millis()-previous);
-  
-
-
-    RTC.getTime();
-  
-
-  status =  WIFI_PRO.isConnected();
-
-
-  // check if module is connected
-  if (status == true)
-  {    
-    USB.print(F("WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);
-  
+    USB.print(F(" (time it took for the WIFI status check)"));   
 
 //frame
 
-      frame.createFrame(ASCII);
-      // Add BAT level
-      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-
-// frame is made
-
-    
-      frame.showFrame();
+    frame.createFrame(ASCII);
+    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());     // Add BAT level
+    frame.showFrame(); // frame is made
    
 
 
-////////////////////////////////////////////////////////////
-
- // 3.2. Send Frame to Meshlium
+ // 3.2. Send Frame 
     ///////////////////////////////
     // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2
+    previous = millis();
+    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 
 
     // check response
     if (error == 0)
     {
       USB.println(F("HTTP OK")); 
-        ssent=1;
-
-      
+      ssent=1;
       USB.print(F("HTTP Time from OFF state (ms):"));    
       USB.println(millis()-previous); 
-      WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
       USB.println(F("ASCII FRAME SEND OK")); 
-
-
     }
     else
     {
       USB.println(F("Error calling 'getURL' function"));
-        ssent=0;
+      ssent=0;
       WIFI_PRO.printErrorCode();
     }
   }
@@ -229,14 +201,16 @@ void loop()
 
 
 
+
+
+
   //////////////////////////////////////////////////
-  // 3. Switch OFF
+  // 3. Switch OFF WIFI
   //////////////////////////////////////////////////  
 
   WIFI_PRO.OFF(socket);
   USB.println(F("WiFi switched OFF\n\n")); 
-
-b=(millis()-prev)/1000;
+  b=(millis()-prev)/1000;
   USB.print("loop execution time[s]: ");
   USB.println(b);
 
@@ -375,7 +349,8 @@ rtc_str[4]=y[1];
   sd_answer = SD.append(filename,  "  " );
   sd_answer = SD.append(filename,  frame.buffer , frame.length );
   sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.appendln(filename,  ssent );
+  itoa(ssent,y,10);
+  sd_answer = SD.appendln(filename,  y );
 // frame 1 is stored 
 
 
