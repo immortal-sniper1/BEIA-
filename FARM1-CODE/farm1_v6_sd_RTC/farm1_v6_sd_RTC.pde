@@ -65,7 +65,7 @@ float concCH4;
 int OPC_status;
 int OPC_measure;
 
-char node_ID[] = "FARM2";
+char node_ID[] = "FARM1";
 
 
 
@@ -82,8 +82,8 @@ uint8_t status2=false;
 
 int count_trials=0;
 int N_trials=10;
-char ESSID[] = "";
-char PASSW[] = "";
+char ESSID[] = "FARM";
+char PASSW[] = "beiafarm";
 
 
 // choose NTP server settings
@@ -108,11 +108,201 @@ uint8_t time_zone = 2;
 
 
 
+// functions
+
+void try_RTC_set()
+{//////////////////////////////////////////////////
+  // 1. Switch ON
+  //////////////////////////////////////////////////  
+  error = WIFI_PRO.ON(socket);
+
+  if (error == 0)
+  {    
+    USB.println(F("1. WiFi switched ON"));
+  }
+  else
+  {
+    USB.println(F("1. WiFi did not initialize correctly"));
+  }
+
+
+  //////////////////////////////////////////////////
+  // 2. Check if connected
+  //////////////////////////////////////////////////  
+
+  // get actual time
+  previous = millis();
+
+  // check connectivity
+  status =  WIFI_PRO.isConnected();
+
+  // Check if module is connected
+  if (status == true)
+  {    
+    USB.print(F("2. WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);
+  }
+  else
+  {
+    USB.print(F("2. WiFi is connected ERROR")); 
+    USB.print(F(" Time(ms):"));    
+    USB.println(millis()-previous);   
+  }
+
+
+  //////////////////////////////////////////////////
+  // 3. Set RTC Time from WiFi module settings
+  //////////////////////////////////////////////////  
+
+  // Check if module is connected
+  if (status == true)
+  {   
+    // 3.1. Open FTP session
+    error = WIFI_PRO.setTimeFromWIFI();
+
+    // check response
+    if (error == 0)
+    {
+      USB.print(F("3. Set RTC time OK. Time:"));
+      USB.println(RTC.getTime());
+    }
+    else
+    {
+      USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
+      WIFI_PRO.printErrorCode();
+      status = false;   
+    }
+  }
+
+
+  //////////////////////////////////////////////////
+  // 4. Switch OFF
+  //////////////////////////////////////////////////  
+  WIFI_PRO.OFF(socket);
+  USB.println(F("4. WiFi switched OFF\n\n")); 
+  USB.println(F("Wait 10 seconds...\n")); 
+  delay(10000);
+  }
+
+
+void WiFi_init()
+{ // 1. Switch ON the WiFi module
+  //////////////////////////////////////////////////
+  error=1;
+  while (error==1)
+  {
+   error = WIFI_PRO.ON(socket);
+  
+   if (error == 0)
+   {    
+     USB.println(F("1. WiFi switched ON"));
+   }
+   else
+   {
+     USB.println(F("1. WiFi did not initialize correctly"));
+   }
+  }
+
+  // 2. Reset to default values
+  //////////////////////////////////////////////////
+  error=1;
+  while (error==1)
+  {error = WIFI_PRO.resetValues();
+
+  if (error == 0)
+    {    
+    USB.println(F("2. WiFi reset to default"));
+    }
+  else
+    {
+    USB.println(F("2. WiFi reset to default ERROR"));
+    }
+  }
+// 3. Set ESSID
+  //////////////////////////////////////////////////
+  error=1;
+  while (error==1)
+{
+  error = WIFI_PRO.setESSID(ESSID);
+
+  if (error == 0)
+  {    
+    USB.println(F("3. WiFi set ESSID OK"));
+  }
+  else
+  {
+    USB.println(F("3. WiFi set ESSID ERROR"));
+  }
+
+}
+  //////////////////////////////////////////////////
+  // 4. Set password key (It takes a while to generate the key)
+  // Authentication modes:
+  //    OPEN: no security
+  //    WEP64: WEP 64
+  //    WEP128: WEP 128
+  //    WPA: WPA-PSK with TKIP encryption
+  //    WPA2: WPA2-PSK with TKIP or AES encryption
+  //////////////////////////////////////////////////
+  error=1;
+  while (error==1)
+  {
+  error = WIFI_PRO.setPassword(WPA2, PASSW);
+
+  if (error == 0)
+  {    
+    USB.println(F("4. WiFi set AUTHKEY OK"));
+  }
+  else
+  {
+    USB.println(F("4. WiFi set AUTHKEY ERROR"));
+  }
+
+  }
+  //////////////////////////////////////////////////
+  // 5. Software Reset 
+  // Parameters take effect following either a 
+  // hardware or software reset
+  //////////////////////////////////////////////////
+  error = WIFI_PRO.softReset();
+
+  if (error == 0)
+  {    
+    USB.println(F("5. WiFi softReset OK"));
+  }
+  else
+  {
+    USB.println(F("5. WiFi softReset ERROR"));
+  }
+
+
+  USB.println(F("*******************************************"));
+  USB.println(F("Once the module is configured with ESSID"));
+  USB.println(F("and PASSWORD, the module will attempt to "));
+  USB.println(F("join the specified Access Point on power up"));
+  USB.println(F("*******************************************\n"));
+  }
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// initialization
 
 void setup()
 {
@@ -122,7 +312,7 @@ void setup()
   //////////////////////////////////////////////////  
   while (status==false)
   {
-    WiFi_init();//initialize Wi-Fi communication
+   WiFi_init();//initialize Wi-Fi communication
   // get actual time
   previous = millis();
 
@@ -248,7 +438,6 @@ void setup()
   // open USB port
   USB.ON();
   RTC.ON(); // Executes the init process
-  first_lost=-7;
 //  USB.print(F("Current RTC settings:"));
 //  USB.println(RTC.getTime());
   IRL_time=false;
@@ -282,11 +471,12 @@ void setup()
   }
 
   while ((count_trials<N_trials)&& (status==false))
-    {try_RTC_set();
-    USB.println(F("Trial"));
-    count_trials=count_trials+1;
-    USB.print(count_trials);
-    USB.println();
+    {
+      try_RTC_set();
+      USB.println(F("Trial"));
+      count_trials=count_trials+1;
+      USB.print(count_trials);
+      USB.println();
       }
 
   }
@@ -294,12 +484,11 @@ void setup()
   
 
    USB.print(F("Current RTC settings:"));
-  USB.println(RTC.getTime());
-
-  USB.println(F("SD_arhive_V2"));
+   USB.println(RTC.getTime());
+   USB.println(F("SD_arhive_V2"));
   
-  // Set SD ON
-  SD.ON();
+    // Set SD ON
+    SD.ON();
 
     if ( sentence==1) 
     {
@@ -329,7 +518,7 @@ void setup()
          } 
   
        USB.print("loop cycle time[s]:= ");
-       USB.println(cycle_time );
+       USB.println(cycle_time2 );
       sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
 
       //!!!!!!!!!!!!!!!!!!!!!!!
