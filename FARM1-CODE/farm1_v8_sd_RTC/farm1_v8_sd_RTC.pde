@@ -651,17 +651,20 @@ void loop()
   // add frame fields
 ////////////////////////////////////////////////////////////
 
-    // Add temperature
-    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-    // Add humidity
-    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-    // Add pressure value
-    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-    // Add CO value
-    frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-    // Add NH3 value
-    frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
-
+      // Add CH4 value
+      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+      // Add CO value
+      frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
+      // Add NH3 value
+      frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
+      // Add PM1
+      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
+      // Add PM2.5
+      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
+      // Add PM10
+      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
+      // Add BAT level
+      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
 
 ////////////////////////////////////////////////////////////
     frame.showFrame();
@@ -736,16 +739,12 @@ delay(5000);
 //frame2
 
       frame.createFrame(ASCII);
-        // Add PM1
-      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-      // Add PM2.5
-      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-      // Add PM10
-      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-      // Add BAT level
-      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-      // Add CH4 value
-      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+      // Add temperature
+      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+      // Add humidity
+      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+      // Add pressure value
+      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
 // frame 2 is made
        frame.showFrame();
    
@@ -859,16 +858,20 @@ rtc_str[4]=y[1];
   SD.ON();
 
   frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
-    // Add temperature
-    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-    // Add humidity
-    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-    // Add pressure value
-    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-    // Add CO value
-    frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-    // Add NH3 value
-    frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
+      // Add CH4 value
+      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+      // Add CO value
+      frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
+      // Add NH3 value
+      frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
+      // Add PM1
+      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
+      // Add PM2.5
+      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
+      // Add PM10
+      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
+      // Add BAT level
+      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
 
   //  USB.println(F("cadru de stocet:")); 
   //  frame.showFrame();
@@ -947,16 +950,12 @@ rtc_str[4]=y[1];
 
 
       frame.createFrame(ASCII);
-        // Add PM1
-      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-      // Add PM2.5
-      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-      // Add PM10
-      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-      // Add BAT level
-      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-      // Add CH4 value
-      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
+      // Add temperature
+      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+      // Add humidity
+      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+      // Add pressure value
+      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
  
 
 
