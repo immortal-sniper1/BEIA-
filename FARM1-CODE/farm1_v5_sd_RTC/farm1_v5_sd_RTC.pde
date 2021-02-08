@@ -22,8 +22,8 @@ char filename[]="FILE1.TXT";
 
 char* time_date; // stores curent date + time
 int first_lost,x,b;
-char y[3],ssent[7],ssent2[7];
-uint8_t sd_answer;
+char y[3];
+uint8_t sd_answer,ssent,ssent2;
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
 int  cycle_time,cycle_time2=10;  // in seconds
@@ -91,7 +91,7 @@ void setup()
     //ceva primire de data aici
   }
 
-  USB.println(F("SD_arhive_V2"));
+  USB.println(F("farm sd arhive v5"));
   
   // Set SD ON
   SD.ON();
@@ -294,10 +294,7 @@ void loop()
     if (error == 0)
     {
       USB.println(F("HTTP OK")); 
-      for (x=0;x<4;x++)
-      {
-        ssent[x]="true"[x];
-      }
+        ssent=1;
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
       USB.println(millis()-previous); 
@@ -309,10 +306,7 @@ void loop()
     else
     {
       USB.println(F("Error calling 'getURL' function"));
-      for (x=0;x<5;x++)
-      {
-        ssent[x]="false"[x];
-      }
+        ssent=0;
       WIFI_PRO.printErrorCode();
     }
   }
@@ -389,25 +383,17 @@ delay(5000);
     if (error == 0)
     {
       USB.println(F("HTTP OK")); 
-      for (x=0;x<4;x++)
-      {
-        ssent2[x]="true"[x];
-      }
+        ssent=1;
       
       USB.print(F("HTTP Time from OFF state (ms):"));    
       USB.println(millis()-previous); 
       WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);
       USB.println(F("ASCII FRAME 2 SEND OK")); 
-
-
     }
     else
     {
       USB.println(F("Error calling 'getURL' function"));
-      for (x=0;x<5;x++)
-      {
-        ssent2[x]="false"[x];
-      }
+        ssent2=0;
       WIFI_PRO.printErrorCode();
     }
   }
@@ -570,7 +556,8 @@ rtc_str[4]=y[1];
   sd_answer = SD.append(filename,  "  " );
   sd_answer = SD.append(filename,  frame.buffer , frame.length );
   sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.appendln(filename,  ssent );
+  itoa(ssent,y ,10);
+  sd_answer = SD.appendln(filename,  y );
 // frame 1 is stored 
 
 
@@ -651,7 +638,8 @@ rtc_str[4]=y[1];
   sd_answer = SD.append(filename,  "  " );
   sd_answer = SD.append(filename,  frame.buffer , frame.length );
   sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.appendln(filename,  ssent2 );
+    itoa(ssent2, y, 10);
+  sd_answer = SD.appendln(filename, y  );
 
 
   SD.OFF();
