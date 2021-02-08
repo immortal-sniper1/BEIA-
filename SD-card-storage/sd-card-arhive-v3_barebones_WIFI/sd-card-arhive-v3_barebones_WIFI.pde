@@ -50,6 +50,127 @@ char node_ID[] = "cevax";
 
 
 
+
+
+// subprograme
+
+void scriitor_SD( char filename_a[] ,uint8_t ssent_a=0)
+{
+  int coruption=0;
+  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  //now storeing it locally 
+  SD.ON();
+  time_date = RTC.getTime(); 
+  USB.print(F("time: "));
+  USB.println(time_date);  
+  
+
+  x=RTC.year;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.month;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.day;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.hour;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.minute;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.second;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a,  "  " );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a,  frame.buffer , frame.length );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a,  "  " );
+  coruption=coruption+sd_answer;
+  itoa(ssent_a,y,10);
+  sd_answer = SD.appendln(filename_a,  y );
+  coruption=coruption+sd_answer;
+// frame is stored 
+  
+  SD.OFF();
+
+  if ( coruption== 15)
+  {
+        USB.println("SD sorage done with no errors");
+  }
+  else
+  {
+        USB.print("SD sorage done with:");
+        USB.print(15-coruption);
+        USB.println(" errors");
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//initializare
+
 void setup()
 {
   // open USB port
@@ -60,7 +181,6 @@ void setup()
 
 
   RTC.ON(); // Executes the init process
-  first_lost=-7;
   if( IRL_time)
   {
     // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
@@ -124,7 +244,7 @@ USB.ON();
 
 
 
-
+//main program
 void loop()
 {
     // get actual time before loop
@@ -227,7 +347,6 @@ if ( cycle_time <10)
 }
   USB.println(cycle_time);
 
-  
 x=cycle_time%60;  // sec
 itoa(x, y, 10);
 if(x<10)
@@ -275,86 +394,10 @@ rtc_str[4]=y[1];
 
 
 
-
-
-
-  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-    //now storeing it locally 
-  SD.ON();
-
   frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-
-  //  USB.println(F("cadru de stocet:")); 
-  //  frame.showFrame();
-    
-
-  time_date = RTC.getTime(); 
-  USB.print(F("time: "));
-  USB.println(time_date);  
+  scriitor_SD( filename, ssent);
   
-  x=RTC.year;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.month;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.day;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.hour;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.minute;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.second;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-  itoa(ssent,y,10);
-  sd_answer = SD.appendln(filename,  y );
-// frame 1 is stored 
-
-
-  SD.OFF();
 
 
 
@@ -381,17 +424,5 @@ rtc_str[4]=y[1];
   USB.println(F("6. Wake up!!\n\n"));
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
