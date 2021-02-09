@@ -18,12 +18,12 @@
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[]="FILE1.TXT";
-
+const  uint16_t MAX_SIZE = 400;
 
 char* time_date; // stores curent date + time
 int first_lost,x,b;
 char y[3];
-uint8_t sd_answer,ssent,ssent2,retries_f1=2; // resending for frame 1 , frame 2 has 2 extra
+uint8_t sd_answer,ssent,ssent2;
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
 int  cycle_time,cycle_time2=1000;  // in seconds
@@ -65,7 +65,7 @@ float concCH4;
 int OPC_status;
 int OPC_measure;
 
-char node_ID[] = "FARM1";
+char node_ID[] = "FARM2";
 
 
 
@@ -309,7 +309,8 @@ void setup()
  
   //////////////////////////////////////////////////
   // 2. Check if connected
-  //////////////////////////////////////////////////  
+  ////////////////////////////////////////////////// 
+
   while (status==false)
   {
    WiFi_init();//initialize Wi-Fi communication
@@ -485,7 +486,7 @@ void setup()
 
    USB.print(F("Current RTC settings:"));
    USB.println(RTC.getTime());
-   USB.println(F("farm1_V9_SD_arhive_RTC_ON"));
+   USB.println(F("farm1_SD_arhive_RTC_ON"));
   
     // Set SD ON
     SD.ON();
@@ -514,8 +515,7 @@ void setup()
          }
          else 
          {
-           USB.print(F("file NOT created   file size[BYTES]:"));  
-           USB.println( SD.getFileSize(filename) );
+           USB.println(F("file NOT created"));  
          } 
   
        USB.print("loop cycle time[s]:= ");
@@ -617,11 +617,9 @@ void loop()
   //////////////////////////////////////////////////
   // 4. Switch ON
   //////////////////////////////////////////////////  
-b=0;
-qwerty:
-
 
   error = WIFI_PRO.ON(socket);
+
   if (error == 0)
   {    
     USB.println(F("WiFi switched ON"));
@@ -668,6 +666,12 @@ qwerty:
       frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
       // Add BAT level
       frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+      // Add temperature
+      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+      // Add humidity
+      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+      // Add pressure value
+      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
 
 ////////////////////////////////////////////////////////////
     frame.showFrame();
@@ -704,102 +708,7 @@ qwerty:
     USB.println(millis()-previous);  
   }
 
-b++;
-if (ssent==0 && b<=retries_f1)
-{
-  delay(5000);
-  USB.print(F("atempting resend no: "));
-  USB.println(b);
-  goto qwerty;
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-delay(5000);
-b=0;
-qwerty_too:
-  status =  WIFI_PRO.isConnected();
-
-
-  // check if module is connected
-  if (status == true)
-  {    
-    USB.print(F("WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);
-  
-
-
-
-
-
-//frame2
-
-      frame.createFrame(ASCII);
-      // Add temperature
-      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-      // Add humidity
-      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-      // Add pressure value
-      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-// frame 2 is made
-       frame.showFrame();
-   
-
-
-////////////////////////////////////////////////////////////
-
- // 3.2. Send Frame to Meshlium
-    ///////////////////////////////
-    // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("HTTP OK")); 
-        ssent=1;
-      
-      USB.print(F("HTTP Time from OFF state (ms):"));    
-      USB.println(millis()-previous); 
-      USB.println(F("ASCII FRAME 2 SEND OK")); 
-    }
-    else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-        ssent2=0;
-      WIFI_PRO.printErrorCode();
-    }
-  }
-  else
-  {
-    USB.print(F("WiFi is connected ERROR")); 
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);  
-  }
-
-b++;
-if (ssent2==0 && (b+2)<=retries_f1)
-{
-  delay(5000);
-  USB.print(F("atempting resend no: "));
-  USB.println(b);
-  goto qwerty_too;
-}
 
 
 
@@ -893,6 +802,12 @@ rtc_str[4]=y[1];
       frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
       // Add BAT level
       frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+      // Add temperature
+      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+      // Add humidity
+      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+      // Add pressure value
+      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
 
   //  USB.println(F("cadru de stocet:")); 
   //  frame.showFrame();
@@ -963,83 +878,6 @@ rtc_str[4]=y[1];
   itoa(ssent,y ,10);
   sd_answer = SD.appendln(filename,  y );
 // frame 1 is stored 
-
-
-
-
-// frame2
-
-
-      frame.createFrame(ASCII);
-      // Add temperature
-      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-      // Add humidity
-      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-      // Add pressure value
-      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
- 
-
-
-  x=RTC.year;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.month;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.date;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.hour;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.minute;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.second;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-
-
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-    itoa(ssent2, y, 10);
-  sd_answer = SD.appendln(filename, y  );
 
 
   SD.OFF();

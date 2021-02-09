@@ -1,89 +1,26 @@
-#include <WaspSensorGas_Pro.h>
 #include <WaspFrame.h>
 #include <WaspPM.h>
 #include <WaspWIFI_PRO.h> 
 #include <WaspSD.h>
 
 
-/*
-   Define objects for sensors
-   Imagine we have a P&S! with the next sensors:
-    - SOCKET_A: BME280 sensor (temperature, humidity & pressure) 
-    - SOCKET_B: sensor (CO)
-    - SOCKET_C: sensor (NH3)
-    - SOCKET_D: Particle matter sensor (dust)
-    - SOCKET_E: None
-    - SOCKET_F: sensor (CH4)
-*/
+
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[]="FILE1.TXT";
 
 
 char* time_date; // stores curent date + time
-int first_lost,x,b;
+int x,b;
+uint8_t error;
+uint8_t status=false;
 char y[3];
-uint8_t sd_answer,ssent,ssent2,retries_f1=2; // resending for frame 1 , frame 2 has 2 extra
+uint8_t sd_answer,ssent,resend_f=2;  // frame resend atempts 
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
-int  cycle_time,cycle_time2=1000;  // in seconds
+int  cycle_time,cycle_time2=10;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
 unsigned long prev,previous;
-
-
-
-
-
-// choose socket (SELECT USER'S SOCKET)
-///////////////////////////////////////
-uint8_t socket = SOCKET1;
-///////////////////////////////////////
-
-
-// choose URL settings
-///////////////////////////////////////
-char type[] = "http";
-char host[] = "82.78.81.178";
-char port[] = "80";
-///////////////////////////////////////
-
-uint8_t error;
-uint8_t status;
-
-Gas CO(SOCKET_B);
-Gas NH3(SOCKET_C);
-Gas CH4(SOCKET_F);
-
-float temperature;
-float humidity;
-float pressure;
-
-float concCO;
-float concNH3;
-float concCH4;
-
-int OPC_status;
-int OPC_measure;
-
-char node_ID[] = "FARM1";
-
-
-
-
-
-
-
-
-
-
-
-
-uint8_t status2=false;
-
-int count_trials=0;
-int N_trials=10;
-char ESSID[] = "FARM";
-char PASSW[] = "beiafarm";
 
 
 // choose NTP server settings
@@ -101,6 +38,26 @@ uint8_t time_zone = 2;
 ///////////////////////////////////////
 
 
+// choose socket (SELECT USER'S SOCKET)
+///////////////////////////////////////
+uint8_t socket = SOCKET1;
+///////////////////////////////////////
+
+
+// choose URL settings
+///////////////////////////////////////
+char type[] = "http";
+char host[] = "82.78.81.178";
+char port[] = "80";
+///////////////////////////////////////
+
+
+
+char node_ID[] = "cevax";
+int count_trials=0;
+int N_trials=10;
+char ESSID[] = "FARM";
+char PASSW[] = "beiafarm";
 
 
 
@@ -108,7 +65,112 @@ uint8_t time_zone = 2;
 
 
 
-// functions
+
+
+
+// subprograme
+
+void scriitor_SD( char filename_a[] ,uint8_t ssent_a=0)
+{
+  int coruption=0;
+  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  //now storeing it locally 
+  SD.ON();
+  time_date = RTC.getTime(); 
+  USB.print(F("time: "));
+  USB.println(time_date);  
+  
+
+  x=RTC.year;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.month;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.date;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.hour;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.minute;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption=coruption+sd_answer;
+  x=RTC.second;
+  itoa(x, y, 10);
+  if(x<10)
+{
+  y[1]=y[0];
+  y[0]='0';
+}
+  sd_answer = SD.append(filename_a,  y  );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a,  "  " );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a,  frame.buffer , frame.length );
+  coruption=coruption+sd_answer;
+  sd_answer = SD.append(filename_a,  "  " );
+  coruption=coruption+sd_answer;
+  itoa(ssent_a,y,10);
+  sd_answer = SD.appendln(filename_a,  y );
+  coruption=coruption+sd_answer;
+// frame is stored 
+  
+  SD.OFF();
+
+  if ( coruption== 15)
+  {
+        USB.println("SD sorage done with no errors");
+  }
+  else
+  {
+        USB.print("SD sorage done with:");
+        USB.print(15-coruption);
+        USB.println(" errors");
+  }
+
+}
+
 
 void try_RTC_set()
 {//////////////////////////////////////////////////
@@ -295,14 +357,7 @@ void WiFi_init()
 
 
 
-
-
-
-
-
-
-
-// initialization
+//initializare
 
 void setup()
 {
@@ -312,7 +367,7 @@ void setup()
   //////////////////////////////////////////////////  
   while (status==false)
   {
-   WiFi_init();//initialize Wi-Fi communication
+  WiFi_init();//initialize Wi-Fi communication
   // get actual time
   previous = millis();
 
@@ -440,7 +495,7 @@ void setup()
   RTC.ON(); // Executes the init process
 //  USB.print(F("Current RTC settings:"));
 //  USB.println(RTC.getTime());
- // IRL_time=false;
+  IRL_time=false;
 
   
   if( IRL_time)
@@ -473,22 +528,22 @@ void setup()
   while ((count_trials<N_trials)&& (status==false))
     {
       try_RTC_set();
-      USB.print(F("Trial: "));
-      count_trials=count_trials+1;
-      USB.print(count_trials);
-      USB.println();
-      }
+    USB.println(F("Trial"));
+    count_trials=count_trials+1;
+    USB.print(count_trials);
+    USB.println();
+     }
 
   }
 
   
 
-   USB.print(F("Current RTC settings:"));
-   USB.println(RTC.getTime());
-   USB.println(F("farm1_V9_SD_arhive_RTC_ON"));
+  USB.print(F("Current RTC settings:"));
+  USB.println(RTC.getTime());
+  USB.println(F("SD_CARD_ARHIVE_V4_RTC_ON_BAREBONES"));
   
-    // Set SD ON
-    SD.ON();
+  // Set SD ON
+  SD.ON();
 
     if ( sentence==1) 
     {
@@ -514,15 +569,29 @@ void setup()
          }
          else 
          {
-           USB.print(F("file NOT created   file size[BYTES]:"));  
-           USB.println( SD.getFileSize(filename) );
+           USB.println(F("file NOT created"));  
          } 
   
        USB.print("loop cycle time[s]:= ");
        USB.println(cycle_time2 );
       sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
+      if( sd_answer==1)
+      {
+           USB.println(F("writeing is OK"));
+      }
+      else
+      {
+           USB.println(F("writeing is haveing errors"));
+      }
 
+      //!!!!!!!!!!!!!!!!!!!!!!!
+      //Se va inlocui cu 
+      // check connectivity
+  /*status =  WIFI_PRO.isConnected();
+  if (status==false)
+  {sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" )};*/
 
+//pm
 USB.ON();
 }
 
@@ -536,92 +605,26 @@ USB.ON();
 
 
 
+
+
+
+//main program
 void loop()
 {
+    // get actual time before loop
   prev=millis();
-  USB.ON();
-
-      ///////////////////////////////////////////
-    // 0. Turn on sensors and wait
-    ///////////////////////////////////////////
-
-    //Power on gas sensors
-    CO.ON();
-    NH3.ON();
-    CH4.ON();
 
 
-    // Sensors need time to warm up and get a response from gas
-    // To reduce the battery consumption, use deepSleep instead delay
-    // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
-    USB.println(RTC.getTime());
-    USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-    PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
-    USB.println(RTC.getTime());
-    USB.println(F("wake up!!\r\n"));
-
-    ///////////////////////////////////////////
-    // 1. Read sensors
-    ///////////////////////////////////////////
-
-    // Read the sensors and compensate with the temperature internally
-    concCO = CO.getConc();
-    concNH3 = NH3.getConc();
-    concCH4 = CH4.getConc();
-
-    // Read enviromental variables
-    temperature = CO.getTemp();
-    //temperature=25;
-    humidity = CO.getHumidity();
-    pressure = CO.getPressure();
-
-    ///////////////////////////////////////////
-    // 2. Turn off the sensors
-    ///////////////////////////////////////////
-
-    //Power off sensors
-    CO.OFF();
-    NH3.OFF();
-    CH4.OFF();
-
-    ///////////////////////////////////////////
-    // 3. Read particle matter sensor
-    ///////////////////////////////////////////
-
-    // Turn on the particle matter sensor
-    OPC_status = PM.ON();
-    if (OPC_status == 1)
-    {
-        USB.println(F("Particle sensor started"));
-    }
-    else
-    {
-        USB.println(F("Error starting the particle sensor"));
-    }
-
-    // Get measurement from the particle matter sensor
-    if (OPC_status == 1)
-    {
-        // Power the fan and the laser and perform a measure of 5 seconds
-        OPC_measure = PM.getPM(5000, 5000);
-    }
-
-    PM.OFF();
-    USB.println(F("Particle sensor is done mesuring, and was turned OFF."));
-
-
-
-
-  // get actual time
+    
+  // get actual time before wifi
   previous = millis();
   //////////////////////////////////////////////////
   // 4. Switch ON
-  //////////////////////////////////////////////////  
-b=0;
-qwerty:
-
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
   error = WIFI_PRO.ON(socket);
+b=0;
+qwerty:
   if (error == 0)
   {    
     USB.println(F("WiFi switched ON"));
@@ -630,158 +633,42 @@ qwerty:
   {
     USB.println(F("WiFi did not initialize correctly"));
   }
-  //////////////////////////////////////////////////
-  // 5. Join AP
-  //////////////////////////////////////////////////  
-  // check connectivity
   status =  WIFI_PRO.isConnected();
-
-
   // check if module is connected
   if (status == true)
   {    
     USB.print(F("WiFi is connected OK"));
     USB.print(F(" Time(ms):"));    
     USB.println(millis()-previous);
-  
+    USB.print(F(" (time it took for the WIFI status check)"));   
 
+//frame
 
-    RTC.getTime();
-    
-  // create new frame 1
-  frame.createFrame(ASCII, node_ID);  // frame1 de trimis & stocat
- 
-  // add frame fields
-////////////////////////////////////////////////////////////
-
-      // Add CH4 value
-      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
-      // Add CO value
-      frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-      // Add NH3 value
-      frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
-      // Add PM1
-      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-      // Add PM2.5
-      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-      // Add PM10
-      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-      // Add BAT level
-      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-
-////////////////////////////////////////////////////////////
-    frame.showFrame();
- // data is sent here
-
- // 3.2. Send Frame to Meshlium
-    ///////////////////////////////
-    // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 1
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("HTTP OK")); 
-        ssent=1;
-      
-      USB.print(F("HTTP Time from OFF state (ms):"));    
-      USB.println(millis()-previous); 
-      USB.println(F("ASCII FRAME 1 SEND OK")); 
-
-
-    }
-    else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-        ssent=0;
-      WIFI_PRO.printErrorCode();
-    }
-  }
-  else
-  {
-    USB.print(F("WiFi is connected ERROR")); 
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);  
-  }
-
-b++;
-if (ssent==0 && b<=retries_f1)
-{
-  delay(5000);
-  USB.print(F("atempting resend no: "));
-  USB.println(b);
-  goto qwerty;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-delay(5000);
-b=0;
-qwerty_too:
-  status =  WIFI_PRO.isConnected();
-
-
-  // check if module is connected
-  if (status == true)
-  {    
-    USB.print(F("WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);
-  
-
-
-
-
-
-//frame2
-
-      frame.createFrame(ASCII);
-      // Add temperature
-      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-      // Add humidity
-      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-      // Add pressure value
-      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-// frame 2 is made
-       frame.showFrame();
+    frame.createFrame(ASCII);
+    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());     // Add BAT level
+    frame.showFrame(); // frame is made
    
 
 
-////////////////////////////////////////////////////////////
-
- // 3.2. Send Frame to Meshlium
+ // 3.2. Send Frame 
     ///////////////////////////////
     // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 2
+    previous = millis();
+    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 
 
     // check response
     if (error == 0)
     {
       USB.println(F("HTTP OK")); 
-        ssent=1;
-      
+      ssent=1;
       USB.print(F("HTTP Time from OFF state (ms):"));    
       USB.println(millis()-previous); 
-      USB.println(F("ASCII FRAME 2 SEND OK")); 
+      USB.println(F("ASCII FRAME SEND OK")); 
     }
     else
     {
       USB.println(F("Error calling 'getURL' function"));
-        ssent2=0;
+      ssent=0;
       WIFI_PRO.printErrorCode();
     }
   }
@@ -791,39 +678,31 @@ qwerty_too:
     USB.print(F(" Time(ms):"));    
     USB.println(millis()-previous);  
   }
-
-b++;
-if (ssent2==0 && (b+2)<=retries_f1)
+if(ssent==0 && b<=resend_f)
 {
   delay(5000);
-  USB.print(F("atempting resend no: "));
-  USB.println(b);
-  goto qwerty_too;
+  goto qwerty;
 }
-
-
-
-
-  //////////////////////////////////////////////////
-  // 3. Switch OFF
-  //////////////////////////////////////////////////  
 
   WIFI_PRO.OFF(socket);
   USB.println(F("WiFi switched OFF\n\n")); 
-
-b=(millis()-prev)/1000;
+  b=(millis()-prev)/1000;
   USB.print("loop execution time[s]: ");
   USB.println(b);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
   
-cycle_time=cycle_time2-b-2;
+cycle_time=cycle_time2-b-1;
 if ( cycle_time <10)
 {
   cycle_time=15;
 }
   USB.println(cycle_time);
 
-  
 x=cycle_time%60;  // sec
 itoa(x, y, 10);
 if(x<10)
@@ -871,185 +750,10 @@ rtc_str[4]=y[1];
 
 
 
-
-
-
-  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-    //now storeing it locally 
-  SD.ON();
-
   frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
-      // Add CH4 value
-      frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
-      // Add CO value
-      frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-      // Add NH3 value
-      frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
-      // Add PM1
-      frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-      // Add PM2.5
-      frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-      // Add PM10
-      frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-      // Add BAT level
-      frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-
-  //  USB.println(F("cadru de stocet:")); 
-  //  frame.showFrame();
-    
-  time_date = RTC.getTime(); 
-  USB.print(F("time: "));
-  USB.println(time_date);  
-
-  x=RTC.year;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.month;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  scriitor_SD( filename, ssent);
   
-  x=RTC.date;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.hour;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.minute;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.second;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-  itoa(ssent,y ,10);
-  sd_answer = SD.appendln(filename,  y );
-// frame 1 is stored 
-
-
-
-
-// frame2
-
-
-      frame.createFrame(ASCII);
-      // Add temperature
-      frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-      // Add humidity
-      frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-      // Add pressure value
-      frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
- 
-
-
-  x=RTC.year;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.month;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.date;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.hour;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.minute;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x=RTC.second;
-  itoa(x, y, 10);
-  if(x<10)
-{
-  y[1]=y[0];
-  y[0]='0';
-}
-  sd_answer = SD.append(filename,  y  );
-
-
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-    itoa(ssent2, y, 10);
-  sd_answer = SD.appendln(filename, y  );
-
-
-  SD.OFF();
-
-
-
-
-
-
-
 
 
   // Go to deepsleep  
@@ -1062,24 +766,11 @@ rtc_str[4]=y[1];
 
   USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   USB.OFF();
-
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-
+  USB.ON();
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
