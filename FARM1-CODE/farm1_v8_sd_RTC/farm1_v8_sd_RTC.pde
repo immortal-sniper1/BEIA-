@@ -712,7 +712,10 @@ if (ssent==0 && b<=retries_f1)
   USB.println(b);
   goto qwerty;
 }
-
+if (ssent==0 && b>=retries_f1)
+{
+    USB.print(F("WIFI failed HARD for some reason "));
+}
 
 
 
