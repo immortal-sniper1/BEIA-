@@ -18,7 +18,7 @@ char y[3];
 uint8_t sd_answer,ssent,resend_f=2;  // frame resend atempts 
 bool sentence=false;   // true for deletion on reboot  , false for data appended to end of file 
 bool IRL_time= false;  //  true for no external data source
-int  cycle_time,cycle_time2=10;  // in seconds
+int  cycle_time,cycle_time2=120;  // in seconds
 char rtc_str[]="00:00:00:05";  //11 char ps incepe de la 0
 unsigned long prev,previous;
 
@@ -56,8 +56,8 @@ char port[] = "80";
 char node_ID[] = "cevax";
 int count_trials=0;
 int N_trials=10;
-char ESSID[] = "FARM";
-char PASSW[] = "beiafarm";
+char ESSID[] = "LANCOMBEIA";
+char PASSW[] = "beialancom";
 
 
 
@@ -693,10 +693,14 @@ if(ssent==0 && b<=resend_f)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+  frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  scriitor_SD( filename, ssent);
+  
 
 
   
-cycle_time=cycle_time2-b-1;
+cycle_time=cycle_time2-b-5;
 if ( cycle_time <10)
 {
   cycle_time=15;
@@ -750,10 +754,6 @@ rtc_str[4]=y[1];
 
 
 
-  frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  scriitor_SD( filename, ssent);
-  
 
 
   // Go to deepsleep  
