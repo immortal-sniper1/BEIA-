@@ -51,6 +51,7 @@ int count_trials = 0;
 int N_trials = 10;
 char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
+uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 
 // subprograme
 
@@ -59,7 +60,7 @@ char PASSW[] = "beialancom";
 
 
 
-void trimitarot()
+void trimitator_WIFI()
 {
 // get actual time before wifi
   previous = millis();
@@ -363,11 +364,21 @@ void WiFi_init() { // 1. Switch ON the WiFi module
 
 void all_in_1_frame_process()
 {
-  trimitarot();
-  scriitor_SD(filename,ssent);
+  trimitator_WIFI();
+  scriitor_SD(filename, ssent);
 }
 
+void  failed_resender( char* filename_a , uint8_t max_atemptss_a )
+{
+  if ( RTC.getTime() >=  "some shit time" && RTC.getTime() >=  "some shit time"  )
+  {
+    USB.println(F("*******************************************"));
+    USB.println(F("DATA RESEND ATEMPTS STARTING"));
+    USB.println(F("*******************************************"));
+  }
 
+
+}
 
 
 // initializare
@@ -563,6 +574,9 @@ void setup() {
   USB.ON();
 }
 
+
+
+
 // main program
 void loop() {
   // get actual time before loop
@@ -577,6 +591,7 @@ void loop() {
   all_in_1_frame_process();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  failed_resender(filename , max_atemptss  );
 
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
