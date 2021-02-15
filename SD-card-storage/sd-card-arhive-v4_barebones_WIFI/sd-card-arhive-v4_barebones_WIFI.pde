@@ -14,7 +14,7 @@ uint8_t status = false;
 char y[3];
 uint8_t sd_answer, ssent, resend_f = 2; // frame resend atempts
 bool sentence = false; // true for deletion on reboot  , false for data appended
-                       // to end of file
+// to end of file
 bool IRL_time = false; //  true for no external data source
 int cycle_time, cycle_time2 = 120; // in seconds
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
@@ -53,6 +53,86 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 
 // subprograme
+
+
+
+
+
+
+void trimitarot()
+{
+// get actual time before wifi
+  previous = millis();
+  //////////////////////////////////////////////////
+  // 4. Switch ON
+  error = WIFI_PRO.ON(socket);
+  b = 0;
+qwerty:
+  if (error == 0) {
+    USB.println(F("WiFi switched ON"));
+  } else {
+    USB.println(F("WiFi did not initialize correctly"));
+  }
+  status = WIFI_PRO.isConnected();
+  // check if module is connected
+  if (status == true) {
+    USB.print(F("WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));
+    USB.println(millis() - previous);
+    USB.print(F(" (time it took for the WIFI status check)"));
+
+    // frame
+    frame.createFrame(ASCII);
+    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel()); // Add BAT level
+    frame.showFrame();                                  // frame is made
+
+    // 3.2. Send Frame
+    ///////////////////////////////
+    // http frame
+    previous = millis();
+    error = WIFI_PRO.sendFrameToMeshlium(type, host, port, frame.buffer, frame.length); // frame
+    // check response
+    if (error == 0) {
+      USB.println(F("HTTP OK"));
+      ssent = 1;
+      USB.print(F("HTTP Time from OFF state (ms):"));
+      USB.println(millis() - previous);
+      USB.println(F("ASCII FRAME SEND OK"));
+    } else {
+      USB.println(F("Error calling 'getURL' function"));
+      ssent = 0;
+      WIFI_PRO.printErrorCode();
+    }
+  } else {
+    USB.print(F("WiFi is connected ERROR"));
+    USB.print(F(" Time(ms):"));
+    USB.println(millis() - previous);
+  }
+  if (ssent == 0 && b <= resend_f) {
+    delay(5000);
+    goto qwerty;
+  }
+
+  WIFI_PRO.OFF(socket);
+  USB.println(F("WiFi switched OFF\n\n"));
+  b = (millis() - prev) / 1000;
+  USB.print("loop execution time[s]: ");
+  USB.println(b);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void scriitor_SD(char filename_a[], uint8_t ssent_a = 0) {
   int coruption = 0;
@@ -280,6 +360,16 @@ void WiFi_init() { // 1. Switch ON the WiFi module
   USB.println(F("*******************************************\n"));
 }
 
+
+void all_in_1_frame_process()
+{
+  trimitarot();
+  scriitor_SD(filename,ssent);
+}
+
+
+
+
 // initializare
 
 void setup() {
@@ -379,7 +469,7 @@ void setup() {
   USB.println(F("it is always possible to request for the Time and"));
   USB.println(F("synchronize it to the Waspmote's RTC"));
   USB.println(
-      F("-----------------------------------------------------------\n"));
+    F("-----------------------------------------------------------\n"));
   delay(5000);
 
   // Init RTC
@@ -391,8 +481,8 @@ void setup() {
   // open USB port
   USB.ON();
   RTC.ON(); // Executes the init process
-            //  USB.print(F("Current RTC settings:"));
-            //  USB.println(RTC.getTime());
+  //  USB.print(F("Current RTC settings:"));
+  //  USB.println(RTC.getTime());
   IRL_time = false;
 
   if (IRL_time) {
@@ -453,7 +543,7 @@ void setup() {
   USB.print("loop cycle time[s]:= ");
   USB.println(cycle_time2);
   sd_answer = SD.appendln(filename, "------------------------------------------"
-                                    "----------------------------------");
+                          "----------------------------------");
   if (sd_answer == 1) {
     USB.println(F("writeing is OK"));
   } else {
@@ -478,74 +568,15 @@ void loop() {
   // get actual time before loop
   prev = millis();
 
-  // get actual time before wifi
-  previous = millis();
-  //////////////////////////////////////////////////
-  // 4. Switch ON
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  error = WIFI_PRO.ON(socket);
-  b = 0;
-qwerty:
-  if (error == 0) {
-    USB.println(F("WiFi switched ON"));
-  } else {
-    USB.println(F("WiFi did not initialize correctly"));
-  }
-  status = WIFI_PRO.isConnected();
-  // check if module is connected
-  if (status == true) {
-    USB.print(F("WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-    USB.print(F(" (time it took for the WIFI status check)"));
-
-    // frame
-
-    frame.createFrame(ASCII);
-    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel()); // Add BAT level
-    frame.showFrame();                                  // frame is made
-
-    // 3.2. Send Frame
-    ///////////////////////////////
-    // http frame
-    previous = millis();
-    error = WIFI_PRO.sendFrameToMeshlium(type, host, port, frame.buffer,
-                                         frame.length); // frame
-
-    // check response
-    if (error == 0) {
-      USB.println(F("HTTP OK"));
-      ssent = 1;
-      USB.print(F("HTTP Time from OFF state (ms):"));
-      USB.println(millis() - previous);
-      USB.println(F("ASCII FRAME SEND OK"));
-    } else {
-      USB.println(F("Error calling 'getURL' function"));
-      ssent = 0;
-      WIFI_PRO.printErrorCode();
-    }
-  } else {
-    USB.print(F("WiFi is connected ERROR"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-  }
-  if (ssent == 0 && b <= resend_f) {
-    delay(5000);
-    goto qwerty;
-  }
-
-  WIFI_PRO.OFF(socket);
-  USB.println(F("WiFi switched OFF\n\n"));
-  b = (millis() - prev) / 1000;
-  USB.print("loop execution time[s]: ");
-  USB.println(b);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  scriitor_SD(filename, ssent);
+
+  all_in_1_frame_process();
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
@@ -598,7 +629,7 @@ qwerty:
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
   USB.println(
-      F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+    F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
 }

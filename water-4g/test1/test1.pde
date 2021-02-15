@@ -49,3 +49,44 @@ void loop()
   // Delay
   delay(10000);  
 }
+
+
+
+
+
+/*
+
+
+
+A code for reading the sensor is shown below:
+int value;
+{
+SensorEventv20.ON();
+delay(10);
+value = SensorEventv20.readValue(SOCKET);
+}
+value is an integer variable where the sensor state (a high value (3.3V) indicating liquid presence or a low value (0V) indicating
+its absence) will be stored.
+SOCKET indicates on which connector the sensor is placed (for this sensor it may be SENS_SOCKET1, SENS_SOCKET2, SENS_
+SOCKET3 and SENS_SOCKET8).
+
+
+
+
+
+
+
+A code for reading the sensor is shown below:
+int value;
+{
+SensorEventv20.ON();
+delay(10);
+value = SensorEventv20.readValue(SOCKET);
+}
+value is an integer variable where the sensor state (a high value (3.3V) indicating that the sensor is closed or a low value (0V)
+indicating that it is open) will be stored.
+SOCKET indicates on which connector the sensor is placed (for this sensor it may be SENS_SOCKET1, SENS_SOCKET2, SENS_
+SOCKET3 and SENS_SOCKET8).
+
+
+ */
