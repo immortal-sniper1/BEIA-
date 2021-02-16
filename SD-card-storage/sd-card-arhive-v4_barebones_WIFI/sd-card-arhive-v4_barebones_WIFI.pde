@@ -82,11 +82,6 @@ qwerty:
     USB.println(millis() - previous);
     USB.print(F(" (time it took for the WIFI status check)"));
 
-    // frame
-    frame.createFrame(ASCII);
-    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel()); // Add BAT level
-    frame.showFrame();                                  // frame is made
-
     // 3.2. Send Frame
     ///////////////////////////////
     // http frame
@@ -587,7 +582,7 @@ void loop() {
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-
+  frame.showFrame(); 
   all_in_1_frame_process();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
