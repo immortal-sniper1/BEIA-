@@ -52,7 +52,8 @@ liquidPresenceClass liquidPresence(SOCKET_E);
 float temp;
 float humd;
 float pres;
-
+flowClass yfs401(SENS_FLOW_YFS401);
+float flow;
 
 
 
@@ -824,7 +825,7 @@ void loop() {
   // Reading of the Temperature sensor
   float temperature = TemperatureSensor.read();
   Events.ON();
-  PWR.deepSleep("00:00:01:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+//  PWR.deepSleep("00:00:01:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
   value = hall.readHallSensor();
   value2 = liquidPresence.readliquidPresence();
   //Temperature
@@ -833,6 +834,19 @@ void loop() {
   humd = Events.getHumidity();
   //Pressure
   pres = Events.getPressure();
+  USB.println(F("FLOW in 5"));
+  delay(1000);
+  USB.println(F("FLOW in 4"));
+  delay(1000);
+  USB.println(F("FLOW in 3"));
+  delay(1000);
+  USB.println(F("FLOW in 2"));
+  delay(1000);
+  USB.println(F("FLOW in 1"));
+  delay(1000);
+  USB.println(F("FLOW in 0"));
+  // Read flow input
+  flow = yfs401.flowReading();
 
   Events.OFF();
 
@@ -865,11 +879,12 @@ void loop() {
   // set frame fields (Time from RTC)
   //RTC.getTime();
   //frame.addSensor(SENSOR_TIME,RTC.year,RTC.mounth,RTC.date, RTC.hour, RTC.minute, RTC.second);
-  frame.addSensor(SENSOR_PA, pres);
-  frame.addSensor(SENSOR_HUM, humd);
-  frame.addSensor(SENSOR_TC, temp);
-  frame.addSensor(SENSOR_HALL , value);
-  frame.addSensor(SENSOR_LP , value2);
+  frame.addSensor(SENSOR_GASES_PRO_PRES, pres);
+  frame.addSensor(SENSOR_GASES_PRO_HUM, humd);
+  frame.addSensor(SENSOR_GASES_PRO_TC, temp);
+  frame.addSensor(SENSOR_EVENTS_HALL , value);
+  frame.addSensor(SENSOR_EVENTS_LP , value2);
+  frame.addSensor(SENSOR_EVENTS_WF, flow);
   frame.showFrame();
 
 

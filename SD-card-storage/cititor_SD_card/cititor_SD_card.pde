@@ -1,7 +1,7 @@
 
 
 // define file name: MUST be 8.3 SHORT FILE NAME
-char filename[]="/data/frames.TXT";
+char filename[]="FILE1.TXT";
 
 // array in order to read data
 char output[101];
