@@ -1,6 +1,7 @@
+#include <WaspSensorGas_Pro.h>
 #include <WaspFrame.h>
-//#include <WaspPM.h>
-//#include <WaspSD.h>
+#include <WaspSensorEvent_v30.h>
+#include <smartWaterIons.h>
 #include <Wasp4G.h>
 
 // define variable SD
@@ -16,11 +17,11 @@ uint8_t sd_answer, ssent = 0, resend_f = 2; // frame resend atempts
 bool sentence = false; // true for deletion on reboot  , false for data appended
 // to end of file
 bool IRL_time = false; //  true for no external data source
-int cycle_time, cycle_time2 = 10; // in seconds
+int cycle_time, cycle_time2 = 120; // in seconds
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 
-char node_ID[] = "qwerty13";
+char node_ID[] = "SSec";
 
 
 // APN settings
@@ -40,6 +41,25 @@ uint16_t port = 80;
 
 uint8_t connection_status, net_in_attempt;
 char operator_name[20];
+
+//senzorii
+
+// Create an instance of the class
+pt1000Class TemperatureSensor;
+int value, value2;
+hallSensorClass hall(SOCKET_A);
+liquidPresenceClass liquidPresence(SOCKET_E);
+float temp;
+float humd;
+float pres;
+
+
+
+
+
+
+
+
 
 // subprograme
 
@@ -742,7 +762,7 @@ void setup() {
 
 
   USB.println(RTC.getTime());
-  USB.println(F("SD_CARD_ARHIVE_V1_RTC_ON_4G_BAREBONES"));
+  USB.println(F("SSecure_SD_RTC_4G_v1"));
 
   // Set SD ON
   SD.ON();
@@ -784,6 +804,7 @@ void setup() {
 
 
   // pm
+  SWIonsBoard.ON();
   USB.ON();
 
 
@@ -798,6 +819,43 @@ void loop() {
 
   // get actual time before loop
   prev = millis();
+//senzorii
+
+  // Reading of the Temperature sensor
+  float temperature = TemperatureSensor.read();
+  Events.ON();
+  PWR.deepSleep("00:00:01:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  value = hall.readHallSensor();
+  value2 = liquidPresence.readliquidPresence();
+  //Temperature
+  temp = Events.getTemperature();
+  //Humidity
+  humd = Events.getHumidity();
+  //Pressure
+  pres = Events.getPressure();
+
+  Events.OFF();
+
+
+  // Print of the results
+  USB.print(F("Temperature (Celsius degrees): "));
+  USB.println(temperature);
+  USB.print(F("hall sensor: "));
+  USB.println(value);
+  USB.print(F("spill sensor: "));
+  USB.println(value2);
+  USB.print("Temperature: ");
+  USB.printFloat(temp, 2);
+  USB.println(F(" Celsius"));
+  USB.print("Humidity: ");
+  USB.printFloat(humd, 1);
+  USB.println(F(" %"));
+  USB.print("Pressure: ");
+  USB.printFloat(pres, 2);
+  USB.println(F(" Pa"));
+
+
+
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -807,7 +865,13 @@ void loop() {
   // set frame fields (Time from RTC)
   //RTC.getTime();
   //frame.addSensor(SENSOR_TIME,RTC.year,RTC.mounth,RTC.date, RTC.hour, RTC.minute, RTC.second);
+  frame.addSensor(SENSOR_PA, pres);
+  frame.addSensor(SENSOR_HUM, humd);
+  frame.addSensor(SENSOR_TC, temp);
+  frame.addSensor(SENSOR_HALL , value);
+  frame.addSensor(SENSOR_LP , value2);
   frame.showFrame();
+
 
   HTTP_4G_TRIMITATOR_FRAME();
   scriitor_SD(filename, ssent);
@@ -877,6 +941,7 @@ void loop() {
 
 
 }
+
 
 
 
