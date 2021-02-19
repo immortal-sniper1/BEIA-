@@ -768,10 +768,11 @@ void setup() {
 
 
 
-
   USB.println(RTC.getTime());
   USB.println(F("SSecure_SD_RTC_4G_v1"));
-
+  // show program version number
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(),DEC);
   // Set SD ON
   SD.ON();
 
