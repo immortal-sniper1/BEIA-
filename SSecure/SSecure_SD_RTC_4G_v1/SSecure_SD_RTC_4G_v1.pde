@@ -13,14 +13,14 @@ int x, b;
 uint8_t error;
 uint8_t status = false;
 char y[3];
-uint8_t sd_answer, ssent = 0, resend_f = 2; // frame resend atempts
+uint8_t sd_answer, ssent = 0, resend_f = 2; // frame resend atempts for first try
 bool sentence = false; // true for deletion on reboot  , false for data appended
 // to end of file
-bool IRL_time = false; //  true for no external data source
-int cycle_time, cycle_time2 = 120; // in seconds
+//bool IRL_time = false; //  true for no external data source
+int cycle_time, cycle_time2 = 1100; // in seconds
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
-
+bool rr = false;  // RTC state of sync
 char node_ID[] = "SSec";
 
 
@@ -39,7 +39,7 @@ uint16_t port = 80;
 
 
 
-uint8_t connection_status, net_in_attempt;
+uint8_t connection_status, net_in_attempt = 10; // number of times there will be a RTC sync atempt at strart of device
 char operator_name[20];
 
 //senzorii
@@ -441,6 +441,10 @@ void INFO_4G_NET()
 
 
 
+
+
+
+
 void HTTP_GET_4G()
 {
   // SERVER settings
@@ -652,8 +656,9 @@ void HTTP_4G_TRIMITATOR_FRAME()
 
 
 
-void SET_RTC_4G( int g = 2)
+bool SET_RTC_4G( int g = 2)
 {
+  bool r = false;
   //////////////////////////////////////////////////
   // 1. Switch ON the 4G module
   //////////////////////////////////////////////////
@@ -674,6 +679,7 @@ kyuubi:
       _4G.setTimeFrom4G();
       USB.println(RTC.getTime());
       USB.println(RTC.getTimestamp());
+      r = true;
     }
   }
   else
@@ -695,6 +701,7 @@ kyuubi:
   //////////////////////////////////////////////////
   _4G.OFF();
   USB.println(F("2. Switch OFF 4G module"));
+  return r;
 }
 
 
@@ -757,7 +764,7 @@ void setup() {
   _4G.show_APN();
 
   RTC.ON();
-  SET_RTC_4G(10);
+  rr = SET_RTC_4G(net_in_attempt);
 
 
 
@@ -795,7 +802,8 @@ void setup() {
   } else {
     USB.println(F("writeing is haveing errors"));
   }
-
+    USB.print(F("RTC sync state: "));
+    USB.println(rr);
   USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
   USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
@@ -825,7 +833,7 @@ void loop() {
   // Reading of the Temperature sensor
   float temperature = TemperatureSensor.read();
   Events.ON();
-//  PWR.deepSleep("00:00:01:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
   value = hall.readHallSensor();
   value2 = liquidPresence.readliquidPresence();
   //Temperature
@@ -834,6 +842,8 @@ void loop() {
   humd = Events.getHumidity();
   //Pressure
   pres = Events.getPressure();
+
+
   USB.println(F("FLOW in 5"));
   delay(1000);
   USB.println(F("FLOW in 4"));
@@ -845,6 +855,8 @@ void loop() {
   USB.println(F("FLOW in 1"));
   delay(1000);
   USB.println(F("FLOW in 0"));
+
+
   // Read flow input
   flow = yfs401.flowReading();
 
@@ -852,8 +864,8 @@ void loop() {
 
 
   // Print of the results
-  USB.print(F("Temperature (Celsius degrees): "));
-  USB.println(temperature);
+  //USB.print(F("Temperature (Celsius degrees): "));
+  //USB.println(temperature);
   USB.print(F("hall sensor: "));
   USB.println(value);
   USB.print(F("spill sensor: "));
@@ -886,13 +898,27 @@ void loop() {
   frame.addSensor(SENSOR_EVENTS_LP , value2);
   frame.addSensor(SENSOR_EVENTS_WF, flow);
   frame.showFrame();
-
-
-  HTTP_4G_TRIMITATOR_FRAME();
+  x = 0;
+  while ( x <= resend_f)
+  {
+    HTTP_4G_TRIMITATOR_FRAME();
+    if(ssent==1)
+    {
+      x=resend_f+2;
+    }
+    else
+    {
+      x++;
+    }
+    PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  }
+  if ( not rr)
+  {
+    USB.println("retring RTC sync atempts ");
+    rr = SET_RTC_4G(net_in_attempt);
+  }
   scriitor_SD(filename, ssent);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 
@@ -945,8 +971,8 @@ void loop() {
 
   //USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   USB.OFF();
-  delay(30000);
-  //PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  //delay(30000);
+  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
