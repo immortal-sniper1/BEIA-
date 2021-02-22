@@ -46,14 +46,17 @@ char operator_name[20];
 
 // Create an instance of the class
 pt1000Class TemperatureSensor;
-int value, value2;
+int value;
 hallSensorClass hall(SOCKET_A);
 liquidPresenceClass liquidPresence(SOCKET_E);
+liquidPresenceClass liquidPresence2(SOCKET_F);
+uint8_t fluid1 , fluid2;
 float temp;
 float humd;
 float pres;
 flowClass yfs401(SENS_FLOW_YFS401);
 float flow;
+float resistance,voltage;
 
 
 
@@ -772,7 +775,7 @@ void setup() {
   USB.println(F("SSecure_SD_RTC_4G_v1"));
   // show program version number
   USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(),DEC);
+  USB.println(Utils.getProgramVersion(), DEC);
   // Set SD ON
   SD.ON();
 
@@ -803,8 +806,8 @@ void setup() {
   } else {
     USB.println(F("writeing is haveing errors"));
   }
-    USB.print(F("RTC sync state: "));
-    USB.println(rr);
+  USB.print(F("RTC sync state: "));
+  USB.println(rr);
   USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
                 "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
   USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
@@ -836,7 +839,11 @@ void loop() {
   Events.ON();
   PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
   value = hall.readHallSensor();
-  value2 = liquidPresence.readliquidPresence();
+  fluid1 = liquidPresence.readliquidPresence();
+  fluid2 = liquidPresence2.readliquidPresence();
+    // Read the sensor level
+  voltage = liquidPresence.readVoltage();
+  resistance = liquidPresence.readResistance(voltage);
   //Temperature
   temp = Events.getTemperature();
   //Humidity
@@ -869,8 +876,16 @@ void loop() {
   //USB.println(temperature);
   USB.print(F("hall sensor: "));
   USB.println(value);
-  USB.print(F("spill sensor: "));
-  USB.println(value2);
+  USB.print(F("spill sensor1: "));
+  USB.println(fluid1);
+  USB.print(F("Resistance: "));
+  USB.printFloat(resistance, 3);
+  USB.println(F(" "));
+  USB.print(F("Voltage: "));
+  USB.printFloat(voltage, 3);
+  USB.println(F(" "));
+  USB.print(F("spill sensor2 (the orange one): "));
+  USB.println(fluid2);
   USB.print("Temperature: ");
   USB.printFloat(temp, 2);
   USB.println(F(" Celsius"));
@@ -896,16 +911,17 @@ void loop() {
   frame.addSensor(SENSOR_GASES_PRO_HUM, humd);
   frame.addSensor(SENSOR_GASES_PRO_TC, temp);
   frame.addSensor(SENSOR_EVENTS_HALL , value);
-  frame.addSensor(SENSOR_EVENTS_LP , value2);
+  frame.addSensor(SENSOR_EVENTS_LP , fluid1);
+  frame.addSensor(SENSOR_EVENTS_LP , fluid2);
   frame.addSensor(SENSOR_EVENTS_WF, flow);
   frame.showFrame();
   x = 0;
   while ( x <= resend_f)
   {
     HTTP_4G_TRIMITATOR_FRAME();
-    if(ssent==1)
+    if (ssent == 1)
     {
-      x=resend_f+2;
+      x = resend_f + 2;
     }
     else
     {
