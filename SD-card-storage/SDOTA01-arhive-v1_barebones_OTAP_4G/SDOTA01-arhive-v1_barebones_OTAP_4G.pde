@@ -9,8 +9,8 @@ char filename[] = "FILE1.TXT";
 
 char *time_date; // stores curent date + time
 int x, b;
-uint8_t RTC_ATEMPTS=10;  // number of RTC sync atempts
-uint8_t error,status = false;
+uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
+uint8_t error, status = false;
 char y[3];
 uint8_t sd_answer, ssent = 0, resend_f = 2; // frame resend atempts
 bool sentence = false; // true for deletion on reboot  , false for data appended
@@ -42,7 +42,9 @@ uint16_t ftp_port = 21;
 char ftp_user[] = "robi@agile.ro";
 char ftp_pass[] = "U$d(SEFA8+UC";
 ///////////////////////////////////////
-
+//FTP send 
+char SD_FILE[]     = "FILE1.TXT";
+char SERVER_FILE[] = "HHKFILE2.TXT";
 
 
 uint8_t connection_status, net_in_attempt;
@@ -781,9 +783,89 @@ void OTAP_4G()
 
 }
 
+void FTP_4G_SEND(char SD_FILE[] ,char SERVER_FILE[])
+{
+  int previous;
+  //////////////////////////////////////////////////
+  // 1. Switch ON
+  //////////////////////////////////////////////////
+  error = _4G.ON();
+
+  if (error == 0)
+  {
+    USB.println(F("1. 4G module ready..."));
+
+    ////////////////////////////////////////////////
+    // 2.1. FTP open session
+    ////////////////////////////////////////////////
+
+    error = _4G.ftpOpenSession(ftp_server, ftp_port, ftp_user, ftp_pass);
+
+    // check answer
+    if (error == 0)
+    {
+      USB.println(F("2.1. FTP open session OK"));
+
+      previous = millis();
+
+      //////////////////////////////////////////////
+      // 2.2. FTP upload
+      //////////////////////////////////////////////
+
+      error = _4G.ftpUpload(SERVER_FILE, SD_FILE);
+
+      if (error == 0)
+      {
+
+        USB.print(F("2.2. Uploading SD file to FTP server done! "));
+        USB.print(F("Upload time: "));
+        USB.print((millis() - previous) / 1000, DEC);
+        USB.println(F(" s"));
+      }
+      else
+      {
+        USB.print(F("2.2. Error calling 'ftpUpload' function. Error: "));
+        USB.println(error, DEC);
+      }
 
 
+      //////////////////////////////////////////////
+      // 2.3. FTP close session
+      //////////////////////////////////////////////
 
+      error = _4G.ftpCloseSession();
+
+      if (error == 0)
+      {
+        USB.println(F("2.3. FTP close session OK"));
+      }
+      else
+      {
+        USB.print(F("2.3. Error calling 'ftpCloseSession' function. error: "));
+        USB.println(error, DEC);
+        USB.print(F("CMEE error: "));
+        USB.println(_4G._errorCode, DEC);
+      }
+    }
+    else
+    {
+      USB.print(F( "2.1. FTP connection error: "));
+      USB.println(error, DEC);
+    }
+  }
+  else
+  {
+    // Problem with the communication with the 4G module
+    USB.println(F("1. 4G module not started"));
+  }
+
+
+  ////////////////////////////////////////////////
+  // 3. Powers off the 4G module
+  ////////////////////////////////////////////////
+  USB.println(F("3. Switch OFF 4G module"));
+  _4G.OFF();
+}
 
 
 
@@ -817,12 +899,13 @@ void OTAP_4G()
 void setup() {
   USB.ON();
   RTC.ON();
+//  x=setProgramVersion(1);
 
-  //INFO_4G_MDD();
-  //INFO_4G_NET();
+  INFO_4G_MDD();
+  INFO_4G_NET();
   //HTTP_GET_4G();
   //HTTP_POST_4G();
-
+FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   status = Utils.checkNewProgram();
 
@@ -924,29 +1007,29 @@ void setup() {
 // main program
 void loop()
 {
-
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
 /*
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-*/
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  USB.println(F("qqqqqqq"));
+  */
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+    USB.println(F("vx"));
+  
   // get actual time before loop
   prev = millis();
 
