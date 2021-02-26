@@ -3,30 +3,27 @@
 #include <WaspSD.h>
 #include <WaspWIFI_PRO.h>
 
+/////////// NU UMBLA AICI!!!!!
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[] = "FILE1.TXT";
-
 char *time_date; // stores curent date + time
 int x, b;
 uint8_t error;
 uint8_t status = false;
 char y[3];
-uint8_t sd_answer, ssent, resend_f = 2; // frame resend atempts
+uint8_t sd_answer, ssent;
 bool sentence = false; // true for deletion on reboot  , false for data appended
 // to end of file
 bool IRL_time = false; //  true for no external data source
-int cycle_time, cycle_time2 = 120; // in seconds
+int cycle_time;
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
-
 // choose NTP server settings
 ///////////////////////////////////////
 char SERVER1[] = "time.nist.gov";
 char SERVER2[] = "wwv.nist.gov";
-
 //"pool.ntp.org";
-
 ///////////////////////////////////////
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
@@ -38,21 +35,34 @@ uint8_t time_zone = 2;
 ///////////////////////////////////////
 uint8_t socket = SOCKET0;
 ///////////////////////////////////////
-
 // choose URL settings
 ///////////////////////////////////////
 char type[] = "http";
 char host[] = "82.78.81.178";
 char port[] = "80";
 ///////////////////////////////////////
+// FTP SERVER settings
+///////////////////////////////////////
+char ftp_server[] = "ftp.agile.ro";
+char ftp_port[] = "21";
+char ftp_user[] = "robi@agile.ro";
+char ftp_pass[] = "U$d(SEFA8+UC";
+///////////////////////////////////////
+char programID[10];
+int8_t answer, verr = 1;
 
+
+
+
+///// EDITEAZA AICI DOAR
 char node_ID[] = "cevax";
 int count_trials = 0;
 int N_trials = 10;
 char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
-
+uint8_t resend_f = 2; // frame resend atempts
+int cycle_time2 = 30; // in seconds
 // subprograme
 
 
@@ -130,7 +140,9 @@ qwerty:
 
 
 
-void scriitor_SD(char filename_a[], uint8_t ssent_a = 0) {
+void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
+{
+
   int coruption = 0;
   PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   // now storeing it locally
@@ -219,166 +231,8 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0) {
   }
 }
 
-void try_RTC_set() { //////////////////////////////////////////////////
-  // 1. Switch ON
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.ON(socket);
-
-  if (error == 0) {
-    USB.println(F("1. WiFi switched ON"));
-  } else {
-    USB.println(F("1. WiFi did not initialize correctly"));
-  }
-
-  //////////////////////////////////////////////////
-  // 2. Check if connected
-  //////////////////////////////////////////////////
-
-  // get actual time
-  previous = millis();
-
-  // check connectivity
-  status = WIFI_PRO.isConnected();
-
-  // Check if module is connected
-  if (status == true) {
-    USB.print(F("2. WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-  } else {
-    USB.print(F("2. WiFi is connected ERROR"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-  }
-
-  //////////////////////////////////////////////////
-  // 3. Set RTC Time from WiFi module settings
-  //////////////////////////////////////////////////
-
-  // Check if module is connected
-  if (status == true) {
-    // 3.1. Open FTP session
-    error = WIFI_PRO.setTimeFromWIFI();
-
-    // check response
-    if (error == 0) {
-      USB.print(F("3. Set RTC time OK. Time:"));
-      USB.println(RTC.getTime());
-    } else {
-      USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
-  }
-
-  //////////////////////////////////////////////////
-  // 4. Switch OFF
-  //////////////////////////////////////////////////
-  WIFI_PRO.OFF(socket);
-  USB.println(F("4. WiFi switched OFF\n\n"));
-  USB.println(F("Wait 10 seconds...\n"));
-  delay(10000);
-}
-
-void WiFi_init() { // 1. Switch ON the WiFi module
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1) {
-    error = WIFI_PRO.ON(socket);
-
-    if (error == 0) {
-      USB.println(F("1. WiFi switched ON"));
-    } else {
-      USB.println(F("1. WiFi did not initialize correctly"));
-    }
-  }
-
-  // 2. Reset to default values
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1) {
-    error = WIFI_PRO.resetValues();
-
-    if (error == 0) {
-      USB.println(F("2. WiFi reset to default"));
-    } else {
-      USB.println(F("2. WiFi reset to default ERROR"));
-    }
-  }
-  // 3. Set ESSID
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1) {
-    error = WIFI_PRO.setESSID(ESSID);
-
-    if (error == 0) {
-      USB.println(F("3. WiFi set ESSID OK"));
-    } else {
-      USB.println(F("3. WiFi set ESSID ERROR"));
-    }
-  }
-  //////////////////////////////////////////////////
-  // 4. Set password key (It takes a while to generate the key)
-  // Authentication modes:
-  //    OPEN: no security
-  //    WEP64: WEP 64
-  //    WEP128: WEP 128
-  //    WPA: WPA-PSK with TKIP encryption
-  //    WPA2: WPA2-PSK with TKIP or AES encryption
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1) {
-    error = WIFI_PRO.setPassword(WPA2, PASSW);
-
-    if (error == 0) {
-      USB.println(F("4. WiFi set AUTHKEY OK"));
-    } else {
-      USB.println(F("4. WiFi set AUTHKEY ERROR"));
-    }
-  }
-  //////////////////////////////////////////////////
-  // 5. Software Reset
-  // Parameters take effect following either a
-  // hardware or software reset
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.softReset();
-
-  if (error == 0) {
-    USB.println(F("5. WiFi softReset OK"));
-  } else {
-    USB.println(F("5. WiFi softReset ERROR"));
-  }
-
-  USB.println(F("*******************************************"));
-  USB.println(F("Once the module is configured with ESSID"));
-  USB.println(F("and PASSWORD, the module will attempt to "));
-  USB.println(F("join the specified Access Point on power up"));
-  USB.println(F("*******************************************\n"));
-}
-
-
-void all_in_1_frame_process()
+void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  try_RTC_set() de n ori
 {
-  trimitator_WIFI();
-  scriitor_SD(filename, ssent);
-}
-
-void  failed_resender( char* filename_a , uint8_t max_atemptss_a )
-{
-  if ( RTC.getTime() >=  "some shit time" && RTC.getTime() >=  "some shit time"  )
-  {
-    USB.println(F("*******************************************"));
-    USB.println(F("DATA RESEND ATEMPTS STARTING"));
-    USB.println(F("*******************************************"));
-  }
-
-
-}
-
-
-// initializare
-
-void setup() {
 
   //////////////////////////////////////////////////
   // 2. Check if connected
@@ -476,7 +330,335 @@ void setup() {
   USB.println(F("synchronize it to the Waspmote's RTC"));
   USB.println(
     F("-----------------------------------------------------------\n"));
-  delay(5000);
+
+}
+
+
+
+
+
+
+void try_RTC_set()
+{
+
+  //////////////////////////////////////////////////
+  // 1. Switch ON
+  //////////////////////////////////////////////////
+  error = WIFI_PRO.ON(socket);
+
+  if (error == 0) {
+    USB.println(F("1. WiFi switched ON"));
+  } else {
+    USB.println(F("1. WiFi did not initialize correctly"));
+  }
+
+  //////////////////////////////////////////////////
+  // 2. Check if connected
+  //////////////////////////////////////////////////
+
+  // get actual time
+  previous = millis();
+
+  // check connectivity
+  status = WIFI_PRO.isConnected();
+
+  // Check if module is connected
+  if (status == true) {
+    USB.print(F("2. WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));
+    USB.println(millis() - previous);
+  } else {
+    USB.print(F("2. WiFi is connected ERROR"));
+    USB.print(F(" Time(ms):"));
+    USB.println(millis() - previous);
+  }
+
+  //////////////////////////////////////////////////
+  // 3. Set RTC Time from WiFi module settings
+  //////////////////////////////////////////////////
+
+  // Check if module is connected
+  if (status == true) {
+    // 3.1. Open FTP session
+    error = WIFI_PRO.setTimeFromWIFI();
+
+    // check response
+    if (error == 0) {
+      USB.print(F("3. Set RTC time OK. Time:"));
+      USB.println(RTC.getTime());
+    } else {
+      USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
+      WIFI_PRO.printErrorCode();
+      status = false;
+    }
+  }
+
+  //////////////////////////////////////////////////
+  // 4. Switch OFF
+  //////////////////////////////////////////////////
+  WIFI_PRO.OFF(socket);
+  USB.println(F("4. WiFi switched OFF\n\n"));
+  USB.println(F("Wait 10 seconds...\n"));
+  delay(10000);
+
+
+}
+
+
+
+
+void WiFi_init() { // 1. Switch ON the WiFi module
+  //////////////////////////////////////////////////
+  error = 1;
+  while (error == 1) {
+    error = WIFI_PRO.ON(socket);
+
+    if (error == 0) {
+      USB.println(F("1. WiFi switched ON"));
+    } else {
+      USB.println(F("1. WiFi did not initialize correctly"));
+    }
+  }
+
+  // 2. Reset to default values
+  //////////////////////////////////////////////////
+  error = 1;
+  while (error == 1) {
+    error = WIFI_PRO.resetValues();
+
+    if (error == 0) {
+      USB.println(F("2. WiFi reset to default"));
+    } else {
+      USB.println(F("2. WiFi reset to default ERROR"));
+    }
+  }
+  // 3. Set ESSID
+  //////////////////////////////////////////////////
+  error = 1;
+  while (error == 1) {
+    error = WIFI_PRO.setESSID(ESSID);
+
+    if (error == 0) {
+      USB.println(F("3. WiFi set ESSID OK"));
+    } else {
+      USB.println(F("3. WiFi set ESSID ERROR"));
+    }
+  }
+  //////////////////////////////////////////////////
+  // 4. Set password key (It takes a while to generate the key)
+  // Authentication modes:
+  //    OPEN: no security
+  //    WEP64: WEP 64
+  //    WEP128: WEP 128
+  //    WPA: WPA-PSK with TKIP encryption
+  //    WPA2: WPA2-PSK with TKIP or AES encryption
+  //////////////////////////////////////////////////
+  error = 1;
+  while (error == 1) {
+    error = WIFI_PRO.setPassword(WPA2, PASSW);
+
+    if (error == 0) {
+      USB.println(F("4. WiFi set AUTHKEY OK"));
+    } else {
+      USB.println(F("4. WiFi set AUTHKEY ERROR"));
+    }
+  }
+  //////////////////////////////////////////////////
+  // 5. Software Reset
+  // Parameters take effect following either a
+  // hardware or software reset
+  //////////////////////////////////////////////////
+  error = WIFI_PRO.softReset();
+
+  if (error == 0) {
+    USB.println(F("5. WiFi softReset OK"));
+  } else {
+    USB.println(F("5. WiFi softReset ERROR"));
+  }
+
+  USB.println(F("*******************************************"));
+  USB.println(F("Once the module is configured with ESSID"));
+  USB.println(F("and PASSWORD, the module will attempt to "));
+  USB.println(F("join the specified Access Point on power up"));
+  USB.println(F("*******************************************\n"));
+}
+
+
+
+
+void all_in_1_frame_process()
+{
+  trimitator_WIFI();
+  scriitor_SD(filename, ssent);
+}
+
+
+
+void  failed_resender( char* filename_a , uint8_t max_atemptss_a )
+{
+  if ( RTC.getTime() >=  "some shit time" && RTC.getTime() >=  "some shit time"  )
+  {
+    USB.println(F("*******************************************"));
+    USB.println(F("DATA RESEND ATEMPTS STARTING"));
+    USB.println(F("*******************************************"));
+  }
+}
+
+
+
+
+
+
+
+void OTA_setup_check()
+{
+  //////////////////////////////////////////////////
+  // 1. Check if the program has been programmed ok
+  //////////////////////////////////////////////////
+  answer = Utils.checkNewProgram();
+
+  switch (answer)
+  {
+  case 0:
+    USB.print(F("REPROGRAMMING ERROR"));
+    Utils.blinkRedLED(1300, 3);
+    break;
+
+  case 1:
+    USB.println(F("REPROGRAMMING OK"));
+    Utils.blinkGreenLED(1300, 3);
+    break;
+
+  default:
+    USB.println(F("RESTARTING"));
+    Utils.blinkGreenLED(1500, 1);
+  }
+
+
+  // show program ID
+  Utils.getProgramID(programID);
+  USB.println(F("-------------------------------"));
+  USB.print(F("Program id: "));
+  USB.println(programID);
+
+  // show program version number
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
+  USB.println(F("-------------------------------"));
+}
+
+
+
+
+
+void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    char user[] = ftp_user,    char password[] = ftp_pass  )
+{
+
+  //////////////////////////////////////////////////
+  // 4. OTA request
+  //////////////////////////////////////////////////
+
+  //////////////////////////////
+  // 4.1. Switch ON
+  //////////////////////////////
+  error = WIFI_PRO.ON(socket);
+
+  if (error == 0)
+  {
+    USB.println(F("1. WiFi switched ON"));
+  }
+  else
+  {
+    USB.println(F("1. WiFi did not initialize correctly"));
+  }
+
+
+  //////////////////////////////
+  // 4.2. Check if connected
+  //////////////////////////////
+  // get actual time
+  previous = millis();
+
+  // check connectivity
+  status =  WIFI_PRO.isConnected();
+
+  // Check if module is connected
+  if (status == true)
+  {
+    USB.print(F("2. WiFi is connected OK"));
+    USB.print(F(" Time(ms):"));
+    USB.println(millis() - previous);
+
+
+    USB.println(F("2.1. Connection Status:"));
+    USB.println(F("-------------------------------"));
+    USB.print(F("Rate (Mbps):"));
+    USB.println(WIFI_PRO._rate);
+    USB.print(F("Signal Level (%):"));
+    USB.println(WIFI_PRO._level);
+    USB.print(F("Link Quality(%):"));
+    USB.println(WIFI_PRO._quality);
+    USB.println(F("-------------------------------"));
+
+    //////////////////////////////
+    // 4.3. Request OTA
+    //////////////////////////////
+    USB.println(F("2.2. Request OTA..."));
+    error = WIFI_PRO.requestOTA(server, port, user, password);
+
+    // If OTA fails, show the error code
+    WIFI_PRO.printErrorCode();
+    Utils.blinkRedLED(1300, 3);
+
+  }
+  else
+  {
+    USB.print(F("2. WiFi is connected ERROR"));
+    USB.print(F(" Time(ms):"));
+    USB.println(millis() - previous);
+    Utils.blinkRedLED(200, 10);
+  }
+
+
+  //////////////////////////////////////////////////
+  // 5. Switch OFF
+  //////////////////////////////////////////////////
+  WIFI_PRO.OFF(socket);
+  USB.println(F("3. WiFi switched OFF"));
+  USB.println(F("OTA_check_loop is done"));
+  delay(1000);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// initializare
+
+void setup() {
+
+
 
   // Init RTC
   //  RTC.ON();
@@ -487,14 +669,25 @@ void setup() {
   // open USB port
   USB.ON();
   RTC.ON(); // Executes the init process
-  //  USB.print(F("Current RTC settings:"));
-  //  USB.println(RTC.getTime());
-  IRL_time = false;
+  USB.println(F("START"));
+  Utils.setProgramVersion( verr );
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
+  delay(5000);
+
+  
+  OTA_setup_check();
+
+  pregatitor_RTC_set();
+  delay(5000);
+
+
 
   if (IRL_time) {
     // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
     RTC.setTime("19:01:01:03:00:00:00");
-  } else {
+  } else
+  {
     // Check if module is connected
     if (status == true) {
       // 3.1. Open FTP session
@@ -522,7 +715,7 @@ void setup() {
 
   USB.print(F("Current RTC settings:"));
   USB.println(RTC.getTime());
-  USB.println(F("SD_CARD_ARHIVE_V4_RTC_ON_BAREBONES"));
+  USB.println(F("SD_CARD_ARHIVE_V5_RTC_ON_BAREBONES"));
 
   // Set SD ON
   SD.ON();
@@ -556,14 +749,6 @@ void setup() {
     USB.println(F("writeing is haveing errors"));
   }
 
-  //!!!!!!!!!!!!!!!!!!!!!!!
-  // Se va inlocui cu
-  // check connectivity
-  /*status =  WIFI_PRO.isConnected();
-  if (status==false)
-  {sd_answer = SD.appendln(filename,
-  "----------------------------------------------------------------------------"
-  )};*/
 
   // pm
   USB.ON();
@@ -582,16 +767,29 @@ void loop() {
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   // set frame fields (String - char*)
-  //frame.addSensor(SENSOR_STR, "this_is_a_string");
+
   // set frame fields (Battery sensor - uint8_t)
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   frame.addTimestamp();
-  frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
-  frame.showFrame(); 
+  //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
+  frame.showFrame();
   all_in_1_frame_process();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   failed_resender(filename , max_atemptss  );
+  OTA_check_loop();
+
+
+
+
+
+
+
+
+
+
+
+///////////////  NU UMBLA AICI !!!
 
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
@@ -626,20 +824,17 @@ void loop() {
   rtc_str[3] = y[0];
   rtc_str[4] = y[1];
 
-  ///-------------
 
-  // Go to deepsleep
 
   ////////////////////////////////////////////////
-  // 5. Sleep
+  // 5. deepsleep
   ////////////////////////////////////////////////
   USB.println(F("5. Enter deep sleep..."));
   USB.print("X");
   USB.print(rtc_str);
   USB.println("X");
 
-  USB.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-              "|||||||||||||||");
+  USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   USB.OFF();
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
