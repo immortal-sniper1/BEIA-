@@ -3,33 +3,23 @@
 //#include <WaspSD.h>
 #include <Wasp4G.h>
 
+//NU UNBLA AICI!!
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[] = "FILE1.TXT";
 
 char *time_date; // stores curent date + time
-int x, b;
-uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
+int cycle_time, x, b;
 uint8_t error, status = false;
 char y[3];
 uint8_t sd_answer, ssent = 0, resend_f = 2; // frame resend atempts
-bool sentence = false; // true for deletion on reboot  , false for data appended
-// to end of file
+bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
 bool IRL_time = false; //  true for no external data source
-int cycle_time, cycle_time2 = 60; // in seconds
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 
-char node_ID[] = "qwerty13";
+
 char programID[10];
-
-// APN settings
-///////////////////////////////////////    pt orange RO
-char apn[] = "net";
-char login[] = "";
-char password[] = "";
-///////////////////////////////////////
-
 // SERVER settings
 ///////////////////////////////////////
 char host[] = "82.78.81.178";
@@ -42,13 +32,31 @@ uint16_t ftp_port = 21;
 char ftp_user[] = "robi@agile.ro";
 char ftp_pass[] = "U$d(SEFA8+UC";
 ///////////////////////////////////////
-//FTP send 
+//FTP send
 char SD_FILE[]     = "FILE1.TXT";
 char SERVER_FILE[] = "HHKFILE2.TXT";
-
-
 uint8_t connection_status, net_in_attempt;
 char operator_name[20];
+
+
+
+//EDITEAZA AICI!
+int  cycle_time2 = 60; // in seconds
+char node_ID[] = "qwerty13";
+uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
+// APN settings
+///////////////////////////////////////    pt orange RO
+char apn[] = "net";
+char login[] = "";
+char password[] = "";
+///////////////////////////////////////
+
+
+
+
+
+
+
 
 // subprograme
 
@@ -56,9 +64,10 @@ char operator_name[20];
 
 
 
-void scriitor_SD(char filename_a[], uint8_t ssent_a = 0) {
+void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
+{
   int coruption = 0;
-  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  delay(1000);
   // now storeing it locally
   SD.ON();
   time_date = RTC.getTime();
@@ -506,13 +515,6 @@ void HTTP_POST_4G()
   USB.ON();
   USB.println(F("Starting program HTTP_POST_4G"));
 
-  USB.println(F("********************************************************************"));
-  USB.println(F("POST method to the Libelium's test url"));
-  USB.println(F("You can use this php to test the HTTP connection of the module."));
-  USB.println(F("The php returns the parameters that the user sends with the URL."));
-  USB.println(F("********************************************************************"));
-
-
   //////////////////////////////////////////////////
   // 1. sets operator parameters
   //////////////////////////////////////////////////
@@ -590,8 +592,6 @@ void HTTP_4G_TRIMITATOR_FRAME()
   if (error == 0)
   {
     USB.println(F("1. 4G module ready..."));
-
-
 
     ////////////////////////////////////////////////
     // 3. Send to Meshlium
@@ -745,6 +745,11 @@ void printErrorxx(uint8_t err)
 
   }
 }
+
+
+
+
+
 void OTAP_4G()
 {
   USB.println(F("STARTING OTAP VERSION CHECK"));
@@ -783,7 +788,9 @@ void OTAP_4G()
 
 }
 
-void FTP_4G_SEND(char SD_FILE[] ,char SERVER_FILE[])
+
+
+void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
 {
   int previous;
   //////////////////////////////////////////////////
@@ -882,21 +889,10 @@ void FTP_4G_SEND(char SD_FILE[] ,char SERVER_FILE[])
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 // initializare
 
-void setup() {
+void setup()
+{
   USB.ON();
   RTC.ON();
 //  x=setProgramVersion(1);
@@ -905,8 +901,19 @@ void setup() {
   INFO_4G_NET();
   //HTTP_GET_4G();
   //HTTP_POST_4G();
-FTP_4G_SEND( SD_FILE , SERVER_FILE  );
+  //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // show program ID
+  Utils.getProgramID(programID);
+  USB.println(F("-----------------------------"));
+  USB.print(F("Program id: "));
+  USB.println(programID);
+
+  // show program version number
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
+  USB.println(F("-----------------------------"));
+
   status = Utils.checkNewProgram();
 
   switch (status)
@@ -927,30 +934,17 @@ FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   }
 
 
-  // show program ID
-  Utils.getProgramID(programID);
-  USB.println(F("-----------------------------"));
-  USB.print(F("Program id: "));
-  USB.println(programID);
 
-  // show program version number
-  USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(), DEC);
-  USB.println(F("-----------------------------"));
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // 1. sets operator parameters
 
   _4G.set_APN(apn, login, password);
-
   _4G.show_APN();
 
-  RTC.ON();
+
   SET_RTC_4G(RTC_ATEMPTS);
-
-
-
 
   USB.println(RTC.getTime());
   USB.println(F("SD_CARD_ARHIVE_V1_RTC_OTAP_4G_BAREBONES"));
@@ -959,31 +953,38 @@ FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   // Set SD ON
   SD.ON();
 
-  if (sentence == 1) {
+  if (sentence == 1)
+  {
     // Delete file
     sd_answer = SD.del(filename);
 
-    if (sd_answer == 1) {
+    if (sd_answer == 1)
+    {
       USB.println(F("file deleted"));
-    } else {
+    } else
+    {
       USB.println(F("file NOT deleted"));
     }
   }
   // Create file IF id doent exist
   sd_answer = SD.create(filename);
 
-  if (sd_answer == 1) {
+  if (sd_answer == 1)
+  {
     USB.println(F("file created"));
-  } else {
+  } else
+  {
     USB.println(F("file NOT created"));
   }
 
   USB.print("loop cycle time[s]:= ");
   USB.println(cycle_time2);
   sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
-  if (sd_answer == 1) {
+  if (sd_answer == 1)
+  {
     USB.println(F("writeing is OK"));
-  } else {
+  } else
+  {
     USB.println(F("writeing is haveing errors"));
   }
 
@@ -1007,31 +1008,34 @@ FTP_4G_SEND( SD_FILE , SERVER_FILE  );
 // main program
 void loop()
 {
-/*
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  USB.println(F("qqqqqqq"));
-  */
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-    USB.println(F("vx"));
-  
   // get actual time before loop
   prev = millis();
+
+
+  /*
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    USB.println(F("qqqqqqq"));
+    */
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+  USB.println(F("vx"));
+
+
 
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1039,8 +1043,6 @@ void loop()
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   // set frame fields (Time from RTC)
-  //RTC.getTime();
-  //frame.addSensor(SENSOR_TIME,RTC.year,RTC.mounth,RTC.date, RTC.hour, RTC.minute, RTC.second);
   frame.showFrame();
 
   HTTP_4G_TRIMITATOR_FRAME();
@@ -1106,8 +1108,6 @@ void loop()
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                 "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
-
-
 
 
 }
