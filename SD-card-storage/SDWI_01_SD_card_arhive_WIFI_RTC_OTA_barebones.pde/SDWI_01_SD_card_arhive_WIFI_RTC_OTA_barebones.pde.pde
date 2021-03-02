@@ -701,6 +701,213 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
 }
 
+/*
+ 
+
+
+  switch (error)
+  {
+    case ERROR_CODE_0000: USB.println(F("Timeout")); break;
+    case ERROR_CODE_0010: USB.println(F("SD not present")); break;
+    case ERROR_CODE_0011: USB.println(F("file not created")); break;
+    case ERROR_CODE_0012: USB.println(F("SD error open file")); break;
+    case ERROR_CODE_0013: USB.println(F("SD error set file offset")); break;
+    case ERROR_CODE_0014: USB.println(F("SD error writing")); break;
+    case ERROR_CODE_0020: USB.println(F("rx buffer full")); break;
+    case ERROR_CODE_0021: USB.println(F("error downloading UPGRADE.TXT")); break;
+    case ERROR_CODE_0022: USB.println(F("filename in UPGRADE.TXT is not a 7-byte name")); break;
+    case ERROR_CODE_0023: USB.println(F("no FILE label is found in UPGRADE.TXT")); break;
+    case ERROR_CODE_0024: USB.println(F("NO_FILE is defined as FILE in UPGRADE.TXT")); break;
+    case ERROR_CODE_0025: USB.println(F("no PATH label is found in UPGRADE.TXT")); break;
+    case ERROR_CODE_0026: USB.println(F("no SIZE label is found in UPGRADE.TXT")); break;
+    case ERROR_CODE_0027: USB.println(F("no VERSION label is found in UPGRADE.TXT")); break;
+    case ERROR_CODE_0028: USB.println(F("version indicated in UPGRADE.TXT is lower/equal to Waspmote's version")); break;
+    case ERROR_CODE_0029: USB.println(F("file size does not match the indicated in UPGRADE.TXT")); break;
+    case ERROR_CODE_0030: USB.println(F("error downloading binary file")); break;
+    case ERROR_CODE_0031: USB.println(F("invalid data length")); break;
+    case ERROR_CODE_0041: USB.println(F("Illegal delimiter")); break;
+    case ERROR_CODE_0042: USB.println(F("Illegal value")); break;
+    case ERROR_CODE_0043: USB.println(F("CR expected ")); break;
+    case ERROR_CODE_0044: USB.println(F("Number expected")); break;
+    case ERROR_CODE_0045: USB.println(F("CR or ‘,’ expected")); break;
+    case ERROR_CODE_0046: USB.println(F("DNS expected")); break;
+    case ERROR_CODE_0047: USB.println(F("‘:’ or ‘~’ expected")); break;
+    case ERROR_CODE_0048: USB.println(F("String expected")); break;
+    case ERROR_CODE_0049: USB.println(F("‘:’ or ‘=’ expected")); break;
+    case ERROR_CODE_0050: USB.println(F("Text expected")); break;
+    case ERROR_CODE_0051: USB.println(F("Syntax error")); break;
+    case ERROR_CODE_0052: USB.println(F("‘,’ expected")); break;
+    case ERROR_CODE_0053: USB.println(F("Illegal cmd code")); break;
+    case ERROR_CODE_0054: USB.println(F("Error when setting parameter")); break;
+    case ERROR_CODE_0055: USB.println(F("Error when getting parameter value")); break;
+    case ERROR_CODE_0056: USB.println(F("User abort")); break;
+    case ERROR_CODE_0057: USB.println(F("Error when trying to establish PPP")); break;
+    case ERROR_CODE_0058: USB.println(F("Error when trying to establish SMTP")); break;
+    case ERROR_CODE_0059: USB.println(F("Error when trying to establish POP3")); break;
+    case ERROR_CODE_0060: USB.println(F("Single session body for MIME exceeds the maximum allowed")); break;
+    case ERROR_CODE_0061: USB.println(F("Internal memory failure")); break;
+    case ERROR_CODE_0062: USB.println(F("User aborted the system")); break;
+    case ERROR_CODE_0063: USB.println(F("~CTSH needs to be LOW to change to hardware flow control")); break;
+    case ERROR_CODE_0064: USB.println(F("User aborted last cmd using ‘---’")); break;
+    case ERROR_CODE_0065: USB.println(F("iChip unique ID already exists")); break;
+    case ERROR_CODE_0066: USB.println(F("Error when setting the MIF parameter")); break;
+    case ERROR_CODE_0067: USB.println(F("Cmd ignored as irrelevant")); break;
+    case ERROR_CODE_0068: USB.println(F("iChip serial number already exists")); break;
+    case ERROR_CODE_0069: USB.println(F("Timeout on host communication")); break;
+    case ERROR_CODE_0070: USB.println(F("Modem failed to respond")); break;
+    case ERROR_CODE_0071: USB.println(F("No dial tone response")); break;
+    case ERROR_CODE_0072: USB.println(F("No carrier modem response")); break;
+    case ERROR_CODE_0073: USB.println(F("Dial failed")); break;
+    case ERROR_CODE_0074: USB.println(F("WLAN connection lost")); break;
+    case ERROR_CODE_0075: USB.println(F("Access denied to ISP server")); break;
+    case ERROR_CODE_0076: USB.println(F("Unable to locate POP3 server")); break;
+    case ERROR_CODE_0077: USB.println(F("POP3 server timed out")); break;
+    case ERROR_CODE_0078: USB.println(F("Access denied to POP3 server")); break;
+    case ERROR_CODE_0079: USB.println(F("POP3 failed ")); break;
+    case ERROR_CODE_0080: USB.println(F("No suitable message in mailbox")); break;
+    case ERROR_CODE_0081: USB.println(F("Unable to locate SMTP server")); break;
+    case ERROR_CODE_0082: USB.println(F("SMTP server timed out")); break;
+    case ERROR_CODE_0083: USB.println(F("SMTP failed")); break;
+    case ERROR_CODE_0086: USB.println(F("Writing to internal non-volatile parameters database failed")); break;
+    case ERROR_CODE_0087: USB.println(F("Web server IP registration failed")); break;
+    case ERROR_CODE_0088: USB.println(F("Socket IP registration failed")); break;
+    case ERROR_CODE_0089: USB.println(F("E-mail IP registration failed")); break;
+    case ERROR_CODE_0090: USB.println(F("IP registration failed for all methods specified")); break;
+    case ERROR_CODE_0094: USB.println(F("In Always Online mode, connection was lost and re-established")); break;
+    case ERROR_CODE_0096: USB.println(F("A remote host, which had taken over iChip through the LATI port, was disconnected")); break;
+    case ERROR_CODE_0100: USB.println(F("Error restoring default parameters")); break;
+    case ERROR_CODE_0101: USB.println(F("No ISP access numbers defined")); break;
+    case ERROR_CODE_0102: USB.println(F("No USRN defined")); break;
+    case ERROR_CODE_0103: USB.println(F("No PWD entered")); break;
+    case ERROR_CODE_0104: USB.println(F("No DNS defined")); break;
+    case ERROR_CODE_0105: USB.println(F("POP3 server not defined")); break;
+    case ERROR_CODE_0106: USB.println(F("MBX (mailbox) not defined")); break;
+    case ERROR_CODE_0107: USB.println(F("MPWD (mailbox password) not defined")); break;
+    case ERROR_CODE_0108: USB.println(F("TOA (addressee) not defined")); break;
+    case ERROR_CODE_0109: USB.println(F("REA (return e-mail address) not defined")); break;
+    case ERROR_CODE_0110: USB.println(F("SMTP server not defined")); break;
+    case ERROR_CODE_0111: USB.println(F("Serial data overflow")); break;
+    case ERROR_CODE_0112: USB.println(F("Illegal cmd when modem online")); break;
+    case ERROR_CODE_0113: USB.println(F("Remote firmware update attempted but not completed. The original firmware remained intact.")); break;
+    case ERROR_CODE_0114: USB.println(F("E-mail parameters update rejected")); break;
+    case ERROR_CODE_0115: USB.println(F("SerialNET could not be started due to missing parameters")); break;
+    case ERROR_CODE_0116: USB.println(F("Error parsing a new trusted CA certificate")); break;
+    case ERROR_CODE_0117: USB.println(F("Error parsing a new Private Key")); break;
+    case ERROR_CODE_0118: USB.println(F("Protocol specified in the USRV parameter does not exist or is unknown")); break;
+    case ERROR_CODE_0119: USB.println(F("WPA passphrase too short has to be 8-63 chars")); break;
+    case ERROR_CODE_0122: USB.println(F("SerialNET error: Host Interface undefined (HIF=0)")); break;
+    case ERROR_CODE_0123: USB.println(F("SerialNET mode error: Host baud rate cannot be determined")); break;
+    case ERROR_CODE_0124: USB.println(F("SerialNET over TELNET error: HIF parameter must be set to 1 or 2")); break;
+    case ERROR_CODE_0125: USB.println(F("Invalid WEP key")); break;
+    case ERROR_CODE_0126: USB.println(F("Invalid parameters’ profile number")); break;
+    case ERROR_CODE_0128: USB.println(F("Product ID already exists")); break;
+    case ERROR_CODE_0129: USB.println(F("HW pin can not be changed after Product-ID was set ")); break;
+    case ERROR_CODE_0200: USB.println(F("Socket does not exist")); break;
+    case ERROR_CODE_0201: USB.println(F("Socket empty on receive")); break;
+    case ERROR_CODE_0202: USB.println(F("Socket not in use")); break;
+    case ERROR_CODE_0203: USB.println(F("Socket down")); break;
+    case ERROR_CODE_0204: USB.println(F("No available sockets")); break;
+    case ERROR_CODE_0206: USB.println(F("PPP open failed for socket")); break;
+    case ERROR_CODE_0207: USB.println(F("Error creating socket")); break;
+    case ERROR_CODE_0208: USB.println(F("Socket send error")); break;
+    case ERROR_CODE_0209: USB.println(F("Socket receive error")); break;
+    case ERROR_CODE_0210: USB.println(F("PPP down for socket")); break;
+    case ERROR_CODE_0212: USB.println(F("Socket flush error ")); break;
+    case ERROR_CODE_0215: USB.println(F("No carrier error on socket operation")); break;
+    case ERROR_CODE_0216: USB.println(F("General exception")); break;
+    case ERROR_CODE_0217: USB.println(F("Out of memory")); break;
+    case ERROR_CODE_0218: USB.println(F("An STCP (Open Socket) cmd specified a local port number that is already in use")); break;
+    case ERROR_CODE_0219: USB.println(F("SSL initialization/internal CA certificate loading error")); break;
+    case ERROR_CODE_0220: USB.println(F("SSL3 negotiation error")); break;
+    case ERROR_CODE_0221: USB.println(F("Illegal SSL socket handle. Must be an open and active TCP socket.")); break;
+    case ERROR_CODE_0222: USB.println(F("Trusted CA certificate does not exist")); break;
+    case ERROR_CODE_0224: USB.println(F("Decoding error on incoming SSL data")); break;
+    case ERROR_CODE_0225: USB.println(F("No additional SSL sockets available")); break;
+    case ERROR_CODE_0226: USB.println(F("Maximum SSL packet size (2KB) exceeded")); break;
+    case ERROR_CODE_0227: USB.println(F("AT+iSSND cmd failed because size of stream sent exceeded 2048 bytes")); break;
+    case ERROR_CODE_0228: USB.println(F("AT+iSSND cmd failed because checksum calculated does not match checksum sent by host")); break;
+    case ERROR_CODE_0229: USB.println(F("SSL parameters are missing ")); break;
+    case ERROR_CODE_0230: USB.println(F("Maximum packet size (4GB) exceeded")); break;
+    case ERROR_CODE_0300: USB.println(F("HTTP server unknown")); break;
+    case ERROR_CODE_0301: USB.println(F("HTTP server timeout ")); break;
+    case ERROR_CODE_0303: USB.println(F("No URL specified ")); break;
+    case ERROR_CODE_0304: USB.println(F("Illegal HTTP host name")); break;
+    case ERROR_CODE_0305: USB.println(F("Illegal HTTP port number")); break;
+    case ERROR_CODE_0306: USB.println(F("Illegal URL address")); break;
+    case ERROR_CODE_0307: USB.println(F("URL address too long ")); break;
+    case ERROR_CODE_0308: USB.println(F("The AT+iWWW cmd failed because iChip does not contain a home page")); break;
+    case ERROR_CODE_0309: USB.println(F("WEB server is already active with a different backlog.")); break;
+    case ERROR_CODE_0400: USB.println(F("MAC address exists")); break;
+    case ERROR_CODE_0401: USB.println(F("No IP address")); break;
+    case ERROR_CODE_0402: USB.println(F("Wireless LAN power set failed")); break;
+    case ERROR_CODE_0403: USB.println(F("Wireless LAN radio control failed")); break;
+    case ERROR_CODE_0404: USB.println(F("Wireless LAN reset failed")); break;
+    case ERROR_CODE_0405: USB.println(F("Wireless LAN hardware setup failed")); break;
+    case ERROR_CODE_0406: USB.println(F("Cmd failed because WiFi module is currently busy")); break;
+    case ERROR_CODE_0407: USB.println(F("Illegal WiFi channel")); break;
+    case ERROR_CODE_0408: USB.println(F("Illegal SNR threshold")); break;
+    case ERROR_CODE_0409: USB.println(F("WPA connection process has not yet completed")); break;
+    case ERROR_CODE_0410: USB.println(F("The network connection is offline (modem)")); break;
+    case ERROR_CODE_0411: USB.println(F("Cmd is illegal when Bridge mode is active")); break;
+    case ERROR_CODE_0501: USB.println(F("Communications platform already active")); break;
+    case ERROR_CODE_0505: USB.println(F("Cannot open additional FTP session – all FTP handles in use")); break;
+    case ERROR_CODE_0506: USB.println(F("Not an FTP session handle")); break;
+    case ERROR_CODE_0507: USB.println(F("FTP server not found")); break;
+    case ERROR_CODE_0508: USB.println(F("Timeout when connecting to FTP server")); break;
+    case ERROR_CODE_0509: USB.println(F("Failed to login to FTP server (bad username or password or account)")); break;
+    case ERROR_CODE_0510: USB.println(F("FTP cmd could not be completed")); break;
+    case ERROR_CODE_0511: USB.println(F("FTP data socket could not be opened")); break;
+    case ERROR_CODE_0512: USB.println(F("Failed to send data on FTP data socket")); break;
+    case ERROR_CODE_0513: USB.println(F("FTP shutdown by remote server")); break;
+    case ERROR_CODE_0550: USB.println(F("Telnet server not found")); break;
+    case ERROR_CODE_0551: USB.println(F("Timeout when connecting to Telnet server")); break;
+    case ERROR_CODE_0552: USB.println(F("Telnet cmd could not be completed")); break;
+    case ERROR_CODE_0553: USB.println(F("Telnet session shutdown by remote server")); break;
+    case ERROR_CODE_0554: USB.println(F("A Telnet session is not currently active")); break;
+    case ERROR_CODE_0555: USB.println(F("A Telnet session is already open")); break;
+    case ERROR_CODE_0556: USB.println(F("Telnet server refused to switch to BINARY mode")); break;
+    case ERROR_CODE_0557: USB.println(F("Telnet server refused to switch to ASCII mode")); break;
+    case ERROR_CODE_0560: USB.println(F("Client could not retrieve a ring response e-mail")); break;
+    case ERROR_CODE_0561: USB.println(F("Remote peer closed the SerialNET socket")); break;
+    case ERROR_CODE_0570: USB.println(F("PING destination not found")); break;
+    case ERROR_CODE_0571: USB.println(F("No reply to PING request")); break;
+    case ERROR_CODE_0600: USB.println(F("Port Forwarding Rule will create ambiguous NAT entry")); break;
+    case ERROR_CODE_0084:
+    case ERROR_CODE_0085:
+    case ERROR_CODE_0091:
+    case ERROR_CODE_0092:
+    case ERROR_CODE_0093:
+    case ERROR_CODE_0098:
+    case ERROR_CODE_0099:
+    case ERROR_CODE_0120:
+    case ERROR_CODE_0121:
+    case ERROR_CODE_0223:
+    case ERROR_CODE_0302:
+    case ERROR_CODE_0500:
+    case ERROR_CODE_0502:
+    case ERROR_CODE_0503:
+    case ERROR_CODE_0504:
+    case ERROR_CODE_0514:
+    case ERROR_CODE_0558:
+    case ERROR_CODE_0559: USB.println(F("RESERVED")); break;
+    default: USB.println(F("UNKNOWN ***"));
+  }
+
+
+
+
+
+ */
+
+
+
+
+
+
+
+
+
+
 
 
 
