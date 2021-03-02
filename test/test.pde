@@ -653,12 +653,16 @@ qwerty:
 
     // add frame fields
 ////////////////////////////////////////////////////////////
-    frame.addSensor(SENSOR_STR, "string1");
-    frame.addSensor(SENSOR_STR, "string2");
-    frame.addSensor(SENSOR_STR, "string3");
-    frame.addSensor(SENSOR_STR, "string4");
-    frame.addSensor(SENSOR_STR, "string5");
-    frame.addSensor(SENSOR_STR, "string6");
+    frame.addSensor(SENSOR_BAT, 13);
+    frame.addSensor(SENSOR_BAT, 33);
+    frame.addSensor(SENSOR_BAT, 23);
+    frame.addSensor(SENSOR_BAT, 43);
+    frame.addSensor(SENSOR_BAT, 15);
+    frame.addSensor(SENSOR_BAT, 15);
+    frame.addSensor(SENSOR_BAT, 17);
+    frame.addSensor(SENSOR_BAT, 11);
+    frame.addSensor(SENSOR_BAT, 19);
+
     // Add CH4 value
     frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
     // Add CO value
