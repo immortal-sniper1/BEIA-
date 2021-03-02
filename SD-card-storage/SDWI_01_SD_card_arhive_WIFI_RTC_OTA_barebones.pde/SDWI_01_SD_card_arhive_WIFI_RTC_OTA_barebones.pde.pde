@@ -672,9 +672,6 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     //////////////////////////////
     USB.println(F("2.2. Request OTA..."));
     error = WIFI_PRO.requestOTA(server, port, user, password);
-    USB.println(F("||||||||||||||||||||||||||||"));
-    printErrorxx(error);
-    USB.println(F("||||||||||||||||||||||||||||"));
     // If OTA fails, show the error code
     WIFI_PRO.printErrorCode();
     Utils.blinkRedLED(1300, 3);
@@ -705,69 +702,6 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 }
 
 
-//printError - prints the error related to OTA
-
-void printErrorxx(uint8_t err)
-{
-  switch (err)
-  {
-  case 1:  USB.println(F("SD not present"));
-    break;
-  case 2:  USB.println(F("error downloading UPGRADE.TXT"));
-    break;
-  case 3:  USB.println(F("error opening FTP session"));
-    break;
-  case 4:  USB.println(F("filename is different to 7 bytes"));
-    break;
-  case 5:  USB.println(F("no 'FILE' pattern found"));
-    break;
-  case 6:  USB.println(F("'NO_FILE' is the filename"));
-    break;
-  case 7:  USB.println(F("no 'PATH' pattern found"));
-    break;
-  case 8:  USB.println(F("no 'SIZE' pattern found"));
-    break;
-  case 9:  USB.println(F("no 'VERSION' pattern found"));
-    break;
-  case 10: USB.println(F("invalid program version number"));
-    break;
-  case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
-    break;
-  case 12: USB.println(F("error downloading binary file: server file size is zero"));
-    break;
-  case 13: USB.println(F("error downloading binary file: reading the file size"));
-    break;
-  case 14: USB.println(F("error downloading binary file: SD not present"));
-    break;
-  case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
-    break;
-  case 16: USB.println(F("error downloading binary file: error opening the file"));
-    break;
-  case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
-    break;
-  case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
-    break;
-  case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
-    break;
-  case 20: USB.println(F("error downloading binary file: error  getting packet size"));
-    break;
-  case 21: USB.println(F("error downloading binary file: packet size mismatch"));
-    break;
-  case 22: USB.println(F("error downloading binary file: error writing SD"));
-    break;
-  case 23: USB.println(F("error downloading binary file: no more retries getting data"));
-    break;
-  case 24: USB.println(F("error downloading binary file: size mismatch"));
-    break;
-  default : USB.println(F("unknown"));
-
-  }
-}
-
-
-
-
-
 
 
 
@@ -783,17 +717,15 @@ void setup()
   USB.println(F("START"));
 
 
-  Utils.setProgramVersion( verr );
-  USB.print(F("Program version: "));
+ // Utils.setProgramVersion( verr );
+ // USB.print(F("Program version: "));
   USB.println(Utils.getProgramVersion(), DEC);
   delay(5000);
 
 
   OTA_setup_check();
   pregatitor_RTC_set();
-  delay(5000);
-
-
+  delay(1000);
 
   if (IRL_time)
   {
