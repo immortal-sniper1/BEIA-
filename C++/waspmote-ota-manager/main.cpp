@@ -1,9 +1,17 @@
 #include <iostream>
 #include <fstream>
+
+
+
+
+
 using namespace std;
 
 string  decitit;
 int sizex, verss;
+
+
+
 
 int main()
 {
@@ -34,11 +42,6 @@ int main()
 
 
 
-
-
-
-
-
-
+cin>>verss;
   return 0;
 }

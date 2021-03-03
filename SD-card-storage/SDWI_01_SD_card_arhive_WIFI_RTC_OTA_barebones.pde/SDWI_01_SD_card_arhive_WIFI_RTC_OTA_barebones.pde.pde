@@ -619,7 +619,8 @@ void OTA_setup_check()
 
 void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    char user[] = ftp_user,    char password[] = ftp_pass  )
 {
-
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
   //////////////////////////////////////////////////
   // 4. OTA request
   //////////////////////////////////////////////////
@@ -627,6 +628,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
   //////////////////////////////
   // 4.1. Switch ON
   //////////////////////////////
+  
   SD.ON();
   error = WIFI_PRO.ON(socket);
 
@@ -925,7 +927,7 @@ void setup()
 
 
  // Utils.setProgramVersion( verr );
- // USB.print(F("Program version: "));
+  USB.print(F("Program version: "));
   USB.println(Utils.getProgramVersion(), DEC);
   delay(5000);
 
