@@ -53,7 +53,7 @@ int8_t answer, verr = 13;
 
 
 ///// EDITEAZA AICI DOAR
-static char LE910_OTA_FILE[] = "UPGRADEEE.TXT";
+static char qaz[] = "UPGREEE.TXT";
 char node_ID[] = "cevax";
 int count_trials = 0;
 int N_trials = 10;
@@ -673,7 +673,8 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     // 4.3. Request OTA
     //////////////////////////////
     USB.println(F("2.2. Request OTA..."));
-    error = WIFI_PRO.requestOTA(server, port, user, password);
+   // error = WaspWIFI_PRO.requestOTA(server, port, user, password  );
+    error = WaspWIFI_PRO.requestOTAA(server, port, user, password ,"fefwe.txt"  );
     // If OTA fails, show the error code
     WIFI_PRO.printErrorCode();
     Utils.blinkRedLED(1300, 3);
@@ -925,6 +926,17 @@ void setup()
   RTC.ON(); // Executes the init process
   USB.println(F("START"));
 
+  USB.println(  OTA_ver_file);
+
+
+  /*
+  //OTA_ver_file
+  for (int i=0;i<12;i++)
+  {
+  OTA_ver_file[x]="e";
+  }
+*/
+  USB.println(  OTA_ver_file);
 
  // Utils.setProgramVersion( verr );
   USB.print(F("Program version: "));
@@ -1070,3 +1082,9 @@ void loop()
       "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
 }
+
+
+
+
+
+
