@@ -53,7 +53,7 @@ int8_t answer, verr = 13;
 
 
 ///// EDITEAZA AICI DOAR
-char upgraderr[] = "UAEE.TXT";
+char upgraderr[] = "UAEEOOO.TXT";
 char node_ID[] = "cevax";
 int count_trials = 0;
 int N_trials = 10;
@@ -678,8 +678,8 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
     error = requestOTAAA(server, port, user, password , upgraderr);
 
-
-
+    USB.print(F("=================="));
+    USB.println(error , DEC);
     // If OTA fails, show the error code
     WIFI_PRO.printErrorCode();
     Utils.blinkRedLED(1300, 3);
@@ -1293,24 +1293,11 @@ void setup()
 {
 
 
-  // open USB port
 
-  ///strcpy(OTA_ver_file , "vecyyya.txt");
   USB.ON();
   RTC.ON(); // Executes the init process
   USB.println(F("START"));
 
-  USB.println(  OTA_ver_file);
-
-
-  /*
-  //OTA_ver_file
-  for (int i=0;i<12;i++)
-  {
-  OTA_ver_file[x]="e";
-  }
-  */
-  USB.println(  OTA_ver_file);
 
 // Utils.setProgramVersion( verr );
   USB.print(F("Program version: "));

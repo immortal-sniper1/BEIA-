@@ -1,24 +1,77 @@
 #include <iostream>
 #include <fstream>
-
+#include <string>
 
 
 
 
 using namespace std;
 
-string  decitit;
+string  decitit, qaz = "qqq";
 int sizex, verss;
-
+bool x = true;
 
 
 
 int main()
 {
-  ofstream myfile;
-  myfile.open ("UPGRADE.TXT");
+  //cout << "introduceti numele fisierului binar " << endl;
+  cout << "introduceti numele de upgrade [NU UITA SA SCRII SI EXTENSIA SI AI GRIJA LA MARIME LITERE] " << endl;
+  cin >> qaz;
+  if (qaz[8] != '.')
+  {
+    x = false;
+  }
+  if (qaz[9] != 'T')
+  {
+    x = false;
+  }
+  if (qaz[10] != 'X')
+  {
+    x = false;
+  }
+  if (qaz[11] != 'T')
+  {
+    x = false;
+  }
+
+
+
+  while ( (qaz.length() != 11) || x   )
+  {
+    cout << "lungime " << qaz.length() << endl;
+    cout << "extensia este " << x << endl;
+    cout << "filename trebuie  sa fie 7 bytes + .TXT la sfarsit" << endl;
+    cout << "introduceti numele de upgrade [NU UITA SA SCRII SI EXTENSIA SI AI GRIZA LA MARIME LITERE] " << endl;
+    cin >> qaz;
+  }
+
+
+
+
+
+
+  std::ofstream myfile (qaz);
+  //ofstream myfile;
+  //myfile.open ("UPGRADE.TXT");
   cout << "introduceti numele fisierului binar " << endl;
   cin >> decitit;
+
+
+    while ( decitit.length() != 11    )
+  {
+    cout << "lungime " << decitit.length() << endl;
+    cout << "filename trebuie  sa fie 7 bytes + RARA EXTENSIE la sfarsit" << endl;
+    cout << "introduceti numele de upgrade [NU UITA SA SCRII SI EXTENSIA SI AI GRIZA LA MARIME LITERE] " << endl;
+    cin >> decitit;
+  }
+
+
+
+
+
+
+
   myfile << "FILE:";
   myfile << decitit;
   myfile << "\n";
@@ -38,10 +91,6 @@ int main()
 
   myfile.close();
 
-
-
-
-
-cin>>verss;
-  return 0;
+  cin >> verss;
+  return 1;
 }
