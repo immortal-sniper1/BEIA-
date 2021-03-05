@@ -597,7 +597,7 @@ void OTA_setup_check()
     Utils.blinkGreenLED(1500, 1);
   }
 
-    USB.println(F(" "));
+  USB.println(F(" "));
   // show program ID
   Utils.getProgramID(programID);
   USB.println(F("-------------------------------"));
@@ -628,7 +628,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
   //////////////////////////////
   // 4.1. Switch ON
   //////////////////////////////
-  
+
   SD.ON();
   error = WIFI_PRO.ON(socket);
 
@@ -673,8 +673,13 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     // 4.3. Request OTA
     //////////////////////////////
     USB.println(F("2.2. Request OTA..."));
-    error = WIFI_PRO.requestOTA( server, port, user, password);
+//   error = WIFI_PRO.requestOTA( server, port, user, password);
 //     error = WIFI_PRO.requestOTAA(server, port, user, password ,upgraderr);
+
+    error = requestOTAAA(server, port, user, password , upgraderr);
+
+
+
     // If OTA fails, show the error code
     WIFI_PRO.printErrorCode();
     Utils.blinkRedLED(1300, 3);
@@ -705,7 +710,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 }
 
 /*
- 
+
 
 
   switch (error)
@@ -938,9 +943,9 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   // check if the card is there or not
   if (!SD.isSD())
   {
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("Error: SD not present\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("Error: SD not present\n"));
+#endif
     SD.OFF();
     WIFI_PRO._errorCode = ERROR_CODE_0010;
     return 1;
@@ -949,9 +954,9 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   // Delete file in the case it exists
   if (SD.isFile(verr_file) == 1)
   {
-    #if DEBUG_WIFI_PRO > 1
-      PRINT_WIFI_PRO(F("delete file\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 1
+    PRINT_WIFI_PRO(F("delete file\n"));
+#endif
     SD.del(verr_file);
   }
 
@@ -962,48 +967,48 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   // 1. Download config file
   ////////////////////////////////////////////////////////////////////////////
 
-  #if DEBUG_WIFI_PRO > 1
-    PRINT_WIFI_PRO(F("Downloading OTA config file...\n"));
-  #endif
+#if DEBUG_WIFI_PRO > 1
+  PRINT_WIFI_PRO(F("Downloading OTA config file...\n"));
+#endif
 
-    // Open FTP session
-    error = WIFI_PRO.ftpOpenSession( server, port, user, pass );
+  // Open FTP session
+  error = WIFI_PRO.ftpOpenSession( server, port, user, pass );
 
-    // check response
-    if (error == 0)
-    {
+  // check response
+  if (error == 0)
+  {
     handle = WIFI_PRO._ftp_handle;
-    #if DEBUG_WIFI_PRO > 1
-      PRINT_WIFI_PRO(F("Open FTP session OK\n"));
-    #endif
-    }
-    else
-    {
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("Error opening FTP session\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 1
+    PRINT_WIFI_PRO(F("Open FTP session OK\n"));
+#endif
+  }
+  else
+  {
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("Error opening FTP session\n"));
+#endif
     return 1;
-    }
+  }
 
   // get verr_file
   error = WIFI_PRO.ftpDownload(handle, verr_file, verr_file);
 
-    // check if file was downloaded correctly
-    if (error == 0)
-    {
-    #if DEBUG_WIFI_PRO > 1
-      PRINT_WIFI_PRO(F("verr_file downloaded OK\n"));
-    #endif
+  // check if file was downloaded correctly
+  if (error == 0)
+  {
+#if DEBUG_WIFI_PRO > 1
+    PRINT_WIFI_PRO(F("verr_file downloaded OK\n"));
+#endif
   }
-    else
-    {
+  else
+  {
     WIFI_PRO._errorCode = ERROR_CODE_0021;
     WIFI_PRO.ftpCloseSession(handle);
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("ERROR downloading verr_file\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("ERROR downloading verr_file\n"));
+#endif
     return 1;
-    }
+  }
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -1024,31 +1029,31 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   SD.goRoot();
 
   // clear buffer
-  memset(_buffer, 0x00, _bufferSize);
+  memset(WIFI_PRO._buffer, 0x00, WIFI_PRO._bufferSize);
 
   // Reads the file and copy to '_buffer'
-  SD.cat(verr_file, 0, _bufferSize);
-  strcpy((char*)_buffer, SD.buffer );
+  SD.cat(verr_file, 0, WIFI_PRO._bufferSize);
+  strcpy((char*)WIFI_PRO._buffer, SD.buffer );
 
   /// 1. Search the file name
-  str_pointer = strstr((char*) _buffer, format_file);
+  str_pointer = strstr((char*) WIFI_PRO._buffer, format_file);
   if (str_pointer != NULL)
   {
     // Copy the FILE contents:
     // get string length and check it is equal to 7
-    length = strchr(str_pointer, '\n')-1-strchr(str_pointer, ':');
+    length = strchr(str_pointer, '\n') - 1 - strchr(str_pointer, ':');
     if (length != 7)
     {
       WIFI_PRO._errorCode = ERROR_CODE_0022;
       WIFI_PRO.ftpCloseSession(handle);
-      #if DEBUG_WIFI_PRO > 0
-        PRINT_WIFI_PRO(F("length:"));
-        USB.println(length);
-      #endif
+#if DEBUG_WIFI_PRO > 0
+      PRINT_WIFI_PRO(F("length:"));
+      USB.println(length);
+#endif
       return 1;
     }
     // copy string
-    strncpy(aux_name, strchr(str_pointer, ':')+1, 7);
+    strncpy(aux_name, strchr(str_pointer, ':') + 1, 7);
     aux_name[7] = '\0';
   }
   else
@@ -1056,30 +1061,30 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
     SD.OFF();
     WIFI_PRO.ftpCloseSession(handle);
     WIFI_PRO._errorCode = ERROR_CODE_0023;
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("No FILE label\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("No FILE label\n"));
+#endif
     return 1;
   }
 
   /// 2. Check if NO_FILE is the filename
-  if (strcmp(aux_name,NO_OTA) == 0)
+  if (strcmp(aux_name, NO_OTA) == 0)
   {
     WIFI_PRO.ftpCloseSession(handle);
     WIFI_PRO._errorCode = ERROR_CODE_0024;
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(NO_OTA);
-      USB.println(NO_OTA);
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(NO_OTA);
+    USB.println(NO_OTA);
+#endif
     return 1;
   }
 
   /// 3. Search the path
-  str_pointer = strstr((char*) _buffer, format_path);
+  str_pointer = strstr((char*) WIFI_PRO._buffer, format_path);
   if (str_pointer != NULL)
   {
     // copy the PATH contents
-    length = strchr(str_pointer, '\n')-1-strchr(str_pointer, ':');
+    length = strchr(str_pointer, '\n') - 1 - strchr(str_pointer, ':');
     strncpy(path, strchr(str_pointer, ':') + 1, length );
     path[length] = '\0';
 
@@ -1091,24 +1096,24 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
     SD.OFF();
     WIFI_PRO.ftpCloseSession(handle);
     WIFI_PRO._errorCode = ERROR_CODE_0025;
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("No PATH label\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("No PATH label\n"));
+#endif
     return 1;
   }
 
   /// 4. Search file size
-  str_pointer = strstr((char*) _buffer, format_size);
+  str_pointer = strstr((char*) WIFI_PRO._buffer, format_size);
   if (str_pointer != NULL)
   {
     // copy the SIZE contents
-    length = strchr(str_pointer, '\n')-1-strchr(str_pointer, ':');
+    length = strchr(str_pointer, '\n') - 1 - strchr(str_pointer, ':');
     // check length does not overflow
     if (length >= (int)sizeof(aux_str))
     {
-      length = sizeof(aux_str)-1;
+      length = sizeof(aux_str) - 1;
     }
-    strncpy(aux_str, strchr(str_pointer, ':')+1, length);
+    strncpy(aux_str, strchr(str_pointer, ':') + 1, length);
     aux_str[length] = '\0';
 
     // converto from string to int
@@ -1119,37 +1124,37 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
     SD.OFF();
     WIFI_PRO.ftpCloseSession(handle);
     WIFI_PRO._errorCode = ERROR_CODE_0026;
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("No SIZE label\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("No SIZE label\n"));
+#endif
     return 1;
   }
 
   /// 5. Search Version
-  str_pointer = strstr((char*) _buffer, format_version);
+  str_pointer = strstr((char*) WIFI_PRO._buffer, format_version);
   if (str_pointer != NULL)
   {
     // copy the SIZE contents
-    length = strchr(str_pointer, '\n')-1-strchr(str_pointer, ':');
+    length = strchr(str_pointer, '\n') - 1 - strchr(str_pointer, ':');
     // check length does not overflow
     if (length >= (int)sizeof(aux_str))
     {
-      length = sizeof(aux_str)-1;
+      length = sizeof(aux_str) - 1;
     }
-    strncpy(aux_str, strchr(str_pointer, ':')+1, length);
+    strncpy(aux_str, strchr(str_pointer, ':') + 1, length);
     aux_str[length] = '\0';
 
     // convert from string to uint8_t
-    aux_version=(uint8_t)atoi(aux_str);
+    aux_version = (uint8_t)atoi(aux_str);
   }
   else
   {
     SD.OFF();
     WIFI_PRO.ftpCloseSession(handle);
     WIFI_PRO._errorCode = ERROR_CODE_0027;
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("No VERSION label\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("No VERSION label\n"));
+#endif
     return 1;
   }
 
@@ -1162,7 +1167,7 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   PRINT_WIFI_PRO(F("SIZE:"));
   USB.println(aux_size);
   PRINT_WIFI_PRO(F("VERSION:"));
-  USB.println(aux_version,DEC);
+  USB.println(aux_version, DEC);
   USB.println(F("--------------------------------"));
 
   // get actual program version
@@ -1172,8 +1177,8 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   Utils.getProgramID(prog_name);
 
   // check if version number
-  #ifdef CHECK_VERSION
-  if (strcmp(prog_name,aux_name) == 0)
+#ifdef CHECK_VERSION
+  if (strcmp(prog_name, aux_name) == 0)
   {
     if (prog_version >= aux_version)
     {
@@ -1183,13 +1188,13 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
       // if we have specified the same program id and lower/same version
       // number, then do not proceed with OTA
       PRINT_WIFI_PRO(F("Invalid version: current="));
-      USB.print(prog_version,DEC);
+      USB.print(prog_version, DEC);
       USB.print(F("; new="));
-      USB.println(aux_version,DEC);
+      USB.println(aux_version, DEC);
       return 1;
     }
   }
-  #endif
+#endif
 
 
   ////////////////////////////////////////////////////////////////////////////
@@ -1198,7 +1203,7 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
 
   // create server file complete path: path + filename
   char server_file[100];
-  if (path[strlen(path)-1] == '/')
+  if (path[strlen(path) - 1] == '/')
   {
     snprintf(server_file, sizeof(server_file), "%s%s", path, aux_name);
   }
@@ -1207,13 +1212,13 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
     snprintf(server_file, sizeof(server_file), "%s/%s", path, aux_name);
   }
 
-  #if DEBUG_WIFI_PRO > 0
-    PRINT_WIFI_PRO(F("Downloading OTA FILE\n"));
-    PRINT_WIFI_PRO(F("Server file:"));
-    USB.println(server_file);
-    PRINT_WIFI_PRO(F("SD file:"));
-    USB.println(aux_name);
-  #endif
+#if DEBUG_WIFI_PRO > 0
+  PRINT_WIFI_PRO(F("Downloading OTA FILE\n"));
+  PRINT_WIFI_PRO(F("Server file:"));
+  USB.println(server_file);
+  PRINT_WIFI_PRO(F("SD file:"));
+  USB.println(aux_name);
+#endif
 
 
   // get binary file
@@ -1230,20 +1235,20 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
       SD.OFF();
       WIFI_PRO.ftpCloseSession(handle);
       WIFI_PRO._errorCode = ERROR_CODE_0029;
-      #if DEBUG_WIFI_PRO > 0
-        PRINT_WIFI_PRO(F("Size does not match\n"));
-        PRINT_WIFI_PRO(F("sd_file_size:"));
-        USB.println(sd_file_size);
-        PRINT_WIFI_PRO(F("UPGRADE.TXT size field:"));
-        USB.println(aux_size);
-      #endif
+#if DEBUG_WIFI_PRO > 0
+      PRINT_WIFI_PRO(F("Size does not match\n"));
+      PRINT_WIFI_PRO(F("sd_file_size:"));
+      USB.println(sd_file_size);
+      PRINT_WIFI_PRO(F("UPGRADE.TXT size field:"));
+      USB.println(aux_size);
+#endif
       return 1;
     }
-    #if DEBUG_WIFI_PRO > 1
-      SD.ls();
-    #endif
+#if DEBUG_WIFI_PRO > 1
+    SD.ls();
+#endif
     WIFI_PRO.ftpCloseSession(handle);
-    Utils.loadOTA(aux_name,aux_version);
+    Utils.loadOTA(aux_name, aux_version);
     return 0;
   }
   else
@@ -1251,9 +1256,9 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
     SD.OFF();
     WIFI_PRO.ftpCloseSession(handle);
     WIFI_PRO._errorCode = ERROR_CODE_0030;
-    #if DEBUG_WIFI_PRO > 0
-      PRINT_WIFI_PRO(F("Error getting binary\n"));
-    #endif
+#if DEBUG_WIFI_PRO > 0
+    PRINT_WIFI_PRO(F("Error getting binary\n"));
+#endif
     return 1;
   }
 
@@ -1289,7 +1294,7 @@ void setup()
 
 
   // open USB port
-  
+
   ///strcpy(OTA_ver_file , "vecyyya.txt");
   USB.ON();
   RTC.ON(); // Executes the init process
@@ -1304,10 +1309,10 @@ void setup()
   {
   OTA_ver_file[x]="e";
   }
-*/
+  */
   USB.println(  OTA_ver_file);
 
- // Utils.setProgramVersion( verr );
+// Utils.setProgramVersion( verr );
   USB.print(F("Program version: "));
   USB.println(Utils.getProgramVersion(), DEC);
   delay(5000);
