@@ -69,8 +69,9 @@ int cycle_time2 = 30; // in seconds
 
 //NU MODIFICA NIMIC IN SUBPROGRAME!
 
-void trimitator_WIFI()
+int trimitator_WIFI()
 {
+  int ssent;
 // get actual time before wifi
   previous = millis();
   //////////////////////////////////////////////////
@@ -128,6 +129,7 @@ qwerty:
   b = (millis() - prev) / 1000;
   USB.print("loop execution time[s]: ");
   USB.println(b);
+  return ssent;
 }
 
 
@@ -470,6 +472,10 @@ void try_RTC_set()
 
 
 
+
+
+
+
 void WiFi_init()
 {
   // 1. Switch ON the WiFi module
@@ -563,11 +569,15 @@ void WiFi_init()
 
 
 
+
+
 void all_in_1_frame_process()
 {
-  trimitator_WIFI();
+  ssent = trimitator_WIFI();
   scriitor_SD(filename, ssent);
 }
+
+
 
 
 
@@ -673,10 +683,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     // 4.3. Request OTA
     //////////////////////////////
     USB.println(F("2.2. Request OTA..."));
-//   error = WIFI_PRO.requestOTA( server, port, user, password);
-//     error = WIFI_PRO.requestOTAA(server, port, user, password ,upgraderr);
-
-    error = requestOTAAA(server, port, user, password , upgraderr);
+    error = WIFI_PRO.requestOTA( server, port, user, password);
 
     USB.print(F("=================="));
     USB.println(error , DEC);
@@ -914,6 +921,184 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// initializare
+
+void setup()
+{
+
+
+
+  USB.ON();
+  RTC.ON(); // Executes the init process
+  USB.println(F("START"));
+
+
+// Utils.setProgramVersion( verr );
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
+  delay(5000);
+
+
+  OTA_setup_check();
+  pregatitor_RTC_set();
+  delay(1000);
+
+  if (IRL_time)
+  {
+    // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
+    RTC.setTime("19:01:01:03:00:00:00");
+  } else
+  {
+    // Check if module is connected
+    if (status == true)
+    {
+      // 3.1. Open FTP session
+      error = WIFI_PRO.setTimeFromWIFI();
+
+      // check response
+      if (error == 0)
+      {
+        USB.print(F("3. Set RTC time OK. Time:"));
+        USB.println(RTC.getTime());
+      } else
+      {
+        USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
+        WIFI_PRO.printErrorCode();
+        status = false;
+      }
+    }
+
+    while ((count_trials < N_trials) && (status == false))
+    {
+      try_RTC_set();
+      USB.println(F("Trial"));
+      count_trials = count_trials + 1;
+      USB.print(count_trials);
+      USB.println();
+    }
+  }
+
+  USB.print(F("Current RTC settings:"));
+  USB.println(RTC.getTime());
+
+  USB.println(F("SD_CARD_ARHIVE_V5_RTC_ON_BAREBONES"));
+  // Set SD ON
+  SD_TEST_FILE_CHECK();
+  // pm
+  USB.ON();
+}
+
+
+
+
+// main program
+void loop()
+{
+  // get actual time before loop
+  prev = millis();
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
+  // set frame fields (String - char*)
+
+  // set frame fields (Battery sensor - uint8_t)
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  frame.addTimestamp();
+  //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
+  frame.showFrame();
+  all_in_1_frame_process();
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  OTA_check_loop();
+
+
+
+
+
+
+///////////////  NU UMBLA AICI !!!
+
+  cycle_time = cycle_time2 - b - 5;
+  if (cycle_time < 10) {
+    cycle_time = 15;
+  }
+  USB.print("cycle time: ");
+  USB.println(cycle_time);
+
+  x = cycle_time % 60; // sec
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[9] = y[0];
+  rtc_str[10] = y[1];
+
+  x = cycle_time / 60 % 60; // min
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[6] = y[0];
+  rtc_str[7] = y[1];
+
+  x = cycle_time / 3600 % 3600; // h
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[3] = y[0];
+  rtc_str[4] = y[1];
+
+
+
+  ////////////////////////////////////////////////
+  // 5. deepsleep
+  ////////////////////////////////////////////////
+  USB.println(F("5. Enter deep sleep..."));
+  USB.print("X");
+  USB.print(rtc_str);
+  USB.println("X");
+
+  USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+  USB.OFF();
+  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  USB.ON();
+  USB.println(
+    F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  USB.println(F("6. Wake up!!\n\n"));
+}
+
+
+
+
+
+
+
+
+
+
+/*
 
 uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], char verr_file[] )
 {
@@ -1265,187 +1450,4 @@ uint8_t requestOTAAA(char server[],   char port[], char user[], char pass[], cha
   return 1;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// initializare
-
-void setup()
-{
-
-
-
-  USB.ON();
-  RTC.ON(); // Executes the init process
-  USB.println(F("START"));
-
-
-// Utils.setProgramVersion( verr );
-  USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(), DEC);
-  delay(5000);
-
-
-  OTA_setup_check();
-  pregatitor_RTC_set();
-  delay(1000);
-
-  if (IRL_time)
-  {
-    // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
-    RTC.setTime("19:01:01:03:00:00:00");
-  } else
-  {
-    // Check if module is connected
-    if (status == true)
-    {
-      // 3.1. Open FTP session
-      error = WIFI_PRO.setTimeFromWIFI();
-
-      // check response
-      if (error == 0)
-      {
-        USB.print(F("3. Set RTC time OK. Time:"));
-        USB.println(RTC.getTime());
-      } else
-      {
-        USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
-        WIFI_PRO.printErrorCode();
-        status = false;
-      }
-    }
-
-    while ((count_trials < N_trials) && (status == false))
-    {
-      try_RTC_set();
-      USB.println(F("Trial"));
-      count_trials = count_trials + 1;
-      USB.print(count_trials);
-      USB.println();
-    }
-  }
-
-  USB.print(F("Current RTC settings:"));
-  USB.println(RTC.getTime());
-
-
-
-
-
-  USB.println(F("SD_CARD_ARHIVE_V5_RTC_ON_BAREBONES"));
-  // Set SD ON
-  SD_TEST_FILE_CHECK();
-  // pm
-  USB.ON();
-}
-
-
-
-
-// main program
-void loop()
-{
-  // get actual time before loop
-  prev = millis();
-
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
-  // set frame fields (String - char*)
-
-  // set frame fields (Battery sensor - uint8_t)
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  frame.addTimestamp();
-  //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
-  frame.showFrame();
-  all_in_1_frame_process();
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  OTA_check_loop();
-
-
-
-
-
-
-///////////////  NU UMBLA AICI !!!
-
-  cycle_time = cycle_time2 - b - 5;
-  if (cycle_time < 10) {
-    cycle_time = 15;
-  }
-  USB.print("cycle time: ");
-  USB.println(cycle_time);
-
-  x = cycle_time % 60; // sec
-  itoa(x, y, 10);
-  if (x < 10) {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  rtc_str[9] = y[0];
-  rtc_str[10] = y[1];
-
-  x = cycle_time / 60 % 60; // min
-  itoa(x, y, 10);
-  if (x < 10) {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  rtc_str[6] = y[0];
-  rtc_str[7] = y[1];
-
-  x = cycle_time / 3600 % 3600; // h
-  itoa(x, y, 10);
-  if (x < 10) {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  rtc_str[3] = y[0];
-  rtc_str[4] = y[1];
-
-
-
-  ////////////////////////////////////////////////
-  // 5. deepsleep
-  ////////////////////////////////////////////////
-  USB.println(F("5. Enter deep sleep..."));
-  USB.print("X");
-  USB.print(rtc_str);
-  USB.println("X");
-
-  USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-  USB.OFF();
-  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-  USB.ON();
-  USB.println(
-    F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
-  USB.println(F("6. Wake up!!\n\n"));
-}
-
-
-
-
-
-
+*/

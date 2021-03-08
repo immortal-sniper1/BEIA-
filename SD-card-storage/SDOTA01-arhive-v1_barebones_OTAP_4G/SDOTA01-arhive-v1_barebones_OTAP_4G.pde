@@ -25,12 +25,7 @@ char programID[10];
 char host[] = "82.78.81.178";
 uint16_t port = 80;
 ///////////////////////////////////////
-// FTP SERVER settings
-///////////////////////////////////////
-char ftp_server[] = "ftp.agile.ro";
-uint16_t ftp_port = 21;
-char ftp_user[] = "robi@agile.ro";
-char ftp_pass[] = "U$d(SEFA8+UC";
+
 ///////////////////////////////////////
 //FTP send
 char SD_FILE[]     = "FILE1.TXT";
@@ -50,7 +45,12 @@ char apn[] = "net";
 char login[] = "";
 char password[] = "";
 ///////////////////////////////////////
-
+// FTP SERVER settings
+///////////////////////////////////////
+char ftp_server[] = "ftp.agile.ro";
+uint16_t ftp_port = 21;
+char ftp_user[] = "robi@agile.ro";
+char ftp_pass[] = "U$d(SEFA8+UC";
 
 
 
@@ -59,9 +59,6 @@ char password[] = "";
 
 
 // subprograme
-
-
-
 
 
 void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
@@ -447,8 +444,7 @@ void HTTP_GET_4G()
   char resource[] = "/test-get-post.php?varA=1&varB=2&varC=3&varD=4&varE=5&varF=6&varG=7&varH=8&varI=9&varJ=10&varK=11&varL=12&varM=13&varN=14&varO=15";
 ///////////////////////////////////////
 
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("STARTING HTTP_GET_4G"));
 //////////////////////////////////////////////////
   // 1. Switch ON
@@ -580,10 +576,10 @@ void HTTP_POST_4G()
 
 
 
-void HTTP_4G_TRIMITATOR_FRAME()
+int HTTP_4G_TRIMITATOR_FRAME()
 {
 
-
+  int ssent;
 //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
@@ -636,11 +632,12 @@ void HTTP_4G_TRIMITATOR_FRAME()
   ////////////////////////////////////////////////
   USB.println(F("4. Switch OFF 4G module"));
   _4G.OFF();
+  return ssent;
 }
 
 
 
-void SET_RTC_4G( int g = 2)
+void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
 {
   //////////////////////////////////////////////////
   // 1. Switch ON the 4G module
@@ -835,7 +832,6 @@ void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
         USB.println(error, DEC);
       }
 
-
       //////////////////////////////////////////////
       // 2.3. FTP close session
       //////////////////////////////////////////////
@@ -873,6 +869,14 @@ void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
   USB.println(F("3. Switch OFF 4G module"));
   _4G.OFF();
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -934,18 +938,13 @@ void setup()
   }
 
 
-
-
-
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // 1. sets operator parameters
 
   _4G.set_APN(apn, login, password);
   _4G.show_APN();
 
-
   SET_RTC_4G(RTC_ATEMPTS);
-
   USB.println(RTC.getTime());
   USB.println(F("SD_CARD_ARHIVE_V1_RTC_OTAP_4G_BAREBONES"));
 
@@ -999,7 +998,6 @@ void setup()
   // pm
   USB.ON();
 
-
 }
 
 
@@ -1011,33 +1009,6 @@ void loop()
   // get actual time before loop
   prev = millis();
 
-
-  /*
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    USB.println(F("qqqqqqq"));
-    */
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-  USB.println(F("vx"));
-
-
-
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
@@ -1045,7 +1016,7 @@ void loop()
   // set frame fields (Time from RTC)
   frame.showFrame();
 
-  HTTP_4G_TRIMITATOR_FRAME();
+  ssent = HTTP_4G_TRIMITATOR_FRAME();
   scriitor_SD(filename, ssent);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1053,7 +1024,7 @@ void loop()
   OTAP_4G();
 
 
-
+/// NU UMBLA AICI!
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
     cycle_time = 15;

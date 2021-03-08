@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string  decitit, qaz = "qqq";
+string  decitit, qaz = "UPGRADE.TXT";
 int sizex, verss;
 bool x = true;
 
@@ -15,6 +15,7 @@ bool x = true;
 
 int main()
 {
+    /*
   //cout << "introduceti numele fisierului binar " << endl;
   cout << "introduceti numele de upgrade [NU UITA SA SCRII SI EXTENSIA SI AI GRIJA LA MARIME LITERE] " << endl;
   cin >> qaz;
@@ -45,7 +46,7 @@ int main()
     cout << "introduceti numele de upgrade [NU UITA SA SCRII SI EXTENSIA SI AI GRIZA LA MARIME LITERE] " << endl;
     cin >> qaz;
   }
-
+*/
 
 
 
@@ -58,7 +59,7 @@ int main()
   cin >> decitit;
 
 
-    while ( decitit.length() != 11    )
+    while ( decitit.length() != 7    )
   {
     cout << "lungime " << decitit.length() << endl;
     cout << "filename trebuie  sa fie 7 bytes + RARA EXTENSIE la sfarsit" << endl;

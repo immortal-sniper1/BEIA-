@@ -1,4 +1,0 @@
-FILE:fefe
-PATH:/
-SIZE:333
-VERSION:3
