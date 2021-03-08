@@ -1,6 +1,4 @@
 #include <WaspFrame.h>
-#include <WaspPM.h>
-#include <WaspSD.h>
 #include <WaspWIFI_PRO.h>
 
 /////////// NU UMBLA AICI!!!!!
