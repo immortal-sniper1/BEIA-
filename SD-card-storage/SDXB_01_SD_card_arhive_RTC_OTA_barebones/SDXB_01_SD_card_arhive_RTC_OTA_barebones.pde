@@ -20,12 +20,14 @@ unsigned long prev, previous;
 
 
 char programID[10];
+/*
 // SERVER settings
 ///////////////////////////////////////
 char host[] = "82.78.81.178";
 uint16_t port = 80;
-uint8_t powerValue = 4; // Define the power level value
+uint8_t powerValue = 1; // Define the power level value
 ///////////////////////////////////////
+*/
 /*
 //FTP send
 char SD_FILE[]     = "FILE1.TXT";
@@ -40,12 +42,14 @@ int  cycle_time2 = 30; // in seconds
 char node_ID[] = "qwerty13";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 ///////////////////////////////////////
+/*
 // FTP SERVER settings
 ///////////////////////////////////////
 char ftp_server[] = "ftp.agile.ro";
 uint16_t ftp_port = 21;
 char ftp_user[] = "robi@agile.ro";
 char ftp_pass[] = "U$d(SEFA8+UC";
+*/
 // coordinator's 64-bit PAN ID to set
 ////////////////////////////////////////////////////////////////////////
 uint8_t  PANID[8] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
@@ -54,7 +58,7 @@ uint8_t  PANID[8] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
 //////////////////////////////////////////
 char RX_ADDRESS[] = "0013A200403A2A49";
 //////////////////////////////////////////
-
+char MESHLIUM_ADDRESS[] = "0013A2004098FB30";  // Destination MAC address
 
 
 
@@ -416,18 +420,18 @@ void POWER_LVL_INSPECTOR()
 
 
 
-void RTC_SET(int incercari = RTC_ATEMPTS , char MESHLIUM_ADDRESS[] = "0013A2004098FB30" )
+void RTC_SET(int incercari = RTC_ATEMPTS , char MESHLIUM_ADDRESS[] = MESHLIUM_ADDRESS )
 {
   uint8_t t = 0 , v = 0;
   USB.ON();
   RTC.ON();
   xbeeZB.ON();
-/*
-  USB.print(F("RTC_IS_IN_SYNCC= "));
-  USB.println(RTC_IS_IN_SYNCC);
-  USB.print(F(" irl time"));
-  USB.println(IRL_time);
-*/
+  /*
+    USB.print(F("RTC_IS_IN_SYNCC= "));
+    USB.println(RTC_IS_IN_SYNCC);
+    USB.print(F(" irl time"));
+    USB.println(IRL_time);
+  */
   //USB.println(F("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"));
   if ((RTC_IS_IN_SYNCC == false) && (IRL_time == false))
   {
@@ -573,12 +577,15 @@ void printErrorxx(uint8_t err)
 
 void setup()
 {
+  
   USB.ON();
   RTC.ON();
 
   // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
   RTC.setTime("19:01:01:03:00:00:00");
-    USB.println(RTC.getTime());
+  USB.println(RTC.getTime());
+
+  pregatitor_XBEE();
   //USB.print(F("QAZ= "));
   //USB.println(RTC_IS_IN_SYNCC);
   RTC_SET(RTC_ATEMPTS );
@@ -746,8 +753,8 @@ void loop()
 
   //USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   USB.OFF();
-  //delay(30000);
-  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  delay(20000);
+  //PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
