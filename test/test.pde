@@ -1,536 +1,1427 @@
-#include <WaspSensorGas_Pro.h>
-#include <WaspFrame.h>
-#include <WaspPM.h>
-#include <WaspWIFI_PRO.h>
-#include <WaspSD.h>
-
-
 /*
-   Define objects for sensors
-   Imagine we have a P&S! with the next sensors:
-    - SOCKET_A: BME280 sensor (temperature, humidity & pressure)
-    - SOCKET_B: sensor (CO)
-    - SOCKET_C: sensor (NH3)
-    - SOCKET_D: Particle matter sensor (dust)
-    - SOCKET_E: None
-    - SOCKET_F: sensor (CH4)
+    ------ Waspmote factory default code ------
+
+    Explanation: Send basic parameters through the corresponding
+    radio module.
+
+    Copyright (C) 2019 Libelium Comunicaciones Distribuidas S.L.
+    http://www.libelium.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    Version:         4.2
+    Design:          David Gascón
+    Implementation:  Yuri Carmona, Javier Siscart
 */
-// define variable SD
-// define file name: MUST be 8.3 SHORT FILE NAME
-char filename[] = "FILE1.TXT";
 
-
-char* time_date; // stores curent date + time
-int first_lost, x, b;
-char y[3];
-uint8_t sd_answer, ssent, ssent2, retries_f1 = 2; // resending for frame 1 , frame 2 has 2 extra
-bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
-bool IRL_time = false; //  true for no external data source
-int  cycle_time, cycle_time2 = 30; // in seconds
-char rtc_str[] = "00:00:00:05"; //11 char ps incepe de la 0
-unsigned long prev, previous;
-
-
-
-
-
-// choose socket (SELECT USER'S SOCKET)
-///////////////////////////////////////
-uint8_t socket = SOCKET0;
-///////////////////////////////////////
-
-
-// choose URL settings
-///////////////////////////////////////
-char type[] = "http";
-char host[] = "82.78.81.178";
-char port[] = "80";
-///////////////////////////////////////
-
-uint8_t error;
-uint8_t status;
-
-Gas CO(SOCKET_B);
-Gas NH3(SOCKET_C);
-Gas CH4(SOCKET_F);
-
-float temperature;
-float humidity;
-float pressure;
-
-float concCO;
-float concNH3;
-float concCH4;
-
-int OPC_status;
-int OPC_measure;
-
-char node_ID[] = "FARM13";
-
-
-
-
-
-
-
-
-
-
-
-
-uint8_t status2 = false;
-
-int count_trials = 0;
-int N_trials = 10;
-char ESSID[] = "LANCOMBEIA";
-char PASSW[] = "beialancom";
-
-
-// choose NTP server settings
-///////////////////////////////////////
-char SERVER1[] = "time.nist.gov";
-char SERVER2[] = "wwv.nist.gov";
-
-//"pool.ntp.org";
-
-///////////////////////////////////////
-
-// Define Time Zone from -12 to 12 (i.e. GMT+2)
-///////////////////////////////////////
-uint8_t time_zone = 2;
-///////////////////////////////////////
-
-
-
-
-
-
-
-
-
-// functions
-
-void try_RTC_set()
-{ //////////////////////////////////////////////////
-  // 1. Switch ON
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.ON(socket);
-
-  if (error == 0)
-  {
-    USB.println(F("1. WiFi switched ON"));
-  }
-  else
-  {
-    USB.println(F("1. WiFi did not initialize correctly"));
-  }
-
-
-  //////////////////////////////////////////////////
-  // 2. Check if connected
-  //////////////////////////////////////////////////
-
-  // get actual time
-  previous = millis();
-
-  // check connectivity
-  status =  WIFI_PRO.isConnected();
-
-  // Check if module is connected
-  if (status == true)
-  {
-    USB.print(F("2. WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-  }
-  else
-  {
-    USB.print(F("2. WiFi is connected ERROR"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-  }
-
-
-  //////////////////////////////////////////////////
-  // 3. Set RTC Time from WiFi module settings
-  //////////////////////////////////////////////////
-
-  // Check if module is connected
-  if (status == true)
-  {
-    // 3.1. Open FTP session
-    error = WIFI_PRO.setTimeFromWIFI();
-
-    // check response
-    if (error == 0)
-    {
-      USB.print(F("3. Set RTC time OK. Time:"));
-      USB.println(RTC.getTime());
-    }
-    else
-    {
-      USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
-  }
-
-
-  //////////////////////////////////////////////////
-  // 4. Switch OFF
-  //////////////////////////////////////////////////
-  WIFI_PRO.OFF(socket);
-  USB.println(F("4. WiFi switched OFF\n\n"));
-  USB.println(F("Wait 10 seconds...\n"));
-  delay(10000);
-}
-
-
-void WiFi_init()
-{ // 1. Switch ON the WiFi module
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1)
-  {
-    error = WIFI_PRO.ON(socket);
-
-    if (error == 0)
-    {
-      USB.println(F("1. WiFi switched ON"));
-    }
-    else
-    {
-      USB.println(F("1. WiFi did not initialize correctly"));
-    }
-  }
-
-  // 2. Reset to default values
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1)
-  { error = WIFI_PRO.resetValues();
-
-    if (error == 0)
-    {
-      USB.println(F("2. WiFi reset to default"));
-    }
-    else
-    {
-      USB.println(F("2. WiFi reset to default ERROR"));
-    }
-  }
-// 3. Set ESSID
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1)
-  {
-    error = WIFI_PRO.setESSID(ESSID);
-
-    if (error == 0)
-    {
-      USB.println(F("3. WiFi set ESSID OK"));
-    }
-    else
-    {
-      USB.println(F("3. WiFi set ESSID ERROR"));
-    }
-
-  }
-  //////////////////////////////////////////////////
-  // 4. Set password key (It takes a while to generate the key)
-  // Authentication modes:
-  //    OPEN: no security
-  //    WEP64: WEP 64
-  //    WEP128: WEP 128
-  //    WPA: WPA-PSK with TKIP encryption
-  //    WPA2: WPA2-PSK with TKIP or AES encryption
-  //////////////////////////////////////////////////
-  error = 1;
-  while (error == 1)
-  {
-    error = WIFI_PRO.setPassword(WPA2, PASSW);
-
-    if (error == 0)
-    {
-      USB.println(F("4. WiFi set AUTHKEY OK"));
-    }
-    else
-    {
-      USB.println(F("4. WiFi set AUTHKEY ERROR"));
-    }
-
-  }
-  //////////////////////////////////////////////////
-  // 5. Software Reset
-  // Parameters take effect following either a
-  // hardware or software reset
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.softReset();
-
-  if (error == 0)
-  {
-    USB.println(F("5. WiFi softReset OK"));
-  }
-  else
-  {
-    USB.println(F("5. WiFi softReset ERROR"));
-  }
-
-
-  USB.println(F("*******************************************"));
-  USB.println(F("Once the module is configured with ESSID"));
-  USB.println(F("and PASSWORD, the module will attempt to "));
-  USB.println(F("join the specified Access Point on power up"));
-  USB.println(F("*******************************************\n"));
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// initialization
+// Include libraries
+#include <WaspXBee802.h>
+#include <WaspXBeeZB.h>
+#include <WaspFrame.h>
+#include <Wasp4G.h>
+
+// Define the Waspmote default ID
+char node_id[] = "node_id";
+
+// Define the authentication key
+char key_access[] = "LIBELIUM";
+
+// Declare global variables
+char macHigh[11];
+char macLow[11];
+char filename[] = "TEST_SD.TXT";
+uint8_t lora_error;
+uint8_t lora_status;
+uint8_t xbee_error;
+uint8_t response;
+
+// Broadcast address
+char destination[] = "000000000000FFFF";
+
+// Declare the XBEE_type
+// 0 - NO radio detected
+// 1 - 802.15.4
+// 2 - 900 MHz - 868 MHz
+// 3 - DigiMesh
+// 4 - XBee ZB
+// 5 - 900 MHz Intl
+// 6 - LoRa (deprecated)
+// 7 - LoRaWAN
+// 8 - Sigfox
+// 9 - WiFi PRO
+// 10 - 4G
+int radio_type = 0;
+
+// Declare the xbee type in the case there is an XBee module
+uint8_t firmware[4];
+
+uint8_t errorFlag = 0;
 
 void setup()
 {
-
-  //////////////////////////////////////////////////
-  // 2. Check if connected
-  //////////////////////////////////////////////////
-  while (status == false)
-  {
-    WiFi_init();//initialize Wi-Fi communication
-    // get actual time
-    previous = millis();
-
-    // check connectivity
-    status =  WIFI_PRO.isConnected();
-
-    // Check if module is connected
-    if (status == true)
-    {
-      USB.print(F("2. WiFi is connected OK"));
-      USB.print(F(" Time(ms):"));
-      USB.println(millis() - previous);
-    }
-    else
-    {
-      USB.print(F("2. WiFi is connected ERROR"));
-      USB.print(F(" Time(ms):"));
-      USB.println(millis() - previous);
-    }
-
-  }
-
-  //////////////////////////////////////////////////
-  // 3. NTP server
-  //////////////////////////////////////////////////
-
-  // Check if module is connected
-  if (status == true)
-  {
-
-//    // 3.1. Set NTP Server (option1)
-    error = WIFI_PRO.setTimeServer(1, SERVER1);
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("3.1. Time Server1 set OK"));
-    }
-    else
-    {
-      USB.println(F("3.1. Error calling 'setTimeServer' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
-
-
-    // 3.2. Set NTP Server (option2)
-    error = WIFI_PRO.setTimeServer(2, SERVER2);
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("3.2. Time Server2 set OK"));
-    }
-    else
-    {
-      USB.println(F("3.2. Error calling 'setTimeServer' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
-
-    // 3.3. Enabled/Disable Time Sync
-    if (status == true)
-    {
-      error = WIFI_PRO.timeActivationFlag(true);
-
-      // check response
-      if ( error == 0 )
-      {
-        USB.println(F("3.3. Network Time-of-Day Activation Flag set OK"));
-      }
-      else
-      {
-        USB.println(F("3.3. Error calling 'timeActivationFlag' function"));
-        WIFI_PRO.printErrorCode();
-        status = false;
-      }
-    }
-
-
-
-    // 3.4. set GMT
-    if (status == true)
-    {
-      error = WIFI_PRO.setGMT(time_zone);
-
-      // check response
-      if (error == 0)
-      {
-        USB.print(F("3.4. GMT set OK to "));
-        USB.println(time_zone, DEC);
-      }
-      else
-      {
-        USB.println(F("3.4. Error calling 'setGMT' function"));
-        WIFI_PRO.printErrorCode();
-      }
-    }
-  }
-
-//
-//  //////////////////////////////////////////////////
-//  // 4. Switch OFF
-//  //////////////////////////////////////////////////
-//  USB.println(F("4. WiFi switched OFF\n"));
-//  WIFI_PRO.OFF(socket);
-
-
-  USB.println(F("-----------------------------------------------------------"));
-  USB.println(F("Once the module has the correct Time Server Settings"));
-  USB.println(F("it is always possible to request for the Time and"));
-  USB.println(F("synchronize it to the Waspmote's RTC"));
-  USB.println(F("-----------------------------------------------------------\n"));
-  delay(5000);
-
-  // Init RTC
-//  RTC.ON();
-//  USB.print(F("Current RTC settings:"));
-//  USB.println(RTC.getTime());
-//
-
-
-  // open USB port
   USB.ON();
-  RTC.ON(); // Executes the init process
-//  USB.print(F("Current RTC settings:"));
-//  USB.println(RTC.getTime());
-// IRL_time=false;
+  USB.println(F("Starting Waspmote factory default program"));
 
+  ///////////////////////////////////////////////////////////////////
+  // Battery checking
+  ///////////////////////////////////////////////////////////////////
 
-  if ( IRL_time)
+  uint8_t battery = PWR.getBatteryLevel();
+
+  if (battery == 0)
   {
-    // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
-    RTC.setTime("19:01:01:03:00:00:00");
-  }
-  else
-  {
-    // Check if module is connected
-    if (status == true)
-    {
-      // 3.1. Open FTP session
-      error = WIFI_PRO.setTimeFromWIFI();
-
-      // check response
-      if (error == 0)
-      {
-        USB.print(F("3. Set RTC time OK. Time:"));
-        USB.println(RTC.getTime());
-      }
-      else
-      {
-        USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
-        WIFI_PRO.printErrorCode();
-        status = false;
-      }
-    }
-
-    while ((count_trials < N_trials) && (status == false))
-    {
-      try_RTC_set();
-      USB.print(F("Trial: "));
-      count_trials = count_trials + 1;
-      USB.print(count_trials);
-      USB.println();
-    }
-
+    USB.println(F("************************************************"));
+    USB.print(F("ERROR: Battery issue. Battery level (%): "));
+    USB.println(battery, DEC);
+    USB.println(F("************************************************"));
+    errorFlag |= 1 << 0x01;
   }
 
 
+  ///////////////////////////////////////////////////////////////////
+  // 1. Serial ID
+  ///////////////////////////////////////////////////////////////////
 
-  USB.print(F("Current RTC settings:"));
-  USB.println(RTC.getTime());
-  USB.println(F("farm1_V9_SD_arhive_RTC_ON"));
+  // Show '_serial_id' stored by the API when powering up
+  USB.print(F("Global variable '_serial_id':"));
+  USB.printHex(_serial_id[0]);
+  USB.printHex(_serial_id[1]);
+  USB.printHex(_serial_id[2]);
+  USB.printHex(_serial_id[3]);
+  USB.printHex(_serial_id[4]);
+  USB.printHex(_serial_id[5]);
+  USB.printHex(_serial_id[6]);
+  USB.printHex(_serial_id[7]);
+  USB.println();
 
-  // Set SD ON
+  // Reading the serial number
+  Utils.readSerialID();
+  USB.print(F("Waspmote serial ID: "));
+  USB.printHex(_serial_id[0]);
+  USB.printHex(_serial_id[1]);
+  USB.printHex(_serial_id[2]);
+  USB.printHex(_serial_id[3]);
+  USB.printHex(_serial_id[4]);
+  USB.printHex(_serial_id[5]);
+  USB.printHex(_serial_id[6]);
+  USB.printHex(_serial_id[7]);
+  USB.println();
+
+
+  ///////////////////////////////////////////////////////////////////
+  // 2. Boards ON
+  ///////////////////////////////////////////////////////////////////
+  PWR.setSensorPower(SENS_3V3, SENS_ON);
+
+
+  /////////////////////////////////////////////////////////////
+  // 3. Test SD
+  /////////////////////////////////////////////////////////////
   SD.ON();
-
-  if ( sentence == 1)
+  if (SD.isSD())
   {
-    // Delete file
-    sd_answer = SD.del(filename);
-
-    if ( sd_answer == 1 )
+    SD.del(filename);
+    SD.create(filename);
+    if (SD.writeSD(filename, "Test SD", 0))
     {
-      USB.println(F("file deleted"));
+      USB.println(F("SD OK"));
     }
     else
     {
-      USB.println(F("file NOT deleted"));
+      USB.println(F("Error SD"));
+      errorFlag |= 1 << 0x02;
     }
-
-  }
-  // Create file IF id doent exist
-  sd_answer = SD.create(filename);
-
-  if ( sd_answer == 1 )
-  {
-    USB.println(F("file created"));
   }
   else
   {
-    USB.print(F("file NOT created   file size[BYTES]:"));
-    USB.println( SD.getFileSize(filename) );
+    USB.println(F("No SD card detected"));
+    errorFlag |= 1 << 0x03;
+  }
+  SD.del(filename);
+  USB.println();
+
+
+  /////////////////////////////////////////////////////////////
+  // 4. Store key access in EEPROM
+  /////////////////////////////////////////////////////////////
+  Utils.setAuthKey(key_access);
+
+
+  /////////////////////////////////////////////////////////////
+  // 5. Init RTC and ACC
+  /////////////////////////////////////////////////////////////
+  RTC.ON();
+  ACC.ON();
+
+
+  /////////////////////////////////////////////////////////////
+  // 6. Set Waspmote setting for XBee module for first time.
+  // (baudrate at 115200 and API mode enabled)
+  /////////////////////////////////////////////////////////////
+  // Note: Only valid for SOCKET 0
+  xbee802.ON();
+
+  Utils.setMuxSocket0();
+  delay(500);
+  beginSerial(9600, 0);
+  printString("+++", 0);
+  delay(2000);
+  printString("ATBD7,AP2,WR,CN\r\n", 0);
+  delay(500);
+
+  xbeeZB.OFF();
+  delay(500);
+  xbeeZB.ON();
+
+  // In case of Zigbee modules:
+  // XBee command for 115200bps --> ATBD7
+  uint8_t ATBD7[] = { 0x7E, 0x00, 0x05, 0x08, 0x01, 0x42, 0x44, 0x07, 0x69 };
+  // XBee command for API mode --> ATAP2
+  uint8_t ATAP2[] = { 0x7E, 0x00, 0x05, 0x08, 0x01, 0x41, 0x50, 0x02, 0x63 };
+  // XBee command for saving config --> ATWR
+  uint8_t ATWR[] = { 0x7E, 0x00, 0x04, 0x08, 0x01, 0x57, 0x52, 0x4D };
+
+  for (uint8_t i = 0; i < 9; i++)
+  {
+    printByte(ATBD7[i], SOCKET0);
+  }
+  delay(150);
+  closeSerial(SOCKET0);
+  delay(200);
+  beginSerial(115200, SOCKET0);
+  for (uint8_t i = 0; i < 9; i++)
+  {
+    printByte(ATAP2[i], SOCKET0);
+  }
+  delay(150);
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    printByte(ATWR[i], SOCKET0);
+  }
+  delay(150);
+  closeSerial(SOCKET0);
+
+
+  /////////////////////////////////////////////////////////////
+  // 7. LEDs management
+  /////////////////////////////////////////////////////////////
+  Utils.setLED(LED0, LED_OFF);
+  Utils.setLED(LED1, LED_OFF);
+  for (int i = 0 ; i < 4 ; i++)
+  {
+    Utils.blinkLEDs(100);
   }
 
-  USB.print("loop cycle time[s]:= ");
-  USB.println(cycle_time2 );
-  sd_answer = SD.appendln(filename,  "----------------------------------------------------------------------------" );
+
+  /////////////////////////////////////////////////////////////
+  // 8. Identify the radio connected to Waspmote
+  //
+  //  Possibilities:
+  //   - XBee 802.15.4
+  //   - XBee 868LP
+  //   - XBee 900HP
+  //   - XBee DigiMesh
+  //   - XBee ZigBee
+  //   - LoRa (SX1272) (deprecated)
+  //   - LoRaWAN (RN2483 or RN2903 or ABZ)
+  //   - Sigfox (TD1207 or TD1508)
+  //   - WiFi PRO
+  //   - 4G (in SOCKET1)
+  /////////////////////////////////////////////////////////////
+  uint8_t answer;
+  radio_type = 0;
 
 
-  USB.ON();
+
+  /////////////////////////////////////////////////////////////
+  // 8.1. check for XBee module
+  /////////////////////////////////////////////////////////////
+
+  // define object for UART0
+  WaspUART uart = WaspUART();
+  uint8_t class_buffer[100];
+  uart._buffer = class_buffer;
+  uart._bufferSize = 100;
+
+  // init object in SOCKET0
+  uart.setUART(SOCKET0);
+
+  // select multiplexer
+  Utils.setMuxSocket0();
+
+  // begin serial communication
+  uart.beginUART();
+
+  // power on the socket
+  PWR.powerSocket(SOCKET0, HIGH);
+  delay(500);
+  serialFlush(SOCKET0);
+
+  // check for XBees in SOCKET0
+  uint8_t cmd_xbee[] = {0x7E, 0x00 , 0x04 , 0x08 , 0x01 , 0x56 , 0x52 , 0x4E};
+
+  // send command & receive answer
+  uart.sendCommand(cmd_xbee, sizeof(cmd_xbee));
+  uart.readBuffer(100);
+
+  // check response: 7E00078801565200xxxx??
+  if (uart._length > 0)
+  {
+    if ((uart._buffer[0] == 0x7E)
+        &&  (uart._buffer[1] == 0x00)
+        &&  (uart._buffer[3] == 0x88)
+        &&  (uart._buffer[4] == 0x01)
+        &&  (uart._buffer[5] == 0x56)
+        &&  (uart._buffer[6] == 0x52)
+        &&  (uart._buffer[7] == 0x00))
+    {
+
+      USB.println(F("XBee module is plugged on socket 0:"));
+
+      /*
+        USB.print(F("XBee module in SOCKET0. Firmware: "));
+        USB.printHex(uart._buffer[8]);
+        USB.printHex(uart._buffer[9]);
+        USB.println();
+      */
+
+      firmware[0] = uart._buffer[8];
+      firmware[1] = uart._buffer[9];
+      firmware[2] = uart._buffer[10];
+      firmware[3] = uart._buffer[11];
+
+      /////////////////////////////////
+      // Get the XBee firmware version
+      /////////////////////////////////
+
+      // Set the XBee firmware type depending ont he previous response
+      if ((firmware[0] < 0x20) && (firmware[1] > 0x80))
+      {
+        radio_type = 1; // 802.15.4
+        USB.println(F("--> XBee type: 802.15.4"));
+      }
+      else if (firmware[0] == 0x10 && firmware[1] < 0x50)
+      {
+        radio_type = 4; //ZB
+        USB.println(F("--> XBee type: ZigBee 3"));
+      }
+      else if ((firmware[0] < 0x20) && (firmware[1] > 0x00))
+      {
+        radio_type = 2; // 868MHz - 900MHz
+
+        xbee802.OFF();
+        xbee802.ON();
+
+        // send Hardware Serial command
+        if (!xbee802.sendCommandAT("HS#"))
+        {
+          // USB.printHexln(xbee802.commandAT, 3);
+        }
+
+        // check for XBee 900HP
+        if (xbee802.commandAT[0] == 3)
+        {
+          USB.println(F("--> XBee type: 900HP"));
+
+          // check for available frequencies:
+          // US: 00FFFFFFFFFFFFFFFF
+          // BR: 00FFFFFFFE00000FFF
+          // AU: 00FFFFFFFE00000000
+          if (!xbee802.sendCommandAT("AF#"))
+          {
+            //USB.printHexln(xbee802.commandAT, 16);
+            if ((xbee802.commandAT[1] == 0xFF)
+                && (xbee802.commandAT[2] == 0xFF)
+                && (xbee802.commandAT[3] == 0xFF)
+                && (xbee802.commandAT[4] == 0xFF)
+                && (xbee802.commandAT[5] == 0xFF)
+                && (xbee802.commandAT[6] == 0xFF)
+                && (xbee802.commandAT[7] == 0xFF)
+                && (xbee802.commandAT[8] == 0xFF))
+            {
+              USB.println(F("--> Hardware serie: USA"));
+            }
+            else if ((xbee802.commandAT[1] == 0xFF)
+                     && (xbee802.commandAT[2] == 0xFF)
+                     && (xbee802.commandAT[3] == 0xFF)
+                     && (xbee802.commandAT[4] == 0xFE)
+                     && (xbee802.commandAT[5] == 0x00)
+                     && (xbee802.commandAT[6] == 0x00)
+                     && (xbee802.commandAT[7] == 0x0F)
+                     && (xbee802.commandAT[8] == 0xFF))
+            {
+              USB.println(F("--> Hardware serie: BRAZIL"));
+            }
+            else if ((xbee802.commandAT[1] == 0xFF)
+                     && (xbee802.commandAT[2] == 0xFF)
+                     && (xbee802.commandAT[3] == 0xFF)
+                     && (xbee802.commandAT[4] == 0xFE)
+                     && (xbee802.commandAT[5] == 0x00)
+                     && (xbee802.commandAT[6] == 0x00)
+                     && (xbee802.commandAT[7] == 0x00)
+                     && (xbee802.commandAT[8] == 0x00))
+            {
+              USB.println(F("--> Hardware serie: AUSTRALIA"));
+            }
+          }
+          else
+          {
+            USB.println(F("--> Hardware serie: ERROR"));
+            errorFlag |= 1 << 0x04;
+          }
+        }
+        // check for XBee 868LP
+        else if (xbee802.commandAT[0] == 8)
+        {
+          USB.println(F("--> XBee type: 868LP"));
+        }
+
+      }
+      else if (firmware[0] >= 0x80)
+      {
+        radio_type = 3; // DigiMesh
+        USB.println(F("--> XBee type: DigiMesh"));
+      }
+      else if (((firmware[0] >= 0x20) && (firmware[1] < 0xB0)) ||
+               ((firmware[0] == 0x70) && (firmware[1] == 0x5B)) )
+      {
+        radio_type = 4; //ZB
+        USB.println(F("--> XBee type: ZigBee"));
+      }
+      else if (firmware[0] == 0x00 && firmware[1] >= 0x02)
+      {
+        radio_type = 5; // 900 MHz Intl
+        USB.println(F("--> XBee type: 900 International"));
+      }
+      else
+      {
+        radio_type = 0;
+      }
+
+      /////////////////////////////////////////////////////////////
+      // Get the XBee MAC address
+      /////////////////////////////////////////////////////////////
+      if (radio_type != 0)
+      {
+        xbee802.OFF();
+        delay(1000);
+        xbee802.ON();
+        delay(1000);
+        xbee802.flush();
+
+        // Get the XBee MAC address
+        int counter = 0;
+        while ((xbee802.getOwnMac() != 0) && (counter < 12))
+        {
+          xbee802.getOwnMac();
+          counter++;
+        }
+
+
+        // convert mac address from array to string
+        Utils.hex2str(xbee802.sourceMacHigh, macHigh, 4);
+        Utils.hex2str(xbee802.sourceMacLow,  macLow,  4);
+
+        // Get the XBee MAC address
+        while ((xbee802.getOwnMac() != 0) && (counter < 12))
+        {
+          xbee802.getOwnMac();
+          counter++;
+        }
+
+        // convert mac address from array to string
+        Utils.hex2str(xbee802.sourceMacHigh, macHigh, 4);
+        Utils.hex2str(xbee802.sourceMacLow,  macLow,  4);
+
+        USB.print(F("--> MAC address: "));
+        USB.print(macHigh);
+        USB.println(macLow);
+
+      }
+
+      if (radio_type < 5)
+      {
+        USB.print(F("--> Firmware version: "));
+        USB.print(firmware[0], HEX);
+        if (firmware[1] < 0x10)
+        {
+          USB.print(F("0"));
+          USB.println(firmware[1], HEX);
+        }
+        else USB.println(firmware[1], HEX);
+      }
+
+      if (radio_type == 5)
+      {
+        USB.print(F("--> Firmware version: "));
+        USB.printHex(firmware[0]);
+        USB.printHex(firmware[1]);
+        USB.printHex(firmware[2]);
+        USB.printHex(firmware[3]);
+        USB.println();
+      }
+    }
+  }
+
+
+  /////////////////////////////////////////////////////////////
+  // 8.2. check for LORAWAN module
+  /////////////////////////////////////////////////////////////
+  if (radio_type == 0)
+  {
+    // init object in SOCKET0
+    xbee802.OFF();
+    uart.setUART(SOCKET0);
+    uart.setBaudrate(57600);
+
+    // switch module OFF
+    uart.closeUART();
+    Utils.setMuxUSB();
+    PWR.powerSocket(SOCKET0, LOW);
+
+    delay(500);
+
+    // select multiplexer
+    Utils.setMuxSocket0();
+
+    // begin serial communication
+    uart.beginUART();
+
+    // power on the socket
+    PWR.powerSocket(SOCKET0, HIGH);
+    delay(500);
+    serialFlush(SOCKET0);
+
+    // check for XBees in SOCKET0
+    static char cmd_lorawan[] = "sys get ver\r\n";
+
+    // send command & receive answer
+    answer = uart.sendCommand((char*)cmd_lorawan, "\r\n", 1000);
+
+    char vers[9], vers_in[21];
+    memset(vers, 0x00, sizeof(vers));
+    memset(vers_in, 0x00, sizeof(vers_in));
+    memcpy (vers, uart._buffer, 8);
+    memcpy (vers_in, uart._buffer, 20);
+
+    // send command & receive answer
+    uint8_t dev_eui_answer = uart.sendCommand((char*)"mac get deveui\r\n", "\r\n", 1000);
+
+    // check response:
+    if (strcmp(vers, "RN2483 0") == 0 || strcmp(vers, "RN2483 1") == 0)
+    {
+      USB.println(F("LoRaWAN module is plugged on socket 0:"));
+      USB.println(F("--> Hardware serie: LoRaWAN EU"));
+      if (dev_eui_answer == 1)
+      {
+        USB.print(F("--> Device EUI: "));
+        USB.print(uart._buffer, uart._length);
+      }
+      radio_type = 7;
+    }
+    else if (strcmp(vers, "RN2903 0") == 0 || strcmp(vers, "RN2903 1") == 0)
+    {
+      if (strcmp(vers_in, "RN2903 1.0.5C_rc1-In") == 0)
+      {
+        USB.println(F("LoRaWAN module is plugged on socket 0:"));
+        USB.println(F("--> Hardware serie: LoRaWAN IN"));
+        if (dev_eui_answer == 1)
+        {
+          USB.print(F("--> Device EUI: "));
+          USB.println(uart._buffer, uart._length);
+        }
+      }
+      else
+      {
+        USB.println(F("LoRaWAN module is plugged on socket 0:"));
+        USB.println(F("--> Hardware serie: LoRaWAN US"));
+        if (dev_eui_answer == 1)
+        {
+          USB.print(F("--> Device EUI: "));
+          USB.println(uart._buffer, uart._length);
+        }
+      }
+      radio_type = 7;
+    }
+    else if (strcmp(vers, "RN2903 S") == 0)
+    {
+      USB.println(F("LoRaWAN module is plugged on socket 0:"));
+      USB.println(F("--> Hardware serie: LoRaWAN AU"));
+      if (dev_eui_answer == 1)
+      {
+        USB.print(F("--> Device EUI: "));
+        USB.println(uart._buffer, uart._length);
+      }
+      radio_type = 7;
+    }
+    else if (strcmp(vers, "RN2903 A") == 0)
+    {
+      USB.println(F("LoRaWAN module is plugged on socket 0:"));
+      USB.println(F("--> Hardware serie: LoRaWAN ASIA-PAC / LATAM"));
+      if (dev_eui_answer == 1)
+      {
+        USB.print(F("--> Device EUI: "));
+        USB.println(uart._buffer, uart._length);
+      }
+      radio_type = 7;
+    }
+  }
+
+  if (radio_type == 0)
+  {
+    // init object in SOCKET0
+    xbee802.OFF();
+    uart.setUART(SOCKET0);
+    uart.setBaudrate(19200);
+
+    // switch module OFF
+    uart.closeUART();
+    Utils.setMuxUSB();
+    PWR.powerSocket(SOCKET0, LOW);
+
+    delay(500);
+
+    // select multiplexer
+    Utils.setMuxSocket0();
+
+    // begin serial communication
+    uart.beginUART();
+
+    // power on the socket
+    PWR.powerSocket(SOCKET0, HIGH);
+    delay(500);
+    serialFlush(SOCKET0);
+
+    // check for XBees in SOCKET0
+    static char cmd_lorawan[] = "at+dev?\r";
+    static char ans_lorawan[] = "ABZ-093";
+
+    // send command & receive answer
+    answer = uart.sendCommand((char*)cmd_lorawan, ans_lorawan, 1000);
+
+    if (answer == 1)
+    {
+      radio_type = 7;
+      // send command & receive answer
+      uint8_t dev_eui_answer = uart.sendCommand((char*)"at+deveui?\r", "+OK=", 1000);
+
+      USB.println(F("LoRaWAN module is plugged on socket 0:"));
+      USB.println(F("--> Hardware serie: LoRaWAN JP/KR"));
+      if (dev_eui_answer == 1)
+      {
+        dev_eui_answer = uart.waitFor("\r", 100);
+        if (dev_eui_answer == 1)
+        {
+          USB.print(F("--> Device EUI: "));
+          USB.println(uart._buffer, uart._length);
+        }
+      }
+    }
+  }
+
+
+  /////////////////////////////////////////////////////////////
+  // 8.4. check for SIGFOX module
+  /////////////////////////////////////////////////////////////
+  if (radio_type == 0)
+  {
+    // init object in SOCKET0
+    uart.setUART(SOCKET0);
+    uart.setBaudrate(9600);
+
+    // switch module OFF
+    uart.closeUART();
+    Utils.setMuxUSB();
+    PWR.powerSocket(SOCKET0, LOW);
+
+    delay(500);
+
+    // select multiplexer
+    Utils.setMuxSocket0();
+
+    // begin serial communication
+    uart.beginUART();
+
+    // power on the socket
+    PWR.powerSocket(SOCKET0, HIGH);
+    delay(6000);
+    serialFlush(SOCKET0);
+
+    // check for XBees in SOCKET0
+    static char cmd_sigfox[] = "AT&V\r";
+
+    // send command & receive answer
+    answer = uart.sendCommand((char*)cmd_sigfox, "TD1207", "TD1508", 1000);
+    char* pch;
+    char sigfox_id[8];
+
+    // get IMEI
+    if (answer != 0)
+    {
+      // send command & receive answer
+      delay(1000);
+      response = uart.sendCommand((char*)"ATI7\r", "\r\n", 1000);
+
+      uart. waitFor("\r\n", 1000);
+      if (response == 1)
+      {
+        pch = strtok( (char*)uart._buffer, "\r\n");
+      }
+    }
+
+    memcpy(sigfox_id, pch, sizeof(sigfox_id));
+
+    // check response:
+    if (answer == 1)
+    {
+      USB.println(F("SIGFOX module is plugged on socket 0:"));
+      USB.println(F("--> Hardware serie: Sigfox EU"));
+      USB.print(F("--> Serial Number: "));
+      USB.println(sigfox_id);
+      radio_type = 8;
+    }
+    else if (answer == 2)
+    {
+      response = uart.sendCommand((char*)"ATS307?\r", "1", "63", 1000);
+      USB.println(F("SIGFOX module is plugged on socket 0:"));
+      if (response == 1)
+      {
+        USB.println(F("--> Hardware serie: Sigfox US"));
+      }
+      else if (response == 2)
+      {
+        USB.println(F("--> Hardware serie: Sigfox AU"));
+      }
+
+      USB.print(F("--> Serial Number: "));
+      USB.println(sigfox_id);
+      radio_type = 8;
+    }
+  }
+
+
+
+
+  /////////////////////////////////////////////////////////////
+  // 8.5. check for WIFI module
+  /////////////////////////////////////////////////////////////
+  if (radio_type == 0)
+  {
+    // init object in SOCKET0
+    uart.setUART(SOCKET0);
+    uart.setBaudrate(115200);
+
+    // switch module OFF
+    uart.closeUART();
+    Utils.setMuxUSB();
+    PWR.powerSocket(SOCKET0, LOW);
+
+    delay(500);
+
+    // select multiplexer
+    Utils.setMuxSocket0();
+
+    // begin serial communication
+    uart.beginUART();
+
+    // power on the socket
+    PWR.powerSocket(SOCKET0, HIGH);
+    delay(3000);
+    serialFlush(SOCKET0);
+
+    // check for XBees in SOCKET0
+    static char cmd_wifi[] = "AT+i\r";
+
+    // send command & receive answer
+    answer = uart.sendCommand((char*)cmd_wifi, "I/OK", 1000);
+
+    // check response:
+    if (answer == 1)
+    {
+      USB.println(F("WIFI PRO module is plugged on socket 0"));
+      radio_type = 9;
+    }
+  }
+
+
+  /////////////////////////////////////////////////////////////
+  // 8.6. check for 4G module
+  /////////////////////////////////////////////////////////////
+  if (radio_type == 0)
+  {
+
+    uint8_t error = _4G.ON();
+
+    if (error == 0)
+    {
+      ////////////////////////////////////////////////
+      //Model identification
+      ////////////////////////////////////////////////
+      error = _4G.getInfo(Wasp4G::INFO_MODEL_ID);
+      if (error == 0)
+      {
+        USB.println(F("4G module is plugged on socket 1:"));
+        USB.print(F("--> Hardware serie: "));
+        USB.println(_4G._buffer, _4G._length);
+      }
+      else
+      {
+        USB.println(F("Module ERROR"));
+      }
+      ////////////////////////////////////////////////
+      // IMEI
+      ////////////////////////////////////////////////
+
+      error = _4G.getInfo(Wasp4G::INFO_IMEI);
+      if (error == 0)
+      {
+        USB.print(F("--> IMEI: "));
+        USB.println(_4G._buffer, _4G._length);
+      }
+      else
+      {
+        USB.println(F("IMEI ERROR"));
+      }
+
+
+      ////////////////////////////////////////////////
+      // SIM card
+      ////////////////////////////////////////////////
+      error = _4G.getInfo(Wasp4G::INFO_ICCID);
+      if (error == 0)
+      {
+        USB.println(F("--> SIM card: OK"));
+      }
+      else
+      {
+        USB.println(F("--> SIM card: ERROR"));
+      }
+      radio_type = 10;
+    }
+  }
+
+
+
+  /////////////////////////////////////////////////////////////
+  // 9. Check for modules into socket 1
+  /////////////////////////////////////////////////////////////
+
+  if (radio_type == 0)
+  {
+    USB.println(F("No radio module detected into socket 0\n"));
+
+    /////////////////////////////////////////////////////////////
+    // 9.1 Set Waspmote setting for XBee module for first time.
+    // (baudrate at 115200 and API mode enabled)
+    /////////////////////////////////////////////////////////////
+    closeSerial(SOCKET1);
+    delay(500);
+    xbee802.ON(SOCKET1);
+
+    Utils.setMuxSocket1();
+    delay(500);
+    beginSerial(9600, 1);
+    printString("+++", 1);
+    delay(2000);
+    printString("ATBD7,AP2,WR,CN\r\n", 1);
+    delay(500);
+
+    xbee802.OFF();
+    delay(500);
+    xbeeZB.ON(SOCKET1);
+
+    // In case of Zigbee modules:
+    // XBee command for 115200bps --> ATBD7
+    uint8_t ATBD7[] = { 0x7E, 0x00, 0x05, 0x08, 0x01, 0x42, 0x44, 0x07, 0x69 };
+    // XBee command for API mode --> ATAP2
+    uint8_t ATAP2[] = { 0x7E, 0x00, 0x05, 0x08, 0x01, 0x41, 0x50, 0x02, 0x63 };
+    // XBee command for saving config --> ATWR
+    uint8_t ATWR[] = { 0x7E, 0x00, 0x04, 0x08, 0x01, 0x57, 0x52, 0x4D };
+
+    for (uint8_t i = 0; i < 9; i++)
+    {
+      printByte(ATBD7[i], SOCKET1);
+    }
+    delay(150);
+    closeSerial(SOCKET1);
+    delay(200);
+    beginSerial(115200, SOCKET1);
+    for (uint8_t i = 0; i < 9; i++)
+    {
+      printByte(ATAP2[i], SOCKET1);
+    }
+    delay(150);
+    for (uint8_t i = 0; i < 8; i++)
+    {
+      printByte(ATWR[i], SOCKET1);
+    }
+    delay(150);
+    closeSerial(SOCKET1);
+
+
+    /////////////////////////////////////////////////////////////
+    // 9.2 check for XBee module
+    /////////////////////////////////////////////////////////////
+
+    // init object in SOCKET0
+    uart.setUART(SOCKET1);
+
+    // select multiplexer
+    Utils.setMuxSocket1();
+
+    // begin serial communication
+    uart.beginUART();
+
+    // power on the socket
+    PWR.powerSocket(SOCKET1, HIGH);
+    delay(500);
+    serialFlush(SOCKET1);
+
+    // check for XBees in SOCKET1
+    uint8_t cmd_xbee[] = {0x7E, 0x00 , 0x04 , 0x08 , 0x01 , 0x56 , 0x52 , 0x4E};
+
+    // send command & receive answer
+    uart.sendCommand(cmd_xbee, sizeof(cmd_xbee));
+    uart.readBuffer(100);
+
+    // check response: 7E00078801565200xxxx??
+    if (uart._length > 0)
+    {
+      if ((uart._buffer[0] == 0x7E)
+          &&  (uart._buffer[1] == 0x00)
+          &&  (uart._buffer[3] == 0x88)
+          &&  (uart._buffer[4] == 0x01)
+          &&  (uart._buffer[5] == 0x56)
+          &&  (uart._buffer[6] == 0x52)
+          &&  (uart._buffer[7] == 0x00))
+      {
+
+        USB.println(F("XBee module is plugged on socket 1:"));
+
+        /*
+          USB.print(F("XBee module in SOCKET0. Firmware: "));
+          USB.printHex(uart._buffer[8]);
+          USB.printHex(uart._buffer[9]);
+          USB.println();
+        */
+
+        firmware[0] = uart._buffer[8];
+        firmware[1] = uart._buffer[9];
+        firmware[2] = uart._buffer[10];
+        firmware[3] = uart._buffer[11];
+
+        /////////////////////////////////
+        // Get the XBee firmware version
+        /////////////////////////////////
+
+        // Set the XBee firmware type depending ont he previous response
+        if ((firmware[0] < 0x20) && (firmware[1] > 0x80))
+        {
+          radio_type = 1; // 802.15.4
+          USB.println(F("--> XBee type: 802.15.4"));
+        }
+        else if (firmware[0] == 0x10 && firmware[1] < 0x50)
+        {
+          radio_type = 4; //ZB
+          USB.println(F("--> XBee type: ZigBee 3"));
+        }
+        else if ((firmware[0] < 0x20) && (firmware[1] > 0x00))
+        {
+          radio_type = 2; // 868MHz - 900MHz
+
+          xbee802.OFF();
+          xbee802.ON(SOCKET1);
+
+          // send Hardware Serial command
+          if (!xbee802.sendCommandAT("HS#"))
+          {
+            // USB.printHexln(xbee802.commandAT, 3);
+          }
+
+          // check for XBee 900HP
+          if (xbee802.commandAT[0] == 3)
+          {
+            USB.println(F("--> XBee type: 900HP"));
+
+            // check for available frequencies:
+            // US: 00FFFFFFFFFFFFFFFF
+            // BR: 00FFFFFFFE00000FFF
+            // AU: 00FFFFFFFE00000000
+            if (!xbee802.sendCommandAT("AF#"))
+            {
+              //USB.printHexln(xbee802.commandAT, 16);
+              if ((xbee802.commandAT[1] == 0xFF)
+                  && (xbee802.commandAT[2] == 0xFF)
+                  && (xbee802.commandAT[3] == 0xFF)
+                  && (xbee802.commandAT[4] == 0xFF)
+                  && (xbee802.commandAT[5] == 0xFF)
+                  && (xbee802.commandAT[6] == 0xFF)
+                  && (xbee802.commandAT[7] == 0xFF)
+                  && (xbee802.commandAT[8] == 0xFF))
+              {
+                USB.println(F("--> Hardware serie: USA"));
+              }
+              else if ((xbee802.commandAT[1] == 0xFF)
+                       && (xbee802.commandAT[2] == 0xFF)
+                       && (xbee802.commandAT[3] == 0xFF)
+                       && (xbee802.commandAT[4] == 0xFE)
+                       && (xbee802.commandAT[5] == 0x00)
+                       && (xbee802.commandAT[6] == 0x00)
+                       && (xbee802.commandAT[7] == 0x0F)
+                       && (xbee802.commandAT[8] == 0xFF))
+              {
+                USB.println(F("--> Hardware serie: BRAZIL"));
+              }
+              else if ((xbee802.commandAT[1] == 0xFF)
+                       && (xbee802.commandAT[2] == 0xFF)
+                       && (xbee802.commandAT[3] == 0xFF)
+                       && (xbee802.commandAT[4] == 0xFE)
+                       && (xbee802.commandAT[5] == 0x00)
+                       && (xbee802.commandAT[6] == 0x00)
+                       && (xbee802.commandAT[7] == 0x00)
+                       && (xbee802.commandAT[8] == 0x00))
+              {
+                USB.println(F("--> Hardware serie: AUSTRALIA"));
+              }
+            }
+            else
+            {
+              USB.println(F("--> Hardware serie: ERROR"));
+              errorFlag |= 1 << 0x04;
+            }
+          }
+          // check for XBee 868LP
+          else if (xbee802.commandAT[0] == 8)
+          {
+            USB.println(F("--> XBee type: 868LP"));
+          }
+
+        }
+        else if (firmware[0] >= 0x80)
+        {
+          radio_type = 3; // DigiMesh
+          USB.println(F("--> XBee type: DigiMesh"));
+        }
+        else if (((firmware[0] >= 0x20) && (firmware[1] < 0xB0)) ||
+                 ((firmware[0] == 0x70) && (firmware[1] == 0x5B)) )
+        {
+          radio_type = 4; //ZB
+          USB.println(F("--> XBee type: ZigBee"));
+        }
+        else if (firmware[0] == 0x00 && firmware[1] >= 0x02)
+        {
+          radio_type = 5; // 900 MHz Intl
+          USB.println(F("--> XBee type: 900 International"));
+        }
+        else
+        {
+          radio_type = 0;
+        }
+
+        /////////////////////////////////////////////////////////////
+        // Get the XBee MAC address
+        /////////////////////////////////////////////////////////////
+        if (radio_type != 0)
+        {
+          xbee802.OFF();
+          delay(1000);
+          xbee802.ON(SOCKET1);
+          delay(1000);
+          xbee802.flush();
+
+          // Get the XBee MAC address
+          int counter = 0;
+          while ((xbee802.getOwnMac() != 0) && (counter < 12))
+          {
+            xbee802.getOwnMac();
+            counter++;
+          }
+
+
+          // convert mac address from array to string
+          Utils.hex2str(xbee802.sourceMacHigh, macHigh, 4);
+          Utils.hex2str(xbee802.sourceMacLow,  macLow,  4);
+
+          // Get the XBee MAC address
+          while ((xbee802.getOwnMac() != 0) && (counter < 12))
+          {
+            xbee802.getOwnMac();
+            counter++;
+          }
+
+          // convert mac address from array to string
+          Utils.hex2str(xbee802.sourceMacHigh, macHigh, 4);
+          Utils.hex2str(xbee802.sourceMacLow,  macLow,  4);
+
+          USB.print(F("--> MAC address: "));
+          USB.print(macHigh);
+          USB.println(macLow);
+
+        }
+
+        if (radio_type < 5)
+        {
+          USB.print(F("--> Firmware version: "));
+          USB.print(firmware[0], HEX);
+          if (firmware[1] < 0x10)
+          {
+            USB.print(F("0"));
+            USB.println(firmware[1], HEX);
+          }
+          else USB.println(firmware[1], HEX);
+        }
+
+        if (radio_type == 5)
+        {
+          USB.print(F("--> Firmware version: "));
+          USB.printHex(firmware[0]);
+          USB.printHex(firmware[1]);
+          USB.printHex(firmware[2]);
+          USB.printHex(firmware[3]);
+          USB.println();
+        }
+      }
+    }
+
+
+    /////////////////////////////////////////////////////////////
+    // 9.3. check for LORAWAN module
+    /////////////////////////////////////////////////////////////
+    if (radio_type == 0)
+    {
+      // init object in SOCKET0
+      xbee802.OFF();
+      uart.setUART(SOCKET1);
+      uart.setBaudrate(57600);
+
+      // switch module OFF
+      uart.closeUART();
+      Utils.setMuxUSB();
+      PWR.powerSocket(SOCKET1, LOW);
+
+      delay(500);
+
+      // select multiplexer
+      Utils.setMuxSocket1();
+
+      // begin serial communication
+      uart.beginUART();
+
+      // power on the socket
+      PWR.powerSocket(SOCKET1, HIGH);
+      delay(500);
+      serialFlush(SOCKET1);
+
+      // check for XBees in SOCKET0
+      static char cmd_lorawan[] = "sys get ver\r\n";
+
+      char vers[9], vers_in[21];
+      memset(vers, 0x00, sizeof(vers));
+      memset(vers_in, 0x00, sizeof(vers_in));
+      memcpy (vers, uart._buffer, 8);
+      memcpy (vers_in, uart._buffer, 20);
+
+      // send command & receive answer
+      answer = uart.sendCommand((char*)cmd_lorawan, "RN2483", "RN2903", 1000);
+
+      // send command & receive answer
+      uint8_t dev_eui_answer = uart.sendCommand((char*)"mac get deveui\r\n", "\r\n", 1000);
+
+      // check response:
+      if (strcmp(vers, "RN2483 0") == 0 || strcmp(vers, "RN2483 1") == 0)
+      {
+        USB.println(F("LoRaWAN module is plugged on socket 1:"));
+        USB.println(F("--> Hardware serie: LoRaWAN EU"));
+        if (dev_eui_answer == 1)
+        {
+          USB.print(F("--> Device EUI: "));
+          USB.println(uart._buffer, uart._length);
+        }
+        radio_type = 7;
+      }
+      else if (strcmp(vers, "RN2903 0") == 0 || strcmp(vers, "RN2903 1") == 0)
+      {
+        if (strcmp(vers_in, "RN2903 1.0.5C_rc1-In") == 0)
+        {
+          USB.println(F("LoRaWAN module is plugged on socket 1:"));
+          USB.println(F("--> Hardware serie: LoRaWAN IN"));
+          if (dev_eui_answer == 1)
+          {
+            USB.print(F("--> Device EUI: "));
+            USB.println(uart._buffer, uart._length);
+          }
+        }
+        else
+        {
+          USB.println(F("LoRaWAN module is plugged on socket 1:"));
+          USB.println(F("--> Hardware serie: LoRaWAN US"));
+          if (dev_eui_answer == 1)
+          {
+            USB.print(F("--> Device EUI: "));
+            USB.println(uart._buffer, uart._length);
+          }
+        }
+        radio_type = 7;
+      }
+      else if (strcmp(vers, "RN2903 S") == 0)
+      {
+        USB.println(F("LoRaWAN module is plugged on socket 1:"));
+        USB.println(F("--> Hardware serie: LoRaWAN AU"));
+        if (dev_eui_answer == 1)
+        {
+          USB.print(F("--> Device EUI: "));
+          USB.println(uart._buffer, uart._length);
+        }
+        radio_type = 7;
+      }
+      else if (strcmp(vers, "RN2903 A") == 0)
+      {
+        USB.println(F("LoRaWAN module is plugged on socket 1:"));
+        USB.println(F("--> Hardware serie: LoRaWAN ASIA-PAC / LATAM"));
+        if (dev_eui_answer == 1)
+        {
+          USB.print(F("--> Device EUI: "));
+          USB.println(uart._buffer, uart._length);
+        }
+        radio_type = 7;
+      }
+    }
+
+    if (radio_type == 0)
+    {
+      // init object in SOCKET0
+      xbee802.OFF();
+      uart.setUART(SOCKET1);
+      uart.setBaudrate(19200);
+
+      // switch module OFF
+      uart.closeUART();
+      Utils.setMuxUSB();
+      PWR.powerSocket(SOCKET1, LOW);
+
+      delay(500);
+
+      // select multiplexer
+      Utils.setMuxSocket1();
+
+      // begin serial communication
+      uart.beginUART();
+
+      // power on the socket
+      PWR.powerSocket(SOCKET1, HIGH);
+      delay(500);
+      serialFlush(SOCKET1);
+      delay(100);
+      // check for XBees in SOCKET0
+      static char cmd_lorawan[] = "at+dev?\r";
+      static char ans_lorawan[] = "ABZ";
+
+      // send command & receive answer
+      answer = uart.sendCommand((char*)cmd_lorawan, ans_lorawan, 1000);
+
+      if (answer == 1)
+      {
+        radio_type = 7;
+
+        // send command & receive answer
+        uint8_t dev_eui_answer = uart.sendCommand((char*)"at+deveui?\r", "+OK=", 1000);
+
+        USB.println(F("LoRaWAN module is plugged on socket 1:"));
+        USB.println(F("--> Hardware serie: LoRaWAN JP/KR"));
+        if (dev_eui_answer == 1)
+        {
+          dev_eui_answer = uart.waitFor("\r", 100);
+          if (dev_eui_answer == 1)
+          {
+            USB.print(F("--> Device EUI: "));
+            USB.println(uart._buffer, uart._length);
+          }
+        }
+      }
+    }
+
+    /////////////////////////////////////////////////////////////
+    // 9.4. check for SIGFOX module
+    /////////////////////////////////////////////////////////////
+    if (radio_type == 0)
+    {
+      // init object in SOCKET0
+      uart.setUART(SOCKET1);
+      uart.setBaudrate(9600);
+
+      // switch module OFF
+      uart.closeUART();
+      Utils.setMuxUSB();
+      PWR.powerSocket(SOCKET1, LOW);
+
+      delay(500);
+
+      // select multiplexer
+      Utils.setMuxSocket1();
+
+      // begin serial communication
+      uart.beginUART();
+
+      // power on the socket
+      PWR.powerSocket(SOCKET1, HIGH);
+      delay(6000);
+      serialFlush(SOCKET1);
+
+      // check for XBees in SOCKET1
+      static char cmd_sigfox[] = "AT&V\r";
+
+      // send command & receive answer
+      answer = uart.sendCommand((char*)cmd_sigfox, "TD1207", "TD1508", 1000);
+      char* sigfox_id;
+
+      // get IMEI
+      if (answer != 0)
+      {
+        // send command & receive answer
+        delay(1000);
+        response = uart.sendCommand((char*)"ATI7\r", "\r\n", 1000);
+
+        uart. waitFor("\r\n", 1000);
+        if (response == 1)
+        {
+          sigfox_id = strtok( (char*)uart._buffer, "\r\n");
+        }
+      }
+
+      // check response:
+      if (answer == 1)
+      {
+        USB.println(F("SIGFOX module is plugged on socket 1:"));
+        USB.println(F("--> Hardware serie: Sigfox EU"));
+        USB.print(F("--> Serial Number: "));
+        USB.println(sigfox_id);
+        radio_type = 8;
+      }
+      else if (answer == 2)
+      {
+        USB.println(F("SIGFOX module is plugged on socket 1:"));
+        USB.println(F("--> Hardware serie: Sigfox US"));
+        USB.print(F("--> Serial Number: "));
+        USB.println(sigfox_id);
+        radio_type = 8;
+      }
+    }
+
+
+
+
+    /////////////////////////////////////////////////////////////
+    // 9.5. check for WIFI module
+    /////////////////////////////////////////////////////////////
+    if (radio_type == 0)
+    {
+      // init object in SOCKET1
+      uart.setUART(SOCKET1);
+      uart.setBaudrate(115200);
+
+      // switch module OFF
+      uart.closeUART();
+      Utils.setMuxUSB();
+      PWR.powerSocket(SOCKET1, LOW);
+
+      delay(500);
+
+      // select multiplexer
+      Utils.setMuxSocket1();
+
+      // begin serial communication
+      uart.beginUART();
+
+      // power on the socket
+      PWR.powerSocket(SOCKET1, HIGH);
+      delay(3000);
+      serialFlush(SOCKET1);
+
+      // check for XBees in SOCKET0
+      static char cmd_wifi[] = "AT+i\r";
+
+      // send command & receive answer
+      answer = uart.sendCommand((char*)cmd_wifi, "I/OK", 1000);
+
+      // check response:
+      if (answer == 1)
+      {
+        USB.println(F("WIFI PRO module is plugged on socket 1"));
+        radio_type = 9;
+      }
+    }
+
+    if (radio_type == 0)
+    {
+      USB.println(F("No radio module detected into socket 1"));
+      errorFlag |= 1 << 0x00;
+    }
+  }
+
+
+  /////////////////////////////////////////////////////////////
+  // 10. Test RTC
+  /////////////////////////////////////////////////////////////
+  RTC.setTime("00:01:01:01:00:00:00");
+  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  if (RTC.second < 5) {
+    errorFlag |= 1 << 0x06;
+  }
+
+
+  /////////////////////////////////////////////////////////////
+  // 11. Print error information
+  /////////////////////////////////////////////////////////////
+  USB.println();
+  USB.println(F("==============================="));
+
+  if (errorFlag != 0) {
+
+    // set red LED button P&S
+    Utils.setLED(LED1, LED_ON);
+    USB.println(F(" TEST: ERROR"));
+
+    if ((errorFlag & 1) != 0) {
+      USB.println(F("   - No radio module detected"));
+    }
+    if ((errorFlag & 2) != 0) {
+      USB.println(F("   - Battery error"));
+    }
+    if ((errorFlag & 4) != 0) {
+      USB.println(F("   - SD error"));
+    }
+    if ((errorFlag & 8) != 0) {
+      USB.println(F("   - No SD detected"));
+    }
+    if ((errorFlag & 16) != 0) {
+      USB.println(F("   - XBee 900HP error"));
+    }
+    if ((errorFlag & 32) != 0) {
+      USB.println(F("   - SIM card error"));
+    }
+    if ((errorFlag & 64) != 0) {
+      USB.println(F("   - deepSleep error"));
+    }
+
+  }
+  else {
+
+    USB.println(F(" TEST: OK"));
+
+  }
+
 }
-
-
-
-
-
-
 
 
 
@@ -538,392 +1429,124 @@ void setup()
 
 void loop()
 {
-  prev = millis();
-  USB.ON();
+  RTC.ON();
+  ACC.ON();
 
-  ///////////////////////////////////////////
-  // 0. Turn on sensors and wait
-  ///////////////////////////////////////////
+  ////////////////////////////////////////////////
+  // 1. Waspmote Frame composition
+  ////////////////////////////////////////////////
 
-  //Power on gas sensors
-  CO.ON();
-  NH3.ON();
-  CH4.ON();
+  // Create new frame
+  frame.setID(node_id);
+  frame.createFrame(ASCII);
 
-
-  // Sensors need time to warm up and get a response from gas
-  // To reduce the battery consumption, use deepSleep instead delay
-  // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
-  USB.println(RTC.getTime());
-  USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
-  USB.println(RTC.getTime());
-  USB.println(F("wake up!!\r\n"));
-
-  ///////////////////////////////////////////
-  // 1. Read sensors
-  ///////////////////////////////////////////
-
-  // Read the sensors and compensate with the temperature internally
-  concCO = CO.getConc();
-  concNH3 = NH3.getConc();
-  concCH4 = CH4.getConc();
-
-  // Read enviromental variables
-  temperature = CO.getTemp();
-  //temperature=25;
-  humidity = CO.getHumidity();
-  pressure = CO.getPressure();
-
-  ///////////////////////////////////////////
-  // 2. Turn off the sensors
-  ///////////////////////////////////////////
-
-  //Power off sensors
-  CO.OFF();
-  NH3.OFF();
-  CH4.OFF();
-
-  ///////////////////////////////////////////
-  // 3. Read particle matter sensor
-  ///////////////////////////////////////////
-
-  // Turn on the particle matter sensor
-  OPC_status = PM.ON();
-  if (OPC_status == 1)
+  // add low MAC address in the case it is an XBee module
+  if ((radio_type == 1) ||
+      (radio_type == 2) ||
+      (radio_type == 3) ||
+      (radio_type == 5)  )
   {
-    USB.println(F("Particle sensor started"));
+    frame.addSensor(SENSOR_MAC, macLow);
   }
-  else
-  {
-    USB.println(F("Error starting the particle sensor"));
-  }
-
-  // Get measurement from the particle matter sensor
-  if (OPC_status == 1)
-  {
-    // Power the fan and the laser and perform a measure of 5 seconds
-    OPC_measure = PM.getPM(5000, 5000);
-  }
-
-  PM.OFF();
-  USB.println(F("Particle sensor is done mesuring, and was turned OFF."));
-
-
-
-
-  // get actual time
-  previous = millis();
-  //////////////////////////////////////////////////
-  // 4. Switch ON
-  //////////////////////////////////////////////////
-  b = 0;
-qwerty:
-
-
-  error = WIFI_PRO.ON(socket);
-  if (error == 0)
-  {
-    USB.println(F("WiFi switched ON"));
-  }
-  else
-  {
-    USB.println(F("WiFi did not initialize correctly"));
-  }
-  //////////////////////////////////////////////////
-  // 5. Join AP
-  //////////////////////////////////////////////////
-  // check connectivity
-  status =  WIFI_PRO.isConnected();
-
-
-  // check if module is connected
-  if (status == true)
-  {
-    USB.print(F("WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-
-
-
-    RTC.getTime();
-
-    // create new frame 1
-    frame.createFrame(BINARY, node_ID);  // frame1 de trimis & stocat
-
-    // add frame fields
-////////////////////////////////////////////////////////////
-    frame.addSensor(SENSOR_BAT, 13);
-    frame.addSensor(SENSOR_BAT, 33);
-    frame.addSensor(SENSOR_BAT, 23);
-    frame.addSensor(SENSOR_BAT, 43);
-    frame.addSensor(SENSOR_BAT, 15);
-    frame.addSensor(SENSOR_BAT, 15);
-    frame.addSensor(SENSOR_BAT, 17);
-    frame.addSensor(SENSOR_BAT, 11);
-    frame.addSensor(SENSOR_BAT, 19);
-
-    // Add CH4 value
-    frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
-    // Add CO value
-    frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-    // Add NH3 value
-    frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
-    // Add PM1
-    frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-    // Add PM2.5
-    frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-    // Add PM10
-    frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-    // Add BAT level
-    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-    // Add temperature
-    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-    // Add humidity
-    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-    // Add pressure value
-    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-
-///////////////////////////////////////////////////////////////////////////////////////////
-    frame.showFrame();
-// data is sent here
-
-
-    USB.print(F("Maximum frame size:"));
-    USB.println(80);
-
-    while (frame.createFragmentHeader(80) > 0)
-    {
-      frame.generateFragment();
-      USB.println(F("Fragment frame:"));
-      USB.println(F("-------------------------------"));
-      USB.printHexln(frame.bufferFragment, frame.lengthFragment);
-      USB.println(F("-------------------------------"));
-      USB.println();
-    }
-    USB.println();
-
-
-
-
-
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.bufferFragment, frame.lengthFragment);   // frame 1
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("HTTP OK"));
-      ssent = 1;
-
-      USB.print(F("HTTP Time from OFF state (ms):"));
-      USB.println(millis() - previous);
-      USB.println(F("ASCII FRAME 1 SEND OK"));
-
-
-    }
-    else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-      ssent = 0;
-      WIFI_PRO.printErrorCode();
-    }
-
-
-
-// 3.2. Send Frame to Meshlium
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    // http frame
-    error = WIFI_PRO.sendFrameToMeshlium( type, host, port, frame.buffer, frame.length);   // frame 1
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("HTTP OK"));
-      ssent = 1;
-
-      USB.print(F("HTTP Time from OFF state (ms):"));
-      USB.println(millis() - previous);
-      USB.println(F("ASCII FRAME 1 SEND OK"));
-
-
-    }
-    else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-      ssent = 0;
-      WIFI_PRO.printErrorCode();
-    }
-  }
-  else
-  {
-    USB.print(F("WiFi is connected ERROR"));
-    USB.print(F(" Time(ms):"));
-    USB.println(millis() - previous);
-  }
-
-  b++;
-  if (ssent == 0 && b <= retries_f1)
-  {
-    delay(5000);
-    USB.print(F("atempting resend no: "));
-    USB.println(b);
-    goto qwerty;
-  }
-  if (ssent == 0 && b >= retries_f1)
-  {
-    USB.print(F("WIFI failed HARD for some reason "));
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-  //now storeing it locally
-  SD.ON();
-
-  frame.createFrame(ASCII, node_ID);  // frame1 de  stocat
-  // Add CH4 value
-  frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
-  // Add CO value
-  frame.addSensor(SENSOR_GASES_PRO_CO, concCO, 2);
-  // Add NH3 value
-  frame.addSensor(SENSOR_GASES_PRO_NH3, concNH3, 2);
-  // Add PM1
-  frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-  // Add PM2.5
-  frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-  // Add PM10
-  frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
-  // Add BAT level
+  frame.addSensor(SENSOR_ACC, ACC.getX(), ACC.getY(), ACC.getZ());
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  // Add temperature
-  frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-  // Add humidity
-  frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-  // Add pressure value
-  frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
+  frame.showFrame();
 
-  //  USB.println(F("cadru de stocet:"));
-  //  frame.showFrame();
-
-  time_date = RTC.getTime();
-  USB.print(F("time: "));
-  USB.println(time_date);
-
-  x = RTC.year;
-  itoa(x, y, 10);
-  if (x < 10)
-  {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x = RTC.month;
-  itoa(x, y, 10);
-  if (x < 10)
-  {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-
-
-  x = RTC.date;
-  itoa(x, y, 10);
-  if (x < 10)
-  {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x = RTC.hour;
-  itoa(x, y, 10);
-  if (x < 10)
-  {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x = RTC.minute;
-  itoa(x, y, 10);
-  if (x < 10)
-  {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename, ".");
-  x = RTC.second;
-  itoa(x, y, 10);
-  if (x < 10)
-  {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  sd_answer = SD.append(filename,  y  );
-  sd_answer = SD.append(filename,  "  " );
-  sd_answer = SD.append(filename,  frame.buffer , frame.length );
-  sd_answer = SD.append(filename,  "  " );
-  itoa(ssent, y , 10);
-  sd_answer = SD.appendln(filename,  y );
-// frame 1 is stored
-
-
-
-  SD.OFF();
-
-
-
-
-
-
-
-
-
-  // Go to deepsleep
 
   ////////////////////////////////////////////////
-  // 5. Sleep
+  // 2. Send the packet
   ////////////////////////////////////////////////
-  USB.println(F("5. Enter deep sleep..."));
-  USB.print("X"); USB.print(rtc_str); USB.println("X");
 
-  USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-  USB.OFF();
+  if (radio_type == 0)
+  {
+    USB.println(F("the frame above is printed just by USB (no radio module detected)"));
+  }
+  else if (radio_type < 6)
+  {
+    // // In the case of XBee 802.15.4
+    if (radio_type == 1)
+    {
+      // turn XBee on
+      xbee802.ON();
+      // sets Destination parameters
+      xbee_error = xbee802.send(destination, frame.buffer, frame.length);
+      // check TX flag
+      if (xbee_error == 0)
+      {
+        USB.println(F("the frame above was sent"));
+      }
+      else
+      {
+        USB.println(F("sending error"));
+      }
+    }
+    else
+    {
+      // In the case of DigiMesh / 868 / 900 / ZigBee
+      // turn XBee on
+      xbeeZB.ON();
 
-  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+      if (radio_type == 4)
+      {
+        do
+        {
+          delay(1000);
+          xbeeZB.getAssociationIndication();
 
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
-  USB.println(F("6. Wake up!!\n\n"));
+          // get operating 64-b PAN ID
+          xbeeZB.getOperating64PAN();
+
+          USB.print(F("operating 64-b PAN ID: "));
+          USB.printHex(xbeeZB.operating64PAN[0]);
+          USB.printHex(xbeeZB.operating64PAN[1]);
+          USB.printHex(xbeeZB.operating64PAN[2]);
+          USB.printHex(xbeeZB.operating64PAN[3]);
+          USB.printHex(xbeeZB.operating64PAN[4]);
+          USB.printHex(xbeeZB.operating64PAN[5]);
+          USB.printHex(xbeeZB.operating64PAN[6]);
+          USB.printHex(xbeeZB.operating64PAN[7]);
+          USB.println();
+        }
+        while ( xbeeZB.associationIndication != 0 );
+      }
+      // sets Destination parameters
+      xbee_error = xbeeZB.send(destination, frame.buffer, frame.length);
+
+      // check TX flag
+      if (xbee_error == 0)
+      {
+        USB.println(F("the frame above was sent"));
+      }
+      else
+      {
+        USB.println(F("sending error"));
+      }
+    }
+  }
+
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  // 3. Deep Sleep
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  USB.println(F("enter deep sleep"));
+  // Go to sleep disconnecting all switches and modules
+  // After 10 seconds, Waspmote wakes up thanks to the RTC Alarm
+  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+
+  USB.ON();
+  USB.println(F("\nwake up"));
+
+  // After wake up check interruption source
+  if ( intFlag & RTC_INT )
+  {
+    // clear interruption flag
+    intFlag &= ~(RTC_INT);
+
+    USB.println(F("---------------------"));
+    USB.println(F("RTC INT captured"));
+    USB.println(F("---------------------"));
+  }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

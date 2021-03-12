@@ -52,13 +52,13 @@ char ftp_pass[] = "U$d(SEFA8+UC";
 */
 // coordinator's 64-bit PAN ID to set
 ////////////////////////////////////////////////////////////////////////
-uint8_t  PANID[8] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+uint8_t  PANID[8] = { "be1a"};
 ////////////////////////////////////////////////////////////////////////
 // Destination MAC address
 //////////////////////////////////////////
-char RX_ADDRESS[] = "0013A200403A2A49";
+char RX_ADDRESS[] = "0013A20041678B8C";                                                  //"0013A200403A2A49";
 //////////////////////////////////////////
-char MESHLIUM_ADDRESS[] = "0013A2004098FB30";  // Destination MAC address
+char MESHLIUM_ADDRESS[] = "0013A20041678B8C";  // Destination MAC address
 
 
 
@@ -216,7 +216,7 @@ void pregatitor_XBEE()
      1 (0x0C)  5 (0x10)  9 (0x14)   13 (0x18)
      2 (0x0D)  6 (0x11)  10 (0x15)
      3 (0x0E)  7 (0x12)  11 (0x16)    */
-  xbeeZB.setScanningChannels(0x03, 0xFF);
+  xbeeZB.setScanningChannels(0x14, 0x15);
 
   // check at command flag
   if (xbeeZB.error_AT == 0)
@@ -422,7 +422,8 @@ void POWER_LVL_INSPECTOR()
 
 void RTC_SET(int incercari = RTC_ATEMPTS , char MESHLIUM_ADDRESS[] = MESHLIUM_ADDRESS )
 {
-  uint8_t t = 0 , v = 0;
+  uint8_t t = 0 ; 
+  int v = 0;
   USB.ON();
   RTC.ON();
   xbeeZB.ON();
@@ -449,7 +450,10 @@ void RTC_SET(int incercari = RTC_ATEMPTS , char MESHLIUM_ADDRESS[] = MESHLIUM_AD
       }
       else
       {
-        USB.println(F("SET RTC error. "));
+        USB.print(v);
+        USB.print("/");
+        USB.print(incercari);
+        USB.println(F(" SET RTC error. "));
         delay(1000);
         v++;
       }
