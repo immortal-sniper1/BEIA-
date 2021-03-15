@@ -581,7 +581,7 @@ void all_in_1_frame_process()
 
 
 
-void OTA_setup_check()
+void OTA_setup_check()     // asta reprogrameaza in practica
 {
   //////////////////////////////////////////////////
   // 1. Check if the program has been programmed ok
