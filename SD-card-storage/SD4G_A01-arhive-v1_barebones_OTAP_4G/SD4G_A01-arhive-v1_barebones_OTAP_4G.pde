@@ -866,7 +866,48 @@ void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
 
 
 
+void OTA_setup_check( int att=1)     // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta 
+{
+  int q=1;
+  bool w=false;
+  while( q<=att && w==false) 
+  {
+    
+  // show program ID
+  Utils.getProgramID(programID);
+  USB.println(F("-----------------------------"));
+  USB.print(F("Program id: "));
+  USB.println(programID);
 
+  // show program version number
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
+  USB.println(F("-----------------------------"));
+
+  status = Utils.checkNewProgram();
+
+  switch (status)
+  {
+  case 0:
+    USB.println(F("REPROGRAMMING ERROR"));
+    Utils.blinkRedLED(300, 3);
+    q++;
+    break;
+
+  case 1:
+    USB.println(F("REPROGRAMMING OK"));
+    Utils.blinkGreenLED(300, 3);
+    w=true;
+    break;
+
+  default:
+    USB.println(F("RESTARTING"));
+    Utils.blinkGreenLED(500, 1);
+    q++;
+  }
+  }
+  
+}
 
 
 
@@ -900,35 +941,7 @@ void setup()
   //HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  // show program ID
-  Utils.getProgramID(programID);
-  USB.println(F("-----------------------------"));
-  USB.print(F("Program id: "));
-  USB.println(programID);
-
-  // show program version number
-  USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(), DEC);
-  USB.println(F("-----------------------------"));
-
-  status = Utils.checkNewProgram();
-
-  switch (status)
-  {
-  case 0:
-    USB.println(F("REPROGRAMMING ERROR"));
-    Utils.blinkRedLED(300, 3);
-    break;
-
-  case 1:
-    USB.println(F("REPROGRAMMING OK"));
-    Utils.blinkGreenLED(300, 3);
-    break;
-
-  default:
-    USB.println(F("RESTARTING"));
-    Utils.blinkGreenLED(500, 1);
-  }
+  OTA_setup_check(10);
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////

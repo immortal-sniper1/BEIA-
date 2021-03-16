@@ -579,43 +579,47 @@ void all_in_1_frame_process()
 
 
 
-
-
-void OTA_setup_check()     // asta reprogrameaza in practica
+void OTA_setup_check( int att=1)     // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta 
 {
-  //////////////////////////////////////////////////
-  // 1. Check if the program has been programmed ok
-  //////////////////////////////////////////////////
-  answer = Utils.checkNewProgram();
-
-  switch (answer)
+  int q=1;
+  bool w=false;
+  while( q<=att && w==false) 
   {
-  case 0:
-    USB.print(F("REPROGRAMMING ERROR"));
-    Utils.blinkRedLED(1500, 3);
-    break;
-
-  case 1:
-    USB.println(F("REPROGRAMMING OK"));
-    Utils.blinkGreenLED(1500, 3);
-    break;
-
-  default:
-    USB.println(F("RESTARTING"));
-    Utils.blinkGreenLED(1500, 1);
-  }
-
-  USB.println(F(" "));
+    
   // show program ID
   Utils.getProgramID(programID);
-  USB.println(F("-------------------------------"));
+  USB.println(F("-----------------------------"));
   USB.print(F("Program id: "));
   USB.println(programID);
 
   // show program version number
   USB.print(F("Program version: "));
   USB.println(Utils.getProgramVersion(), DEC);
-  USB.println(F("-------------------------------"));
+  USB.println(F("-----------------------------"));
+
+  status = Utils.checkNewProgram();
+
+  switch (status)
+  {
+  case 0:
+    USB.println(F("REPROGRAMMING ERROR"));
+    Utils.blinkRedLED(300, 3);
+    q++;
+    break;
+
+  case 1:
+    USB.println(F("REPROGRAMMING OK"));
+    Utils.blinkGreenLED(300, 3);
+    w=true;
+    break;
+
+  default:
+    USB.println(F("RESTARTING"));
+    Utils.blinkGreenLED(500, 1);
+    q++;
+  }
+  }
+  
 }
 
 
@@ -953,7 +957,7 @@ void setup()
   delay(5000);
 
 
-  OTA_setup_check();
+  OTA_setup_check(10);
   pregatitor_RTC_set();
   delay(1000);
 
