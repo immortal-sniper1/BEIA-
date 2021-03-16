@@ -485,16 +485,6 @@ void RTC_SET(int incercari = RTC_ATEMPTS , char MESHLIUM_ADDRESS[] = MESHLIUM_AD
 
 
 
-
-
-
-
-
-
-
-
-
-
 //printError - prints the error related to OTA
 
 void printErrorxx(uint8_t err)
@@ -557,7 +547,48 @@ void printErrorxx(uint8_t err)
 
 
 
+void OTA_setup_check( int att=1)     // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta 
+{
+  int q=1;
+  bool w=false;
+  while( q<=att && w==false) 
+  {
+    
+  // show program ID
+  Utils.getProgramID(programID);
+  USB.println(F("-----------------------------"));
+  USB.print(F("Program id: "));
+  USB.println(programID);
 
+  // show program version number
+  USB.print(F("Program version: "));
+  USB.println(Utils.getProgramVersion(), DEC);
+  USB.println(F("-----------------------------"));
+
+  status = Utils.checkNewProgram();
+
+  switch (status)
+  {
+  case 0:
+    USB.println(F("REPROGRAMMING ERROR"));
+    Utils.blinkRedLED(300, 3);
+    q++;
+    break;
+
+  case 1:
+    USB.println(F("REPROGRAMMING OK"));
+    Utils.blinkGreenLED(300, 3);
+    w=true;
+    break;
+
+  default:
+    USB.println(F("RESTARTING"));
+    Utils.blinkGreenLED(500, 1);
+    q++;
+  }
+  }
+  
+}
 
 
 
@@ -584,7 +615,7 @@ void setup()
   
   USB.ON();
   RTC.ON();
-
+  OTA_setup_check(10);
   // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
   RTC.setTime("19:01:01:03:00:00:00");
   USB.println(RTC.getTime());
