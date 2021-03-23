@@ -267,7 +267,7 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
   SD.OFF();
 
   if (coruption == 15) {
-    USB.println("SD sorage done with no errors");
+    USB.println("SD storage done with no errors");
   } else {
     USB.print("SD sorage done with:");
     USB.print(15 - coruption);

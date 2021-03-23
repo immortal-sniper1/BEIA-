@@ -1,20 +1,38 @@
-# coding=utf-8
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+"""
+This is a comment
+written in
+more than just one line
+"""
 
+#fewfewfwefwefwefwefewewfe
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print("Hi, {0}".format(name))  # Press Ctrl+F8 to toggle the breakpoint.
-    print("Hi, {0}".format(name))  # Press Ctrl+F8 to toggle the breakpoint.
-    print("Hi, {0}".format(name))  # Press Ctrl+F8 to toggle the breakpoint.
-
+if 5 > 2:
+    print('ceva ergregergegre aici')
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('ceva txt aici')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+x = 5
+y = "John"
+print(x)
+print(y)
+
+
+
+
+x1 = 4       # x is of type int
+x1 = "Sally" # x is now of type str
+print(x1)
+print(type(x1))
+
+
+xx = str(3)    # x will be '3'
+yy = int(3)    # y will be 3
+zy = float(3)  # z will be 3.0
+
+
+
+
+
+
+
