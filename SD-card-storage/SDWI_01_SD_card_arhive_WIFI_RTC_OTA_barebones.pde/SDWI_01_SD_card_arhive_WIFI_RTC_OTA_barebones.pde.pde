@@ -15,6 +15,7 @@ bool sentence = false; // true for deletion on reboot  , false for data appended
 bool IRL_time = false; //  true for no external data source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
+bool RTC_SUCCES;
 // choose NTP server settings
 ///////////////////////////////////////
 char SERVER1[] = "time.nist.gov";
@@ -448,6 +449,7 @@ void try_RTC_set()
     {
       USB.print(F("3. Set RTC time OK. Time:"));
       USB.println(RTC.getTime());
+      RTC_SUCCES=true;
     } else
     {
       USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
@@ -468,7 +470,13 @@ void try_RTC_set()
 }
 
 
-
+void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
+{
+  if(  (RTC_SUCCES= false) || false)
+  {
+    try_RTC_set();
+  }
+}
 
 
 
@@ -1036,7 +1044,7 @@ void loop()
 
 
 ///////////////  NU UMBLA AICI !!!
-
+  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
     cycle_time = 15;

@@ -15,7 +15,7 @@ bool sentence = false; // true for deletion on reboot  , false for data appended
 bool IRL_time = false; //  true for no external data source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
-
+bool RTC_SUCCES;
 
 char programID[10];
 // SERVER settings
@@ -630,6 +630,14 @@ int HTTP_4G_TRIMITATOR_FRAME()
 
 
 
+
+
+
+
+
+
+
+
 void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
 {
   //////////////////////////////////////////////////
@@ -652,6 +660,7 @@ kyuubi:
       _4G.setTimeFrom4G();
       USB.println(RTC.getTime());
       USB.println(RTC.getTimestamp());
+      RTC_SUCCES=true;
     }
   }
   else
@@ -674,6 +683,19 @@ kyuubi:
   _4G.OFF();
   USB.println(F("2. Switch OFF 4G module"));
 }
+
+
+
+void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
+{
+  if(  (RTC_SUCCES= false) || false)
+  {
+    SET_RTC_4G();
+  }
+}
+
+
+
 
 
 
@@ -1006,6 +1028,12 @@ void setup()
 
 
 
+
+
+
+
+
+
 // main program
 void loop()
 {
@@ -1028,6 +1056,7 @@ void loop()
 
 
 /// NU UMBLA AICI!
+  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
     cycle_time = 15;

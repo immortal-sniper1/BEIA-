@@ -52,7 +52,7 @@ char ftp_pass[] = "U$d(SEFA8+UC";
 */
 // coordinator's 64-bit PAN ID to set
 ////////////////////////////////////////////////////////////////////////
-uint8_t  PANID[8] = { "be1a"};
+uint8_t  PANID[8] = { "BE1A"};
 ////////////////////////////////////////////////////////////////////////
 // Destination MAC address
 //////////////////////////////////////////
@@ -345,11 +345,21 @@ void checkNetworkParams()
 
 
 
+
+
+
+
 void ALL_IN_ONE_FRAME_HANDLER()
 {
   ssent = XBEE_frame_sender();
   scriitor_SD(filename, ssent);
 }
+
+
+
+
+
+
 
 
 void POWER_LVL_INSPECTOR()
@@ -476,10 +486,10 @@ void RTC_SET(int incercari = RTC_ATEMPTS , char MESHLIUM_ADDRESS[] = MESHLIUM_AD
   {
     delay(1);
   }
-
-
-
 }
+
+
+
 
 
 
@@ -547,13 +557,24 @@ void printErrorxx(uint8_t err)
 
 
 
+
+
+
+
 void OTA_setup_check( int att=1)     // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta 
 {
+
   int q=1;
   bool w=false;
   while( q<=att && w==false) 
   {
-    
+
+    USB.println(  PWR.getBatteryLevel()   );
+          break;
+    USB.print(F("iteration: "));
+    USB.print(q);
+    USB.print(F(" / "));
+    USB.println(att);
   // show program ID
   Utils.getProgramID(programID);
   USB.println(F("-----------------------------"));
@@ -614,6 +635,7 @@ void setup()
 {
   
   USB.ON();
+  USB.println(  PWR.getBatteryLevel()   );
   RTC.ON();
   OTA_setup_check(10);
   // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
