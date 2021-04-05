@@ -472,7 +472,7 @@ void try_RTC_set()
 
 void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 {
-  if(  (RTC_SUCCES= false) || false)
+  if(  (RTC_SUCCES= false) || (intFlag & RTC_INT)  )
   {
     try_RTC_set();
   }
@@ -1044,6 +1044,7 @@ void loop()
 
 
 ///////////////  NU UMBLA AICI !!!
+  RTC.setAlarm2("01:10:00",RTC_ABSOLUTE,RTC_ALM2_MODE1);  // activare in fiecare duminica la 1000 mimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
