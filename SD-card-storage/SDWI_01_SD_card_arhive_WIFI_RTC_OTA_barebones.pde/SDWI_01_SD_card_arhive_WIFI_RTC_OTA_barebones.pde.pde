@@ -12,7 +12,7 @@ uint8_t status = false;
 char y[3];
 uint8_t sd_answer, ssent;
 bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
-bool IRL_time = false; //  true for no external data source
+bool IRL_time = false; //  true for no external date source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 bool RTC_SUCCES;
@@ -61,9 +61,16 @@ char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
 int cycle_time2 = 30; // in seconds
+
+
+
+
+
+
+
+
+
 // subprograme
-
-
 
 
 //NU MODIFICA NIMIC IN SUBPROGRAME!
@@ -81,12 +88,14 @@ qwerty:
   if (error == 0)
   {
     USB.println(F("WiFi switched ON"));
-  } else {
+  } else
+  {
     USB.println(F("WiFi did not initialize correctly"));
   }
   status = WIFI_PRO.isConnected();
   // check if module is connected
-  if (status == true) {
+  if (status == true)
+  {
     USB.print(F("WiFi is connected OK"));
     USB.print(F(" Time(ms):"));
     USB.println(millis() - previous);
@@ -133,7 +142,7 @@ qwerty:
 
 
 
-void SD_TEST_FILE_CHECK()
+void SD_TEST_FILE_CHECK( char filename_st[] =  filename )
 {
 
   SD.ON();
@@ -141,7 +150,7 @@ void SD_TEST_FILE_CHECK()
   if (sentence == 1)
   {
     // Delete file
-    sd_answer = SD.del(filename);
+    sd_answer = SD.del(filename_st);
 
     if (sd_answer == 1)
     {
@@ -152,18 +161,19 @@ void SD_TEST_FILE_CHECK()
     }
   }
   // Create file IF id doent exist
-  sd_answer = SD.create(filename);
+  sd_answer = SD.create(filename_st);
 
   if (sd_answer == 1)
   {
     USB.println(F("file created"));
-  } else {
+  } else
+  {
     USB.println(F("file NOT created"));
   }
 
   USB.print("loop cycle time[s]:= ");
   USB.println(cycle_time2);
-  sd_answer = SD.appendln(filename, "----------------------------------------------------------------------------");
+  sd_answer = SD.appendln(filename_st, "----------------------------------------------------------------------------");
   if (sd_answer == 1)
   {
     USB.println(F("writeing is OK"));
@@ -187,11 +197,37 @@ void SD_TEST_FILE_CHECK()
 
 void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
 {
+  SD.ON();
+
+
+  long int size, m;
+  m = 104857600 ; //100MB file size
+  bool q = true;
+  int i = 1;
+  size = SD.getFileSize( filename_a);
+
+
+
+fazuzu:
+  if (  (size >= m)  )
+  {
+    i++;
+    filename_a[4] = i;
+    goto  fazuzu;
+  }
+
+  i = SD.create(filename_a);
+  if (i == 1)
+  {
+    USB.println(F("file created since it was not present "));
+  }
+
+
+
 
   int coruption = 0;
   PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   // now storeing it locally
-  SD.ON();
   time_date = RTC.getTime();
   USB.print(F("time: "));
   USB.println(time_date);
@@ -280,18 +316,41 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
 
 
 
+
+
+
+
+
+
+
+
+
+
 void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  try_RTC_set() de n ori
 {
-
+int atempts=0;
   //////////////////////////////////////////////////
   // 2. Check if connected
   //////////////////////////////////////////////////
+  error = WIFI_PRO.ON(socket);
+
+  if (error == 0)
+  {
+    USB.println(F("1. WiFi switched ON"));
+  } else
+  {
+    USB.println(F("1. WiFi did not initialize correctly"));
+  }
+
+  
   while (status == false)
   {
     WiFi_init(); // initialize Wi-Fi communication
     // get actual time
     previous = millis();
-
+    atempts++;
+    USB.print(F("atempt: "));
+    USB.println(atempts);
     // check connectivity
     status = WIFI_PRO.isConnected();
 
@@ -321,9 +380,11 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
     error = WIFI_PRO.setTimeServer(1, SERVER1);
 
     // check response
-    if (error == 0) {
+    if (error == 0)
+    {
       USB.println(F("3.1. Time Server1 set OK"));
-    } else {
+    } else
+    {
       USB.println(F("3.1. Error calling 'setTimeServer' function"));
       WIFI_PRO.printErrorCode();
       status = false;
@@ -336,7 +397,8 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
     if (error == 0)
     {
       USB.println(F("3.2. Time Server2 set OK"));
-    } else {
+    } else
+    {
       USB.println(F("3.2. Error calling 'setTimeServer' function"));
       WIFI_PRO.printErrorCode();
       status = false;
@@ -351,7 +413,8 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
       if (error == 0)
       {
         USB.println(F("3.3. Network Time-of-Day Activation Flag set OK"));
-      } else {
+      } else
+      {
         USB.println(F("3.3. Error calling 'timeActivationFlag' function"));
         WIFI_PRO.printErrorCode();
         status = false;
@@ -364,10 +427,12 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
       error = WIFI_PRO.setGMT(time_zone);
 
       // check response
-      if (error == 0) {
+      if (error == 0)
+      {
         USB.print(F("3.4. GMT set OK to "));
         USB.println(time_zone, DEC);
-      } else {
+      } else
+      {
         USB.println(F("3.4. Error calling 'setGMT' function"));
         WIFI_PRO.printErrorCode();
       }
@@ -401,6 +466,7 @@ void try_RTC_set()
   //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
+  USB.println(F("STARTING RTC SET WITH WIFI:"));
   error = WIFI_PRO.ON(socket);
 
   if (error == 0)
@@ -449,7 +515,7 @@ void try_RTC_set()
     {
       USB.print(F("3. Set RTC time OK. Time:"));
       USB.println(RTC.getTime());
-      RTC_SUCCES=true;
+      RTC_SUCCES = true;
     } else
     {
       USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
@@ -465,14 +531,16 @@ void try_RTC_set()
   USB.println(F("4. WiFi switched OFF\n\n"));
   USB.println(F("Wait 10 seconds...\n"));
   delay(10000);
-
-
 }
+
+
+
+
 
 
 void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 {
-  if(  (RTC_SUCCES= false) || (intFlag & RTC_INT)  )
+  if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)  )
   {
     try_RTC_set();
   }
@@ -587,47 +655,51 @@ void all_in_1_frame_process()
 
 
 
-void OTA_setup_check( int att=1)     // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta 
+void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
 {
-  int q=1;
-  bool w=false;
-  while( q<=att && w==false) 
+  int q = 1;
+  bool w = false;
+  while ( q <= att && w == false)
   {
-    
-  // show program ID
-  Utils.getProgramID(programID);
-  USB.println(F("-----------------------------"));
-  USB.print(F("Program id: "));
-  USB.println(programID);
+    USB.println(" ");
+    USB.print(F("atempt: "));
+    USB.print(q);
+    USB.print(F("/"));
+    USB.println(att);
+    // show program ID
+    Utils.getProgramID(programID);
+    USB.println(F("-----------------------------"));
+    USB.print(F("Program id: "));
+    USB.println(programID);
 
-  // show program version number
-  USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(), DEC);
-  USB.println(F("-----------------------------"));
+    // show program version number
+    USB.print(F("Program version: "));
+    USB.println(Utils.getProgramVersion(), DEC);
+    USB.println(F("-----------------------------"));
 
-  status = Utils.checkNewProgram();
+    status = Utils.checkNewProgram();
 
-  switch (status)
-  {
-  case 0:
-    USB.println(F("REPROGRAMMING ERROR"));
-    Utils.blinkRedLED(300, 3);
-    q++;
-    break;
+    switch (status)
+    {
+    case 0:
+      USB.println(F("REPROGRAMMING ERROR"));
+      Utils.blinkRedLED(300, 3);
+      q++;
+      break;
 
-  case 1:
-    USB.println(F("REPROGRAMMING OK"));
-    Utils.blinkGreenLED(300, 3);
-    w=true;
-    break;
+    case 1:
+      USB.println(F("REPROGRAMMING OK"));
+      Utils.blinkGreenLED(300, 3);
+      w = true;
+      break;
 
-  default:
-    USB.println(F("RESTARTING"));
-    Utils.blinkGreenLED(500, 1);
-    q++;
+    default:
+      USB.println(F("RESTARTING"));
+      Utils.blinkGreenLED(500, 1);
+      q++;
+    }
   }
-  }
-  
+
 }
 
 
@@ -951,9 +1023,6 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
 void setup()
 {
-
-
-
   USB.ON();
   RTC.ON(); // Executes the init process
   USB.println(F("START"));
@@ -975,30 +1044,13 @@ void setup()
     RTC.setTime("19:01:01:03:00:00:00");
   } else
   {
-    // Check if module is connected
-    if (status == true)
-    {
-      // 3.1. Open FTP session
-      error = WIFI_PRO.setTimeFromWIFI();
 
-      // check response
-      if (error == 0)
-      {
-        USB.print(F("3. Set RTC time OK. Time:"));
-        USB.println(RTC.getTime());
-      } else
-      {
-        USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
-        WIFI_PRO.printErrorCode();
-        status = false;
-      }
-    }
-
-    while ((count_trials < N_trials) && (status == false))
+    //while ((count_trials < N_trials) && (status == false))
+    while (  count_trials < N_trials )
     {
       try_RTC_set();
       USB.println(F("Trial"));
-      count_trials = count_trials + 1;
+      count_trials++;
       USB.print(count_trials);
       USB.println();
     }
@@ -1013,6 +1065,9 @@ void setup()
   // pm
   USB.ON();
 }
+
+
+
 
 
 
@@ -1044,7 +1099,7 @@ void loop()
 
 
 ///////////////  NU UMBLA AICI !!!
-  RTC.setAlarm2("01:10:00",RTC_ABSOLUTE,RTC_ALM2_MODE1);  // activare in fiecare duminica la 1000 mimineata
+  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 mimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
