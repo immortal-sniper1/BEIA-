@@ -12,7 +12,7 @@ uint8_t status = false;
 char y[3];
 uint8_t sd_answer, ssent;
 bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
-bool IRL_time = false; //  true for no external date source
+bool IRL_time = true; //  true for no external date source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 bool RTC_SUCCES;
@@ -52,8 +52,7 @@ int8_t answer, verr = 13;
 
 
 ///// EDITEAZA AICI DOAR
-char upgraderr[] = "UAEEOOO.TXT";
-char node_ID[] = "cevax";
+char node_ID[] = "ceva13x";
 int count_trials = 0;
 int N_trials = 10;
 char ESSID[] = "LANCOMBEIA";
@@ -74,7 +73,6 @@ int cycle_time2 = 30; // in seconds
 
 
 //NU MODIFICA NIMIC IN SUBPROGRAME!
-
 int trimitator_WIFI()
 {
   int ssent;
@@ -195,32 +193,82 @@ void SD_TEST_FILE_CHECK( char filename_st[] =  filename )
 
 
 
-void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
+void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 {
   SD.ON();
-
+  USB.println(F("scriitor SD1"));
 
   long int size, m;
   m = 104857600 ; //100MB file size
+  //m= 1048576;    //10MB file size
   bool q = true;
-  int i = 1;
-  size = SD.getFileSize( filename_a);
+  int i;
+  char filename_a[13];
+
+  for (i = 0; i < 12; i++)
+  {
+    filename_a[i] = filename_a2[i];
+  }
+  USB.println(F("scriitor SD2"));
 
 
-
+  i = 1;
 fazuzu:
+  USB.println(F("scriitor SD3"));
+  size = SD.getFileSize( filename_a );
+  USB.print(F("filename: "));
+  USB.println(filename_a);
   if (  (size >= m)  )
   {
     i++;
-    filename_a[4] = i;
+    i = 27;
+    itoa(i, y , 10);
+    USB.print(F("xxxxx"));
+    USB.print(  strlen(  filename_a  ));
+    USB.println(F("xxxxx"));
+
+
+    if (i < 10)
+    {
+      filename_a[4] = y[0];
+    }
+    else
+    {
+      for (int t = 0; t < 4; t++)
+      {
+        filename_a[9 - t] = filename_a[8 - t];
+      }
+      filename_a[4] = y[0];
+      filename_a[5] = y[1];
+      filename_a[10] = '\0';
+
+
+      
+      USB.print(F("xxxxx"));
+      USB.print(  filename_a  );
+      USB.println(F("xxxxx"));
+      USB.print(F("xxxxx"));
+      USB.print(  strlen(  filename_a  ));
+      USB.println(F("xxxxx"));
+    }
+
     goto  fazuzu;
   }
+  USB.println(F("scriitor SD4"));
+
+
+
+
+
+
 
   i = SD.create(filename_a);
   if (i == 1)
   {
     USB.println(F("file created since it was not present "));
   }
+
+  SD.appendln(filename_a, "am scris aici!!!!!!!!");
 
 
 
@@ -318,6 +366,29 @@ fazuzu:
 
 
 
+void data_maker( int x , char filename_a[]  )
+{
+  SD.ON();
+
+  for (int ii = 1 ; ii <= x ; ii++)
+  {
+    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");   //100 byte per line
+    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
+    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
+    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
+    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
+  }
+
+
+
+
+  SD.OFF();
+
+}
+
+
+
+
 
 
 
@@ -328,7 +399,7 @@ fazuzu:
 
 void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  try_RTC_set() de n ori
 {
-int atempts=0;
+  int atempts = 0;
   //////////////////////////////////////////////////
   // 2. Check if connected
   //////////////////////////////////////////////////
@@ -342,7 +413,7 @@ int atempts=0;
     USB.println(F("1. WiFi did not initialize correctly"));
   }
 
-  
+
   while (status == false)
   {
     WiFi_init(); // initialize Wi-Fi communication
@@ -1027,15 +1098,15 @@ void setup()
   RTC.ON(); // Executes the init process
   USB.println(F("START"));
 
+  //data_maker( 10000 ,  filename  );
+
 
 // Utils.setProgramVersion( verr );
-  USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(), DEC);
-  delay(5000);
 
 
-  OTA_setup_check(10);
-  pregatitor_RTC_set();
+
+  //OTA_setup_check(10);
+  //pregatitor_RTC_set();
   delay(1000);
 
   if (IRL_time)
@@ -1078,20 +1149,27 @@ void loop()
   // get actual time before loop
   prev = millis();
 
+
+
+
+
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
-  // set frame fields (String - char*)
 
   // set frame fields (Battery sensor - uint8_t)
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   frame.addTimestamp();
   //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
   frame.showFrame();
-  all_in_1_frame_process();
+  USB.println("11111 ");
+  scriitor_SD(filename, 7);
+  USB.println("1333333 ");
+  //all_in_1_frame_process();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  OTA_check_loop();
+  //OTA_check_loop();
 
 
 
@@ -1099,10 +1177,11 @@ void loop()
 
 
 ///////////////  NU UMBLA AICI !!!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 mimineata
-  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+//  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 mimineata
+//  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
-  if (cycle_time < 10) {
+  if (cycle_time < 10)
+  {
     cycle_time = 15;
   }
   USB.print("cycle time: ");
@@ -1119,7 +1198,8 @@ void loop()
 
   x = cycle_time / 60 % 60; // min
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -1128,7 +1208,8 @@ void loop()
 
   x = cycle_time / 3600 % 3600; // h
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
