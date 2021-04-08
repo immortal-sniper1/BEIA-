@@ -140,7 +140,7 @@ qwerty:
 
 
 
-void SD_TEST_FILE_CHECK( char filename_st[] =  filename )
+void SD_TEST_FILE_CHECK( char filename_st[] =  filename )   // eventual de adaugat suport pt delete all files on SD?
 {
 
   SD.ON();
@@ -196,7 +196,7 @@ void SD_TEST_FILE_CHECK( char filename_st[] =  filename )
 void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 {
   SD.ON();
-  USB.println(F("scriitor SD1"));
+  USB.print(F("scriitor SD  "));
 
   long int size, m;
   m = 104857600 ; //100MB file size
@@ -205,34 +205,30 @@ void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
   int i;
   char filename_a[13];
 
+
+
+
+
   for (i = 0; i < 12; i++)
   {
     filename_a[i] = filename_a2[i];
   }
-  USB.println(F("scriitor SD2"));
+  //USB.println(F("scriitor SD2"));
 
 
   i = 1;
 fazuzu:
-  USB.println(F("scriitor SD3"));
   size = SD.getFileSize( filename_a );
-  USB.print(F("filename: "));
-  USB.println(filename_a);
   if (  (size >= m)  )
   {
     i++;
-    i = 27;
     itoa(i, y , 10);
-    USB.print(F("xxxxx"));
-    USB.print(  strlen(  filename_a  ));
-    USB.println(F("xxxxx"));
-
 
     if (i < 10)
     {
       filename_a[4] = y[0];
     }
-    else
+    else if ( i >= 10 && i <= 99)
     {
       for (int t = 0; t < 4; t++)
       {
@@ -243,38 +239,57 @@ fazuzu:
       filename_a[10] = '\0';
 
 
-      
+      /*
       USB.print(F("xxxxx"));
       USB.print(  filename_a  );
       USB.println(F("xxxxx"));
       USB.print(F("xxxxx"));
       USB.print(  strlen(  filename_a  ));
       USB.println(F("xxxxx"));
+
+      */
+    }
+    else
+    {
+
+      if (i > 330)
+      {
+        i = 330; // pt ca exista o limita de fisiere in root si 330 a destul de sub limita sa nu faca probleme
+      }
+      for (int t = 0; t < 4; t++)
+      {
+        filename_a[10 - t] = filename_a[9 - t];
+      }
+      filename_a[4] = y[0];
+      filename_a[5] = y[1];
+      filename_a[6] = y[2];
+      filename_a[11] = '\0';
     }
 
     goto  fazuzu;
   }
-  USB.println(F("scriitor SD4"));
+  //USB.println(F("scriitor SD4"));
 
 
 
 
 
-
-
+  USB.print(F("se va scrie in: "));
+  USB.println(filename_a);
   i = SD.create(filename_a);
   if (i == 1)
   {
     USB.println(F("file created since it was not present "));
   }
 
-  SD.appendln(filename_a, "am scris aici!!!!!!!!");
+
 
 
 
 
   int coruption = 0;
-  PWR.deepSleep("00:00:00:05", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  //sd_answer = SD.appendln(filename_a, "am scris aici!!!!!!!!");
+  //coruption = coruption + sd_answer;
   // now storeing it locally
   time_date = RTC.getTime();
   USB.print(F("time: "));
@@ -286,13 +301,15 @@ fazuzu:
     y[1] = y[0];
     y[0] = '0';
   }
+
   sd_answer = SD.append(filename_a, y);
   coruption = coruption + sd_answer;
   sd_answer = SD.append(filename_a, ".");
   coruption = coruption + sd_answer;
   x = RTC.month;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -322,7 +339,8 @@ fazuzu:
   coruption = coruption + sd_answer;
   x = RTC.minute;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -332,7 +350,8 @@ fazuzu:
   coruption = coruption + sd_answer;
   x = RTC.second;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -340,7 +359,10 @@ fazuzu:
   coruption = coruption + sd_answer;
   sd_answer = SD.append(filename_a, "  ");
   coruption = coruption + sd_answer;
-  sd_answer = SD.append(filename_a, frame.buffer, frame.length);
+
+
+
+  sd_answer = SD.append(filename_a, frame.buffer, frame.length);  // scriere propriuzisa frame
   coruption = coruption + sd_answer;
   sd_answer = SD.append(filename_a, "  ");
   coruption = coruption + sd_answer;
@@ -351,7 +373,8 @@ fazuzu:
 
   SD.OFF();
 
-  if (coruption == 15) {
+  if (coruption == 15)
+  {
     USB.println("SD storage done with no errors");
   } else {
     USB.print("SD sorage done with:");
@@ -370,18 +393,22 @@ void data_maker( int x , char filename_a[]  )
 {
   SD.ON();
 
-  for (int ii = 1 ; ii <= x ; ii++)
+  for (int ii = 1 ; ii <= x ; ii++) //10MB per x=1
   {
-    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");   //100 byte per line
-    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
-    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
-    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
-    SD.appendln(filename_a, "eokfumpwqroifvnqrofcmwpocfumwqgifcunwqrpnofcmwifcwuifwnunpcwogrwrqfcnqwogfqprwfmqwfhwdjfbplpkp,;pl ");
+    USB.println(" cycles: ");
+    USB.println(ii);
+    USB.println("/");
+    USB.println(x);
+    for (int g = 0; g < 324 ; g++)
+    {
+      SD.appendln(filename_a, " ");
+      USB.println(" subcycles: ");
+      USB.println(g);
+      USB.println("/324");
+      for (int k = 0 ; k < 324 ; k++)
+        SD.append(filename_a, "eokfumpwqroifv4478fcmwpocfumwqgif17nwqrpn5fcmwifcwuifw7unpcwogr2rqfcnqwogfqprwfmqwfhwdjfbplpkp13pl ");   //100 byte per line
+    }
   }
-
-
-
-
   SD.OFF();
 
 }
@@ -1105,8 +1132,8 @@ void setup()
 
 
 
-  //OTA_setup_check(10);
-  //pregatitor_RTC_set();
+  OTA_setup_check(10);
+  pregatitor_RTC_set();
   delay(1000);
 
   if (IRL_time)
@@ -1163,13 +1190,13 @@ void loop()
   frame.addTimestamp();
   //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
   frame.showFrame();
-  USB.println("11111 ");
-  scriitor_SD(filename, 7);
-  USB.println("1333333 ");
-  //all_in_1_frame_process();
+  //USB.println("11111 ");
+  //scriitor_SD(filename, 7);
+  //USB.println("1333333 ");
+  all_in_1_frame_process();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //OTA_check_loop();
+  OTA_check_loop();
 
 
 
@@ -1177,8 +1204,8 @@ void loop()
 
 
 ///////////////  NU UMBLA AICI !!!
-//  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 mimineata
-//  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
+  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10)
   {
@@ -1215,8 +1242,6 @@ void loop()
   }
   rtc_str[3] = y[0];
   rtc_str[4] = y[1];
-
-
 
   ////////////////////////////////////////////////
   // 5. deepsleep

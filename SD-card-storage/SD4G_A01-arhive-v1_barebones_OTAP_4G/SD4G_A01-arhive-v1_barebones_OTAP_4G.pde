@@ -59,12 +59,104 @@ char ftp_pass[] = "U$d(SEFA8+UC";
 // subprograme
 
 
-void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
+void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 {
-  int coruption = 0;
-  delay(1000);
-  // now storeing it locally
   SD.ON();
+  USB.print(F("scriitor SD  "));
+
+  long int size, m;
+  m = 104857600 ; //100MB file size
+  //m= 1048576;    //10MB file size
+  bool q = true;
+  int i;
+  char filename_a[13];
+
+
+
+
+
+  for (i = 0; i < 12; i++)
+  {
+    filename_a[i] = filename_a2[i];
+  }
+  //USB.println(F("scriitor SD2"));
+
+
+  i = 1;
+fazuzu:
+  size = SD.getFileSize( filename_a );
+  if (  (size >= m)  )
+  {
+    i++;
+    itoa(i, y , 10);
+
+    if (i < 10)
+    {
+      filename_a[4] = y[0];
+    }
+    else if ( i >= 10 && i <= 99)
+    {
+      for (int t = 0; t < 4; t++)
+      {
+        filename_a[9 - t] = filename_a[8 - t];
+      }
+      filename_a[4] = y[0];
+      filename_a[5] = y[1];
+      filename_a[10] = '\0';
+
+
+      /*
+      USB.print(F("xxxxx"));
+      USB.print(  filename_a  );
+      USB.println(F("xxxxx"));
+      USB.print(F("xxxxx"));
+      USB.print(  strlen(  filename_a  ));
+      USB.println(F("xxxxx"));
+
+      */
+    }
+    else
+    {
+
+      if (i > 330)
+      {
+        i = 330; // pt ca exista o limita de fisiere in root si 330 a destul de sub limita sa nu faca probleme
+      }
+      for (int t = 0; t < 4; t++)
+      {
+        filename_a[10 - t] = filename_a[9 - t];
+      }
+      filename_a[4] = y[0];
+      filename_a[5] = y[1];
+      filename_a[6] = y[2];
+      filename_a[11] = '\0';
+    }
+
+    goto  fazuzu;
+  }
+  //USB.println(F("scriitor SD4"));
+
+
+
+
+
+  USB.print(F("se va scrie in: "));
+  USB.println(filename_a);
+  i = SD.create(filename_a);
+  if (i == 1)
+  {
+    USB.println(F("file created since it was not present "));
+  }
+
+
+
+
+
+
+  int coruption = 0;
+  //sd_answer = SD.appendln(filename_a, "am scris aici!!!!!!!!");
+  //coruption = coruption + sd_answer;
+  // now storeing it locally
   time_date = RTC.getTime();
   USB.print(F("time: "));
   USB.println(time_date);
@@ -75,13 +167,15 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
     y[1] = y[0];
     y[0] = '0';
   }
+
   sd_answer = SD.append(filename_a, y);
   coruption = coruption + sd_answer;
   sd_answer = SD.append(filename_a, ".");
   coruption = coruption + sd_answer;
   x = RTC.month;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -111,7 +205,8 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
   coruption = coruption + sd_answer;
   x = RTC.minute;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -121,7 +216,8 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
   coruption = coruption + sd_answer;
   x = RTC.second;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -129,7 +225,10 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
   coruption = coruption + sd_answer;
   sd_answer = SD.append(filename_a, "  ");
   coruption = coruption + sd_answer;
-  sd_answer = SD.append(filename_a, frame.buffer, frame.length);
+
+
+
+  sd_answer = SD.append(filename_a, frame.buffer, frame.length);  // scriere propriuzisa frame
   coruption = coruption + sd_answer;
   sd_answer = SD.append(filename_a, "  ");
   coruption = coruption + sd_answer;
@@ -140,14 +239,44 @@ void scriitor_SD(char filename_a[], uint8_t ssent_a = 0)
 
   SD.OFF();
 
-  if (coruption == 15) {
+  if (coruption == 15)
+  {
     USB.println("SD storage done with no errors");
   } else {
-    USB.print("SD storage done with:");
+    USB.print("SD sorage done with:");
     USB.print(15 - coruption);
     USB.println(" errors");
   }
 }
+
+
+
+void data_maker( int x , char filename_a[]  )
+{
+  SD.ON();
+
+  for (int ii = 1 ; ii <= x ; ii++) //10MB per x=1
+  {
+    USB.println(" cycles: ");
+    USB.println(ii);
+    USB.println("/");
+    USB.println(x);
+    for (int g = 0; g < 324 ; g++)
+    {
+      SD.appendln(filename_a, " ");
+      USB.println(" subcycles: ");
+      USB.println(g);
+      USB.println("/324");
+      for (int k = 0 ; k < 324 ; k++)
+        SD.append(filename_a, "eokfumpwqroifv4478fcmwpocfumwqgif17nwqrpn5fcmwifcwuifw7unpcwogr2rqfcnqwogfqprwfmqwfhwdjfbplpkp13pl ");   //100 byte per line
+    }
+  }
+  SD.OFF();
+
+}
+
+
+
 
 
 
@@ -660,7 +789,7 @@ kyuubi:
       _4G.setTimeFrom4G();
       USB.println(RTC.getTime());
       USB.println(RTC.getTimestamp());
-      RTC_SUCCES=true;
+      RTC_SUCCES = true;
     }
   }
   else
@@ -688,7 +817,7 @@ kyuubi:
 
 void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 {
-  if(  (RTC_SUCCES= false) || (intFlag & RTC_INT)   )
+  if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)   )
   {
     SET_RTC_4G();
   }
@@ -888,47 +1017,47 @@ void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
 
 
 
-void OTA_setup_check( int att=1)     // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta 
+void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
 {
-  int q=1;
-  bool w=false;
-  while( q<=att && w==false) 
+  int q = 1;
+  bool w = false;
+  while ( q <= att && w == false)
   {
-    
-  // show program ID
-  Utils.getProgramID(programID);
-  USB.println(F("-----------------------------"));
-  USB.print(F("Program id: "));
-  USB.println(programID);
 
-  // show program version number
-  USB.print(F("Program version: "));
-  USB.println(Utils.getProgramVersion(), DEC);
-  USB.println(F("-----------------------------"));
+    // show program ID
+    Utils.getProgramID(programID);
+    USB.println(F("-----------------------------"));
+    USB.print(F("Program id: "));
+    USB.println(programID);
 
-  status = Utils.checkNewProgram();
+    // show program version number
+    USB.print(F("Program version: "));
+    USB.println(Utils.getProgramVersion(), DEC);
+    USB.println(F("-----------------------------"));
 
-  switch (status)
-  {
-  case 0:
-    USB.println(F("REPROGRAMMING ERROR"));
-    Utils.blinkRedLED(300, 3);
-    q++;
-    break;
+    status = Utils.checkNewProgram();
 
-  case 1:
-    USB.println(F("REPROGRAMMING OK"));
-    Utils.blinkGreenLED(300, 3);
-    w=true;
-    break;
+    switch (status)
+    {
+    case 0:
+      USB.println(F("REPROGRAMMING ERROR"));
+      Utils.blinkRedLED(300, 3);
+      q++;
+      break;
 
-  default:
-    USB.println(F("RESTARTING"));
-    Utils.blinkGreenLED(500, 1);
-    q++;
+    case 1:
+      USB.println(F("REPROGRAMMING OK"));
+      Utils.blinkGreenLED(300, 3);
+      w = true;
+      break;
+
+    default:
+      USB.println(F("RESTARTING"));
+      Utils.blinkGreenLED(500, 1);
+      q++;
+    }
   }
-  }
-  
+
 }
 
 
@@ -1056,7 +1185,7 @@ void loop()
 
 
 /// NU UMBLA AICI!
-  RTC.setAlarm2("01:10:00",RTC_ABSOLUTE,RTC_ALM2_MODE1);  // activare in fiecare duminica la 1000 mimineata
+  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 mimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
