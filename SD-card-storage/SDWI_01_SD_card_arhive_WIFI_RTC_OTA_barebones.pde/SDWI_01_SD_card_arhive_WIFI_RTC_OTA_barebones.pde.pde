@@ -196,6 +196,7 @@ void SD_TEST_FILE_CHECK( char filename_st[] =  filename )   // eventual de adaug
 void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 {
   SD.ON();
+  USB.ON();
   USB.print(F("scriitor SD  "));
 
   long int size, m;
