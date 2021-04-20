@@ -1,7 +1,7 @@
 #include <WaspFrame.h>
 #include <WaspWIFI_PRO.h>
 #include <WaspSensorGas_Pro.h>
-//#include "WaspFrameConstantsv15.h"
+#include "WaspFrameConstantsv15.h"
 
 
 /////////// NU UMBLA AICI!!!!!
@@ -55,7 +55,7 @@ int8_t answer, verr = 13;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "T4ME2";
+char node_ID[] = "T4ME21";
 int count_trials = 0;
 int N_trials = 10;
 char ESSID[] = "LANCOMBEIA";
@@ -1128,6 +1128,27 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
 void gazelee()
 {
+
+  ///////////////////////////////////////////
+  // 1. Turn on sensors and wait
+  ///////////////////////////////////////////
+
+  //Power on gas sensors
+  CH4.ON();
+  O3.ON();
+  SO2.ON();
+  NO2.ON();
+  CO.ON();
+  H2.ON();
+  USB.print(F("Heating sensors for 2 minutes"));
+
+  // Sensors need time to warm up and get a response from gas
+  // To reduce the battery consumption, use deepSleep instead delay
+  // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
+  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+
+
+
   ///////////////////////////////////////////
   // 2. Read sensors
   ///////////////////////////////////////////
@@ -1228,13 +1249,25 @@ void gazelee()
   // Add CO value
   frame.addSensor(SENSOR_GASES_PRO_CO, concCO);
   // Add H2 value
+
+  // Show the frame
+  frame.showFrame();
+  all_in_1_frame_process();
+
+
+  frame.createFrame(ASCII, node_ID);
   frame.addSensor(SENSOR_GASES_PRO_H2, concH2);
   // Add CH4 value
   frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4);
   // Add NO2 value
   frame.addSensor(SENSOR_GASES_PRO_NO2, concNO2);
-  // Show the frame
+//  frame.addSensor(SENSOR_BAT_VOLT, VOLT);
+//  frame.addSensor(SENSOR_BAT_CURR, CHRG);
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   frame.showFrame();
+  all_in_1_frame_process();
+
+
 }
 
 
@@ -1281,7 +1314,7 @@ void setup()
   USB.println(F("Frame Gases_Pro_Board"));
   USB.println(F("Sensors used:"));
   USB.println(F("- SOCKET_1: CH4 sensor"));
-  USB.println(F("- SOCKET_2: H2 sensor)"));
+  USB.println(F("- SOCKET_2: H2 sensor"));
   USB.println(F("- SOCKET_3: O3 sensor"));
   USB.println(F("- SOCKET_4: NO2 sensor"));
   USB.println(F("- SOCKET_5: CO sensor"));
@@ -1350,8 +1383,6 @@ void loop()
   gazelee();
 
 
-
-  all_in_1_frame_process();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //OTA_check_loop();
