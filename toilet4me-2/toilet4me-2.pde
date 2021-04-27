@@ -28,7 +28,7 @@ char SERVER2[] = "wwv.nist.gov";
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
 ///////////////////////////////////////
-uint8_t time_zone = 2;
+uint8_t time_zone = 3;
 ///////////////////////////////////////
 
 // choose socket (SELECT USER'S SOCKET)
@@ -38,7 +38,7 @@ uint8_t socket = SOCKET0;
 // choose URL settings
 ///////////////////////////////////////
 char type[] = "http";
-char host[] = "82.78.81.178";
+char host[] = "82.78.81.171";
 char port[] = "80";
 ///////////////////////////////////////
 // FTP SERVER settings
@@ -62,7 +62,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 1100; // in seconds
+int cycle_time2 = 290; // in seconds
 
 
 ///toilet part
@@ -1393,8 +1393,11 @@ void loop()
 
 
 ///////////////  NU UMBLA AICI !!!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
-  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+  //RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
+  //IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+
+
+  
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10)
   {

@@ -746,7 +746,24 @@ void WiFi_init()
 
 void all_in_1_frame_process()
 {
-  ssent = trimitator_WIFI();
+  if( PWR.getBatteryLevel()>=50 )
+  {
+      ssent = trimitator_WIFI();
+  }
+  else
+  {
+    if( PWR.getBatteryLevel()<20 )
+    {
+      ssent=0;
+    }
+    else
+    {
+            ssent = trimitator_WIFI();  // eventual de adaugat un counter care reduce rata de trimitere la 1/2 sau 1/3
+    }
+  }
+
+  
+
   scriitor_SD(filename, ssent);
 }
 
