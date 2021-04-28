@@ -1125,14 +1125,31 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 void measurerr_CH4()
 {
   delay(3000);
-
+int ppp;
 
 
     USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));
 
-  VV1 = analogRead(ANALOG1);
+  VV1 = analogRead(ANALOG7);
   USB.print(F("ANALOG1: "));
   USB.println(VV1);
+ppp=VV1*50000/1024;
+
+  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
+
+  // set frame fields (Battery sensor - uint8_t)
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  frame.addSensor(SENSOR_GASES_CH4, ppp  );
+  frame.addSensor(SENSOR_GASES_US, VV1);
+  frame.addTimestamp();
+  //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
+  frame.showFrame();
+
+
+
+
+
+  
 }
 
 
@@ -1221,17 +1238,7 @@ void loop()
 
   measurerr_CH4();
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
-
-  // set frame fields (Battery sensor - uint8_t)
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
- //frame.addSensor(SGX_CH4, PWR.getBatteryLevel());
- // frame.addSensor(SGX_V, PWR.getBatteryLevel());
-  frame.addTimestamp();
-  //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
-  frame.showFrame();
 
 
   all_in_1_frame_process();
