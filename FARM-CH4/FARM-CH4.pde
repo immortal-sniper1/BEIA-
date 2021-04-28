@@ -51,6 +51,25 @@ char programID[10];
 int8_t answer, verr = 13;
 int VV1;
 
+
+// UART
+ // Create WaspUART object 
+ WaspUART uart = WaspUART(); 
+ 
+ // Variable to store function returns
+ uint8_t answer13;
+
+ // Variable to store connection to UART
+ // AUX1(1) or AUX2(2)
+ uint8_t auxiliar = 1;
+
+////////////
+
+
+
+
+
+
 /*
 
 #define SGX_V    ?
@@ -1124,30 +1143,86 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
 void measurerr_CH4()
 {
-  delay(3000);
-int ppp;
+
+  USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
+  PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on 
+  delay(50000);
+  int ppp, ppp2, dd, j;
+  long int sum=0;
+  char answer4[] = {"ERROR reading sensor\r\n"};
+  uint32_t timeout = 10000;
+  char sensor_reading[] = {"\r\n"};
+  char kk[10];
 
 
-    USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));
 
-  VV1 = analogRead(ANALOG7);
-  USB.print(F("ANALOG1: "));
-  USB.println(VV1);
-ppp=VV1*50000/1024;
+
+  //USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));     // citirea pin analog 
+  for(  j=1; j<=5 ; j++)
+  {
+      VV1 = analogRead(ANALOG7);
+      USB.print(F("    ANALOG: "));
+      USB.print(VV1);
+      sum=sum+VV1;
+      delay(1200);
+  }
+      USB.println(" ");
+      VV1=sum/5;
+  ppp=VV1*50000/1024;
+
+
+
+
+
+
+// citire pin digital 
+/*
+0        0
+0.2      62
+
+1.8      558
+2        620 
+ */
+
+  answer13 = uart.waitFor(sensor_reading,answer4,timeout);
+
+
+switch(answer13)
+{
+  case 0:
+        USB.print(F("TIMEOUTED 10S "));
+  break;
+  case 1:
+      USB.print(F("Parse sensor info: "));
+      USB.println((char*)uart._buffer);
+  break;
+  case 2:
+      // Answer was ERROR reading sensor
+      USB.println(F("Answer was ERROR reading sensor"));
+  break;
+  default:
+      USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
+      USB.println(F("CODE IS MESSES UP HARD HERE!"));
+}
+ //ppp2=atoi(uart._buffer);
+   for(  j=0; j< uart.length() ; j++)
+   {
+    kk[j]=uart._buffer[j];
+   }
+
+
+
+
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
 
-  // set frame fields (Battery sensor - uint8_t)
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   frame.addSensor(SENSOR_GASES_CH4, ppp  );
   frame.addSensor(SENSOR_GASES_US, VV1);
   frame.addTimestamp();
-  //frame.addSensor(SENSOR_STR, "Prior to No0 you can now store node flo");
+  frame.addSensor(SENSOR_GASES_CH4, ppp2  );
   frame.showFrame();
-
-
-
-
+  PWR.setSensorPower(SENS_3V3, SENS_OFF);
 
   
 }
@@ -1219,6 +1294,14 @@ void setup()
   SD_TEST_FILE_CHECK();
   // pm
   USB.ON();
+
+//UART
+  uart.setBaudrate(115200);
+  uart.setUART(SOCKET1);
+  uart.beginUART();
+  Utils.setMuxAux1();
+  serialFlush(1);
+  
 }
 
 
