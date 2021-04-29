@@ -50,7 +50,7 @@ char ftp_pass[] = "U$d(SEFA8+UC";
 char programID[10];
 int8_t answer, verr = 13;
 int VV1;
-
+int uart_data_ch[100];
 
 // UART
 // Create WaspUART object
@@ -1168,7 +1168,7 @@ void measurerr_CH4()
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
   delay(50000);
-  int ppp, ppp2, dd, j, nnr;
+  int ppp, ppp2, dd, j, nnr, jj;
   long int sum = 0;
   char answer4[] = {"ERROR reading sensor\r\n"};
   uint32_t timeout = 10000;
@@ -1190,7 +1190,7 @@ void measurerr_CH4()
   USB.println(" ");
   VV1 = sum / 5;
   ppp = VV1 * 50000 / 1024;
-
+  sum = 0;
 
 
 
@@ -1204,33 +1204,40 @@ void measurerr_CH4()
   1.8      558    high
   2        620
    */
-
-  answer13 = uart.waitFor(sensor_reading, answer4, timeout);
-  switch (answer13)
+  for (  j = 1; j <= 5 ; j++)
   {
-  case 0:
-    USB.print(F("TIMEOUTED 10S "));
-    break;
-  case 1:
-    USB.print(F("Parse sensor info: "));
-    USB.println((char*)uart._buffer);
-    break;
-  case 2:
-    // Answer was ERROR reading sensor
-    USB.println(F("Answer was ERROR reading sensor"));
-    break;
-  default:
-    USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
-    USB.println(F("CODE IS MESSES UP HARD HERE!"));
+    answer13 = uart.waitFor(sensor_reading, answer4, timeout);
+    switch (answer13)
+    {
+    case 0:
+      USB.print(F("TIMEOUTED 10S "));
+      break;
+    case 1:
+      USB.print(F("Parse sensor info: "));
+      USB.println((char*)uart._buffer);
+      break;
+    case 2:
+      // Answer was ERROR reading sensor
+      USB.println(F("Answer was ERROR reading sensor"));
+      break;
+    default:
+      USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
+      USB.println(F("CODE IS MESSES UP HARD HERE!"));
+    }
+    for (  jj = 0; jj < uart._length ; jj++)
+    {
+      nnr = nnr * 10 + uart._buffer[jj];
+      uart_data_ch[j * 5 + jj] = uart._buffer[jj];
+    }
+    ppp2 = binaryToDecimal( nnr);
+    sum = sum + ppp2;
+    delay(500);
+
   }
+  ppp2 = sum / 5;
+  USB.print(F("SUM-digital: "));
+  USB.println(sum);
 
-
-
-  for (  j = 0; j < uart._length ; j++)
-  {
-    nnr = nnr * 10 + uart._buffer[j];
-  }
-  ppp2 = binaryToDecimal( nnr);
 
 
 
