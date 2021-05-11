@@ -268,7 +268,7 @@ void data_maker( int x , char filename_a[]  )
       USB.println(g);
       USB.println("/324");
       for (int k = 0 ; k < 324 ; k++)
-        SD.append(filename_a, "eokfumpwqroifv4478fcmwpocfumwqgif17nwqrpn5fcmwifcwuifw7unpcwogr2rqfcnqwogfqprwfmqwfhwdjfbplpkp13pl ");   //100 byte per line
+        SD.append(filename_a, "eokfumpwqroifv4478fcmwpocfumwqgif17nwqrpn5fcmwifcwuifw7unpcwogr2rqfcnqwogfqprwfmqwfhwdjfbplpkp13plo");   //100 byte per line
     }
   }
   SD.OFF();
@@ -1185,8 +1185,12 @@ void loop()
 
 
 /// NU UMBLA AICI!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 mimineata
+  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+
+
+
+  
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
     cycle_time = 15;
