@@ -16,17 +16,31 @@ bool IRL_time = true; //  true for no external date source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 bool RTC_SUCCES;
+
+
+uint8_t errorSetTimeServer, errorEnableTimeSync, errorSetGMT, errorsetTimefromWiFi, errorsetSSID, errorsetpass, errorsoftreset, errorresetdef;
+uint8_t statusWiFiconn, statusSetTimeServer, statusTimeSync, statusSetGMT, statussetTimefromWiFi;
+
+
+
 // choose NTP server settings
 ///////////////////////////////////////
-char SERVER1[] = "time.nist.gov";
-char SERVER2[] = "wwv.nist.gov";
-//"pool.ntp.org";
+char SERVERS[][25] =
+{
+  "time.nist.gov",
+  "wwv.nist.gov"
+};
+char server[25], serbuf[64];
 ///////////////////////////////////////
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
 ///////////////////////////////////////
-uint8_t time_zone = 2;
+uint8_t time_zone = 3;///for ROMANIA
 ///////////////////////////////////////
+
+
+
+
 
 // choose socket (SELECT USER'S SOCKET)
 ///////////////////////////////////////
@@ -425,211 +439,281 @@ void data_maker( int x , char filename_a[]  )
 
 
 
-void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  try_RTC_set() de n ori
+
+
+
+
+
+
+
+
+
+
+void RTC_setup()   // asa era in void setup si am pus tot in functia asta
 {
-  int atempts = 0;
-  //////////////////////////////////////////////////
-  // 2. Check if connected
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.ON(socket);
-
-  if (error == 0)
+  int NServers = sizeof(SERVERS) / sizeof(SERVERS[0]);
+  sprintf (serbuf, "The number of available servers in the list is %d \r\n", NServers);
+  USB.println(serbuf);
+  start_prog();
+  do
   {
-    USB.println(F("1. WiFi switched ON"));
-  } else
-  {
-    USB.println(F("1. WiFi did not initialize correctly"));
-  }
-
-
-  while (status == false)
-  {
-    WiFi_init(); // initialize Wi-Fi communication
-    // get actual time
-    previous = millis();
-    atempts++;
-    USB.print(F("atempt: "));
-    USB.println(atempts);
-    // check connectivity
-    status = WIFI_PRO.isConnected();
-
+    switchon_WiFi();
+    WiFi_resetdefault();
+    setSSID_pass_reset();
+    statusWiFiconn = check_WiFi_conn();
     // Check if module is connected
-    if (status == true)
+    if (statusWiFiconn == true)
     {
-      USB.print(F("2. WiFi is connected OK"));
-      USB.print(F(" Time(ms):"));
-      USB.println(millis() - previous);
-    } else
-    {
-      USB.print(F("2. WiFi is connected ERROR"));
-      USB.print(F(" Time(ms):"));
-      USB.println(millis() - previous);
-    }
-  }
-
-  //////////////////////////////////////////////////
-  // 3. NTP server
-  //////////////////////////////////////////////////
-
-  // Check if module is connected
-  if (status == true)
-  {
-
-    //    // 3.1. Set NTP Server (option1)
-    error = WIFI_PRO.setTimeServer(1, SERVER1);
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("3.1. Time Server1 set OK"));
-    } else
-    {
-      USB.println(F("3.1. Error calling 'setTimeServer' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
-
-    // 3.2. Set NTP Server (option2)
-    error = WIFI_PRO.setTimeServer(2, SERVER2);
-
-    // check response
-    if (error == 0)
-    {
-      USB.println(F("3.2. Time Server2 set OK"));
-    } else
-    {
-      USB.println(F("3.2. Error calling 'setTimeServer' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
-
-    // 3.3. Enabled/Disable Time Sync
-    if (status == true)
-    {
-      error = WIFI_PRO.timeActivationFlag(true);
-
-      // check response
-      if (error == 0)
+      for (int cnt = 0; cnt < NServers; cnt++)
+        statusSetTimeServer = RTC_setTimeServer(SERVERS[cnt]);
+      if (statusSetTimeServer == true)
       {
-        USB.println(F("3.3. Network Time-of-Day Activation Flag set OK"));
-      } else
-      {
-        USB.println(F("3.3. Error calling 'timeActivationFlag' function"));
-        WIFI_PRO.printErrorCode();
-        status = false;
+        statusTimeSync = RTC_EnableTimeSync();
+        if (statusTimeSync == true)
+        { RTC_setGMT();
+          goto SWITCHOFF;
+        }
       }
     }
-
-    // 3.4. set GMT
-    if (status == true)
-    {
-      error = WIFI_PRO.setGMT(time_zone);
-
-      // check response
-      if (error == 0)
-      {
-        USB.print(F("3.4. GMT set OK to "));
-        USB.println(time_zone, DEC);
-      } else
-      {
-        USB.println(F("3.4. Error calling 'setGMT' function"));
-        WIFI_PRO.printErrorCode();
-      }
-    }
+SWITCHOFF:
+    switchoff_WiFi();
   }
-
-  //
-  //  //////////////////////////////////////////////////
-  //  // 4. Switch OFF
-  //  //////////////////////////////////////////////////
-  //  USB.println(F("4. WiFi switched OFF\n"));
-  //  WIFI_PRO.OFF(socket);
-
-  USB.println(F("-----------------------------------------------------------"));
-  USB.println(F("Once the module has the correct Time Server Settings"));
-  USB.println(F("it is always possible to request for the Time and"));
-  USB.println(F("synchronize it to the Waspmote's RTC"));
-  USB.println(
-    F("-----------------------------------------------------------\n"));
-
+  while (statusSetTimeServer == false);
+  delay(5000);
+  RTC_init();
 }
 
 
-
-
-
-
-void try_RTC_set()
+////////////////////FUNCTII///////////////////////////
+/////////////////////////////FUNCTII WIFI///////////////////////////
+void switchon_WiFi()
 {
-
+// 1. Switch ON
   //////////////////////////////////////////////////
-  // 1. Switch ON
-  //////////////////////////////////////////////////
-  USB.println(F("STARTING RTC SET WITH WIFI:"));
   error = WIFI_PRO.ON(socket);
 
   if (error == 0)
   {
     USB.println(F("1. WiFi switched ON"));
-  } else
+  }
+  else
   {
     USB.println(F("1. WiFi did not initialize correctly"));
   }
+}
 
-  //////////////////////////////////////////////////
-  // 2. Check if connected
+boolean check_WiFi_conn()
+{ // 2. Check if connected
   //////////////////////////////////////////////////
 
   // get actual time
   previous = millis();
 
   // check connectivity
-  status = WIFI_PRO.isConnected();
+  statusWiFiconn =  WIFI_PRO.isConnected();
 
   // Check if module is connected
-  if (status == true)
+  if (statusWiFiconn == true)
   {
     USB.print(F("2. WiFi is connected OK"));
     USB.print(F(" Time(ms):"));
     USB.println(millis() - previous);
-  } else
+  }
+  else
   {
     USB.print(F("2. WiFi is connected ERROR"));
     USB.print(F(" Time(ms):"));
     USB.println(millis() - previous);
   }
+  return statusWiFiconn;
+}
 
-  //////////////////////////////////////////////////
-  // 3. Set RTC Time from WiFi module settings
-  //////////////////////////////////////////////////
+void switchoff_WiFi()
+{
+  USB.println(F("4. WiFi switched OFF\n"));
+  WIFI_PRO.OFF(socket);
 
-  // Check if module is connected
-  if (status == true)
+
+  USB.println(F("-----------------------------------------------------------"));
+  USB.println(F("Once the module has the correct Time Server Settings"));
+  USB.println(F("it is always possible to request for the Time and"));
+  USB.println(F("synchronize it to the Waspmote's RTC"));
+  USB.println(F("-----------------------------------------------------------\n"));
+}
+
+void WiFi_resetdefault()
+{
+  errorresetdef = WIFI_PRO.resetValues();
+
+  if (errorresetdef == 0)
   {
-    // 3.1. Open FTP session
-    error = WIFI_PRO.setTimeFromWIFI();
+    USB.println(F("2. WiFi reset to default"));
+  }
+  else
+  {
+    USB.println(F("2. WiFi reset to default ERROR"));
+  }
+}
 
-    // check response
-    if (error == 0)
-    {
-      USB.print(F("3. Set RTC time OK. Time:"));
-      USB.println(RTC.getTime());
-      RTC_SUCCES = true;
-    } else
-    {
-      USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
-      WIFI_PRO.printErrorCode();
-      status = false;
-    }
+void setSSID_pass_reset()
+{ // 3. Set ESSID
+  //////////////////////////////////////////////////
+  errorsetSSID = WIFI_PRO.setESSID(ESSID);
+
+  if (errorsetSSID == 0)
+  {
+    USB.println(F("3. WiFi set ESSID OK"));
+  }
+  else
+  {
+    USB.println(F("3. WiFi set ESSID ERROR"));
   }
 
+
   //////////////////////////////////////////////////
-  // 4. Switch OFF
+  // 4. Set password key (It takes a while to generate the key)
+  // Authentication modes:
+  //    OPEN: no security
+  //    WEP64: WEP 64
+  //    WEP128: WEP 128
+  //    WPA: WPA-PSK with TKIP encryption
+  //    WPA2: WPA2-PSK with TKIP or AES encryption
   //////////////////////////////////////////////////
-  WIFI_PRO.OFF(socket);
-  USB.println(F("4. WiFi switched OFF\n\n"));
-  USB.println(F("Wait 10 seconds...\n"));
-  delay(10000);
+  errorsetpass = WIFI_PRO.setPassword(WPA2, PASSW);
+
+  if (errorsetpass == 0)
+  {
+    USB.println(F("4. WiFi set AUTHKEY OK"));
+  }
+  else
+  {
+    USB.println(F("4. WiFi set AUTHKEY ERROR"));
+  }
+
+
+  //////////////////////////////////////////////////
+  // 5. Software Reset
+  // Parameters take effect following either a
+  // hardware or software reset
+  //////////////////////////////////////////////////
+  errorsoftreset = WIFI_PRO.softReset();
+
+  if (errorsoftreset == 0)
+  {
+    USB.println(F("5. WiFi softReset OK"));
+  }
+  else
+  {
+    USB.println(F("5. WiFi softReset ERROR"));
+  }
+
+
+  USB.println(F("*******************************************"));
+  USB.println(F("Once the module is configured with ESSID"));
+  USB.println(F("and PASSWORD, the module will attempt to "));
+  USB.println(F("join the specified Access Point on power up"));
+  USB.println(F("*******************************************\n"));
+
+}
+
+
+/////////////////////////////ALTE FUNCTII DE START///////////////////////////
+void start_prog()
+{
+  USB.ON();
+  USB.println(F("Start program"));
+  USB.println(F("***************************************"));
+  USB.println(F("Once the module is set with one or more"));
+  USB.println(F("AP settings, it attempts to join the AP"));
+  USB.println(F("automatically once it is powered on"));
+  USB.println(F("Refer to example 'WIFI_PRO_01' to configure"));
+  USB.println(F("the WiFi module with proper settings"));
+  USB.println(F("***************************************"));
+}
+/////////////////////////////FUNCTII RTC///////////////////////////
+boolean RTC_setTimeServer(char *server)
+{
+// 3.1. Set NTP Server (option1)
+  errorSetTimeServer = WIFI_PRO.setTimeServer(1, server);
+
+  // check response
+  if (errorSetTimeServer == 0)
+  { sprintf (serbuf, "3.1. Time Server %s set OK \r\n", server);
+    USB.println(serbuf);
+    statusSetTimeServer = true;
+  }
+  else
+  {
+    USB.println(F("3.1. Error calling 'setTimeServer' function"));
+    WIFI_PRO.printErrorCode();
+    statusSetTimeServer = false;
+  }
+  return statusSetTimeServer;
+}
+
+boolean RTC_EnableTimeSync()
+{
+  errorEnableTimeSync = WIFI_PRO.timeActivationFlag(true);
+
+  // check response
+  if ( errorEnableTimeSync == 0 )
+  {
+    USB.println(F("3.3. Network Time-of-Day Activation Flag set OK"));
+    statusTimeSync = true;
+  }
+  else
+  {
+    USB.println(F("3.3. Error calling 'timeActivationFlag' function"));
+    WIFI_PRO.printErrorCode();
+    statusTimeSync = false;
+  }
+  return statusTimeSync;
+}
+
+void RTC_setGMT()
+{
+  errorSetGMT = WIFI_PRO.setGMT(time_zone);
+
+  // check response
+  if (errorSetGMT == 0)
+  {
+    USB.print(F("3.4. GMT set OK to "));
+    USB.println(time_zone, DEC);
+  }
+  else
+  {
+    USB.println(F("3.4. Error calling 'setGMT' function"));
+    WIFI_PRO.printErrorCode();
+  }
+}
+
+void RTC_init()
+{
+// Init RTC
+  RTC.ON();
+  USB.print(F("Current RTC settings:"));
+  USB.println(RTC.getTime());
+}
+
+
+void RTC_setTimefromWiFi()
+{
+// 3.1. Open FTP session
+  errorsetTimefromWiFi = WIFI_PRO.setTimeFromWIFI();
+
+  // check response
+  if (errorsetTimefromWiFi == 0)
+  {
+    USB.print(F("3. Set RTC time OK. Time:"));
+    USB.println(RTC.getTime());
+    statussetTimefromWiFi = true;
+  }
+  else
+  {
+    USB.println(F("3. Error calling 'setTimeFromWIFI' function"));
+    WIFI_PRO.printErrorCode();
+    statussetTimefromWiFi = false;
+  }
 }
 
 
@@ -637,6 +721,68 @@ void try_RTC_set()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 {
   if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)  )
@@ -644,7 +790,7 @@ void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
     try_RTC_set();
   }
 }
-
+*/
 
 
 
@@ -746,23 +892,23 @@ void WiFi_init()
 
 void all_in_1_frame_process()
 {
-  if( PWR.getBatteryLevel()>=50 )
+  if ( PWR.getBatteryLevel() >= 50 )
   {
-      ssent = trimitator_WIFI();
+    ssent = trimitator_WIFI();
   }
   else
   {
-    if( PWR.getBatteryLevel()<20 )
+    if ( PWR.getBatteryLevel() < 20 )
     {
-      ssent=0;
+      ssent = 0;
     }
     else
     {
-            ssent = trimitator_WIFI();  // eventual de adaugat un counter care reduce rata de trimitere la 1/2 sau 1/3
+      ssent = trimitator_WIFI();  // eventual de adaugat un counter care reduce rata de trimitere la 1/2 sau 1/3
     }
   }
 
-  
+
 
   scriitor_SD(filename, ssent);
 }
@@ -1151,26 +1297,11 @@ void setup()
 
 
   OTA_setup_check(10);
-  pregatitor_RTC_set();
-  delay(1000);
+  RTC_setup();
 
-  if (IRL_time)
-  {
-    // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
-    RTC.setTime("19:01:01:03:00:00:00");
-  } else
-  {
 
-    //while ((count_trials < N_trials) && (status == false))
-    while (  count_trials < N_trials )
-    {
-      try_RTC_set();
-      USB.println(F("Trial"));
-      count_trials++;
-      USB.print(count_trials);
-      USB.println();
-    }
-  }
+
+
 
   USB.print(F("Current RTC settings:"));
   USB.println(RTC.getTime());
@@ -1223,7 +1354,13 @@ void loop()
 
 ///////////////  NU UMBLA AICI !!!
   RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
-  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+  //IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+
+
+
+
+
+
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10)
   {
