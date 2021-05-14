@@ -627,7 +627,7 @@ boolean WiFi_sendFrame()
 		USB.println(millis() - previousSendFrame);
 		USB.println(F("ASCII FRAME SEND OK"));
 	}
-	 else
+	else
 	{
 		USB.println(F("Error calling 'getURL' function"));
 		ssent = 0;
@@ -778,80 +778,80 @@ void RTC_setTimefromWiFi()
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
 void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 {
-  if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)  )
-  {
-    try_RTC_set();
-  }
+	if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)  )
+	{
+		USB.println(F("Atempt RTC on weekly basis to make sure it is correct"));
+		RTC_setTimefromWiFi();
+	}
 }
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
