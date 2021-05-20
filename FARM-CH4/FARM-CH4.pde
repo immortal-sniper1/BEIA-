@@ -89,12 +89,12 @@ char const str_NEW2[] PROGMEM = "SGX_CH42"; // ?
 ///// EDITEAZA AICI DOAR
 char node_ID[] = "FARM-CH4-1";
 int count_trials = 0;
-int N_trials = 10;
+int N_trials = 5;
 char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 30; // in seconds
+int cycle_time2 = 300; // in seconds
 
 
 
@@ -973,14 +973,14 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     case ERROR_CODE_0042: USB.println(F("Illegal value")); break;
     case ERROR_CODE_0043: USB.println(F("CR expected ")); break;
     case ERROR_CODE_0044: USB.println(F("Number expected")); break;
-    case ERROR_CODE_0045: USB.println(F("CR or ‘,’ expected")); break;
+    case ERROR_CODE_0045: USB.println(F("CR or â€˜,â€™ expected")); break;
     case ERROR_CODE_0046: USB.println(F("DNS expected")); break;
-    case ERROR_CODE_0047: USB.println(F("‘:’ or ‘~’ expected")); break;
+    case ERROR_CODE_0047: USB.println(F("â€˜:â€™ or â€˜~â€™ expected")); break;
     case ERROR_CODE_0048: USB.println(F("String expected")); break;
-    case ERROR_CODE_0049: USB.println(F("‘:’ or ‘=’ expected")); break;
+    case ERROR_CODE_0049: USB.println(F("â€˜:â€™ or â€˜=â€™ expected")); break;
     case ERROR_CODE_0050: USB.println(F("Text expected")); break;
     case ERROR_CODE_0051: USB.println(F("Syntax error")); break;
-    case ERROR_CODE_0052: USB.println(F("‘,’ expected")); break;
+    case ERROR_CODE_0052: USB.println(F("â€˜,â€™ expected")); break;
     case ERROR_CODE_0053: USB.println(F("Illegal cmd code")); break;
     case ERROR_CODE_0054: USB.println(F("Error when setting parameter")); break;
     case ERROR_CODE_0055: USB.println(F("Error when getting parameter value")); break;
@@ -992,7 +992,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     case ERROR_CODE_0061: USB.println(F("Internal memory failure")); break;
     case ERROR_CODE_0062: USB.println(F("User aborted the system")); break;
     case ERROR_CODE_0063: USB.println(F("~CTSH needs to be LOW to change to hardware flow control")); break;
-    case ERROR_CODE_0064: USB.println(F("User aborted last cmd using ‘---’")); break;
+    case ERROR_CODE_0064: USB.println(F("User aborted last cmd using â€˜---â€™")); break;
     case ERROR_CODE_0065: USB.println(F("iChip unique ID already exists")); break;
     case ERROR_CODE_0066: USB.println(F("Error when setting the MIF parameter")); break;
     case ERROR_CODE_0067: USB.println(F("Cmd ignored as irrelevant")); break;
@@ -1043,7 +1043,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     case ERROR_CODE_0123: USB.println(F("SerialNET mode error: Host baud rate cannot be determined")); break;
     case ERROR_CODE_0124: USB.println(F("SerialNET over TELNET error: HIF parameter must be set to 1 or 2")); break;
     case ERROR_CODE_0125: USB.println(F("Invalid WEP key")); break;
-    case ERROR_CODE_0126: USB.println(F("Invalid parameters’ profile number")); break;
+    case ERROR_CODE_0126: USB.println(F("Invalid parametersâ€™ profile number")); break;
     case ERROR_CODE_0128: USB.println(F("Product ID already exists")); break;
     case ERROR_CODE_0129: USB.println(F("HW pin can not be changed after Product-ID was set ")); break;
     case ERROR_CODE_0200: USB.println(F("Socket does not exist")); break;
@@ -1094,7 +1094,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     case ERROR_CODE_0410: USB.println(F("The network connection is offline (modem)")); break;
     case ERROR_CODE_0411: USB.println(F("Cmd is illegal when Bridge mode is active")); break;
     case ERROR_CODE_0501: USB.println(F("Communications platform already active")); break;
-    case ERROR_CODE_0505: USB.println(F("Cannot open additional FTP session – all FTP handles in use")); break;
+    case ERROR_CODE_0505: USB.println(F("Cannot open additional FTP session â€“ all FTP handles in use")); break;
     case ERROR_CODE_0506: USB.println(F("Not an FTP session handle")); break;
     case ERROR_CODE_0507: USB.println(F("FTP server not found")); break;
     case ERROR_CODE_0508: USB.println(F("Timeout when connecting to FTP server")); break;
@@ -1169,7 +1169,7 @@ void measurerr_CH4()
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
   delay(50000);
   int ppp, ppp2, dd, j, nnr, jj;
-  long int sum = 0;
+  int sum = 0;
   char answer4[] = {"ERROR reading sensor\r\n"};
   uint32_t timeout = 10000;
   char sensor_reading[] = {"\r\n"};
@@ -1181,7 +1181,7 @@ void measurerr_CH4()
   //USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));     // citirea pin analog
   for (  j = 1; j <= 5 ; j++)
   {
-    VV1 = analogRead(ANALOG7);
+    VV1 = analogRead(ANALOG5);
     USB.print(F("  ||    ANALOG: "));
     USB.print(VV1);
     sum = sum + VV1;
@@ -1189,11 +1189,13 @@ void measurerr_CH4()
   }
   USB.println(" ");
   VV1 = sum / 5;
-  ppp = VV1 * 50000 / 1024;
+  ppp = VV1 / 1024* 50000;
   sum = 0;
-
-
-
+  USB.println(" ");
+  USB.print(F("  ||    ANALOG avg: "));
+  USB.print(  VV1/1024 );
+  USB.print(F("  V"));
+  USB.println(" ");
 
 
 // citire pin digital
@@ -1207,10 +1209,12 @@ void measurerr_CH4()
   for (  j = 1; j <= 5 ; j++)
   {
     answer13 = uart.waitFor(sensor_reading, answer4, timeout);
+
+
     switch (answer13)
     {
     case 0:
-      USB.print(F("TIMEOUTED 10S "));
+      USB.println(F("TIMEOUTED 10S "));
       break;
     case 1:
       USB.print(F("Parse sensor info: "));
@@ -1224,16 +1228,20 @@ void measurerr_CH4()
       USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
       USB.println(F("CODE IS MESSES UP HARD HERE!"));
     }
+      USB.print(F("UART data: "));
     for (  jj = 0; jj < uart._length ; jj++)
     {
+      USB.print(   uart._buffer[jj]  );
       nnr = nnr * 10 + uart._buffer[jj];
       uart_data_ch[j * 5 + jj] = uart._buffer[jj];
     }
+          USB.println(" " );
     ppp2 = binaryToDecimal( nnr);
     sum = sum + ppp2;
     delay(500);
 
   }
+  USB.println(" ");
   ppp2 = sum / 5;
   USB.print(F("SUM-digital: "));
   USB.println(sum);
@@ -1246,7 +1254,7 @@ void measurerr_CH4()
   frame.addSensor(SENSOR_GASES_CH4, ppp  );
   frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
   frame.addTimestamp();
-  frame.addSensor(SENSOR_GASES_CH4, ppp2  );
+  frame.addSensor(SENSOR_GASES_O2, ppp2  );
   frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
   frame.showFrame();
   PWR.setSensorPower(SENS_3V3, SENS_OFF);
@@ -1324,7 +1332,7 @@ void setup()
 
 //UART
   uart.setBaudrate(115200);
-  uart.setUART(SOCKET1);
+  uart.setUART(SOCKET0);
   uart.beginUART();
   Utils.setMuxAux1();
   serialFlush(1);
@@ -1418,6 +1426,7 @@ void loop()
       "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
 }
+
 
 
 
