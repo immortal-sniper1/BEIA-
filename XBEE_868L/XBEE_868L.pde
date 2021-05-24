@@ -684,6 +684,7 @@ void trimitaro_data_XXBEE()
   // 2. Send packet
   ///////////////////////////////////////////
   xbee868LP.ON();
+  delay(1000);
   // send XBee packet
   error = xbee868LP.send( RX_ADDRESS, frame.buffer, frame.length );
 

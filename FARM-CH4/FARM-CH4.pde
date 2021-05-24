@@ -94,7 +94,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 300; // in seconds
+int cycle_time2 = 120; // in seconds
 
 
 
@@ -1166,7 +1166,8 @@ int binaryToDecimal(int n)
 
 void measurerr_CH4()
 {
-
+  Utils.setLED(LED0, LED_ON);
+  Utils.setLED(LED1, LED_ON);
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
   delay(50000);
@@ -1272,7 +1273,7 @@ void measurerr_CH4()
   frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
   frame.showFrame();
   PWR.setSensorPower(SENS_3V3, SENS_OFF);
-
+  Utils.setLED(LED1, LED_OFF);
 
 }
 
@@ -1303,6 +1304,7 @@ void measurerr_CH4()
 void setup()
 {
   USB.ON();
+  Utils.setLED(LED0, LED_ON);
   RTC.ON(); // Executes the init process
   USB.println(F("START"));
 
@@ -1367,6 +1369,7 @@ void loop()
 {
   // get actual time before loop
   prev = millis();
+  Utils.setLED(LED0, LED_ON);
 
 
 
