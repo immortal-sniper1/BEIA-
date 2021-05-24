@@ -1325,6 +1325,8 @@ void setup()
       USB.println(F("Trial"));
       count_trials++;
       USB.print(count_trials);
+      USB.print(" / ");
+      USB.print(N_trials);
       USB.println();
     }
   }
