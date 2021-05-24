@@ -14,7 +14,7 @@ uint8_t status = false;
 char y[3];
 uint8_t sd_answer, ssent;
 bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
-bool IRL_time = true; //  true for no external date source
+bool IRL_time = false; //  true for no external date source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 bool RTC_SUCCES;
@@ -1192,7 +1192,10 @@ void measurerr_CH4()
   USB.println(" ");
   VV1 = sum / 5;
   ppp = VV1 / 1024 * 50000;
-  sum = 0;
+  if (ppp<0)
+  {
+    ppp=0;
+  }
   USB.println(" ");
   USB.print(F("  ||    ANALOG avg: "));
   USB.print(  VV1 );
@@ -1214,11 +1217,10 @@ void measurerr_CH4()
   1.8      558    high
   2        620
    */
+  sum = 0;
   for (  j = 1; j <= 5 ; j++)
   {
     answer13 = uart.waitFor(sensor_reading, answer4, timeout);
-
-
     switch (answer13)
     {
     case 0:
@@ -1237,6 +1239,7 @@ void measurerr_CH4()
       USB.println(F("CODE IS MESSES UP HARD HERE!"));
     }
     USB.print(F("UART data: "));
+    nnr=0;
     for (  jj = 0; jj < uart._length ; jj++)
     {
       USB.print(   uart._buffer[jj]  );
@@ -1245,12 +1248,15 @@ void measurerr_CH4()
     }
     USB.println(" " );
     ppp2 = binaryToDecimal( nnr);
+    USB.println(F("DIgital data: "));
+    USB.println( ppp2 );
     sum = sum + ppp2;
     delay(1200);
 
   }
   USB.println(" ");
   ppp2 = sum / 5;
+  
   USB.print(F("SUM-digital: "));
   USB.println(sum);
 
@@ -1315,7 +1321,8 @@ void setup()
   {
     // Setting date and time [yy:mm:dd:dow:hh:mm:ss]
     RTC.setTime("19:01:01:03:00:00:00");
-  } else
+  } 
+  else
   {
 
     //while ((count_trials < N_trials) && (status == false))
