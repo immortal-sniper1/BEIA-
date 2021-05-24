@@ -108,6 +108,7 @@ qwerty:
 	if (ssent == 0 && b <= resend_f)
 	{
 		delay(5000);
+    b++;
 		goto qwerty;
 	}
 

@@ -116,7 +116,8 @@ qwerty:
   if (error == 0)
   {
     USB.println(F("WiFi switched ON"));
-  } else
+  }
+  else
   {
     USB.println(F("WiFi did not initialize correctly"));
   }
@@ -157,6 +158,7 @@ qwerty:
   if (ssent == 0 && b <= resend_f)
   {
     delay(5000);
+    b++;
     goto qwerty;
   }
 
@@ -1169,7 +1171,7 @@ void measurerr_CH4()
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
   delay(50000);
   int ppp, ppp2, dd, j, nnr, jj;
-  int sum = 0;
+  long int sum = 0;
   char answer4[] = {"ERROR reading sensor\r\n"};
   uint32_t timeout = 10000;
   char sensor_reading[] = {"\r\n"};
@@ -1189,13 +1191,19 @@ void measurerr_CH4()
   }
   USB.println(" ");
   VV1 = sum / 5;
-  ppp = VV1 / 1024* 50000;
+  ppp = VV1 / 1024 * 50000;
   sum = 0;
   USB.println(" ");
   USB.print(F("  ||    ANALOG avg: "));
-  USB.print(  VV1/1024 );
+  USB.print(  VV1 );
+  USB.print(F("  units and that is equivalent to: "));
+  USB.print(  VV1 * 3.33 / 1024 );
   USB.print(F("  V"));
   USB.println(" ");
+
+
+
+
 
 
 // citire pin digital
@@ -1228,17 +1236,17 @@ void measurerr_CH4()
       USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
       USB.println(F("CODE IS MESSES UP HARD HERE!"));
     }
-      USB.print(F("UART data: "));
+    USB.print(F("UART data: "));
     for (  jj = 0; jj < uart._length ; jj++)
     {
       USB.print(   uart._buffer[jj]  );
       nnr = nnr * 10 + uart._buffer[jj];
       uart_data_ch[j * 5 + jj] = uart._buffer[jj];
     }
-          USB.println(" " );
+    USB.println(" " );
     ppp2 = binaryToDecimal( nnr);
     sum = sum + ppp2;
-    delay(500);
+    delay(1200);
 
   }
   USB.println(" ");
@@ -1251,10 +1259,10 @@ void measurerr_CH4()
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  frame.addSensor(SENSOR_GASES_CH4, ppp  );
+  frame.addSensor(SENSOR_GASES_CH4, ppp  );     // CH4 analogic
   frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
   frame.addTimestamp();
-  frame.addSensor(SENSOR_GASES_O2, ppp2  );
+  frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
   frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
   frame.showFrame();
   PWR.setSensorPower(SENS_3V3, SENS_OFF);
