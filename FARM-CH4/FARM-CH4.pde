@@ -27,7 +27,7 @@ char SERVER2[] = "wwv.nist.gov";
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
 ///////////////////////////////////////
-uint8_t time_zone = 2;
+uint8_t time_zone = 3;
 ///////////////////////////////////////
 
 // choose socket (SELECT USER'S SOCKET)
