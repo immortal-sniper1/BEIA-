@@ -776,6 +776,7 @@ int HTTP_4G_TRIMITATOR_FRAME()
 
 void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
 {
+  USB.println(F("START OF THE RTC SEGMENT"));
   //////////////////////////////////////////////////
   // 1. Switch ON the 4G module
   //////////////////////////////////////////////////
@@ -1074,7 +1075,7 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 
 void masurator_apa()
 {
-    // Socket B sensor
+  // Socket B sensor
   // Turn ON the sensor
   myPHEHT_B.ON();
   // Read the sensor
@@ -1085,7 +1086,7 @@ void masurator_apa()
 
 
 
-    frame.createFrame(ASCII, node_ID); // frame1 de  stocat
+  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   // add Socket B sensor values
   frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
   frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
@@ -1100,7 +1101,7 @@ void masurator_apa()
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   // set frame fields (Time from RTC)
   frame.showFrame();
-  
+
 }
 
 
@@ -1213,7 +1214,7 @@ void loop()
 
 
 
- masurator_apa();
+  masurator_apa();
   ssent = HTTP_4G_TRIMITATOR_FRAME();
   scriitor_SD(filename, ssent);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1228,7 +1229,7 @@ void loop()
 
 
 
-  
+
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
     cycle_time = 15;
