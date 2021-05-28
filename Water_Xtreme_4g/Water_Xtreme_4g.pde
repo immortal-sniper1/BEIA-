@@ -18,7 +18,7 @@ bool sentence = false; // true for deletion on reboot  , false for data appended
 bool IRL_time = false; //  true for no external data source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
-bool RTC_SUCCES;
+bool RTC_SUCCES=false;
 
 char programID[10];
 // SERVER settings
@@ -42,7 +42,7 @@ char node_ID[] = "SWX1";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 // APN settings
 ///////////////////////////////////////    pt orange RO
-char apn[] = "internet";
+char apn[] = "net";
 char login[] = "";
 char password[] = "";
 ///////////////////////////////////////
@@ -118,12 +118,12 @@ fazuzu:
 
 
       /*
-      USB.print(F("xxxxx"));
-      USB.print(  filename_a  );
-      USB.println(F("xxxxx"));
-      USB.print(F("xxxxx"));
-      USB.print(  strlen(  filename_a  ));
-      USB.println(F("xxxxx"));
+        USB.print(F("xxxxx"));
+        USB.print(  filename_a  );
+        USB.println(F("xxxxx"));
+        USB.print(F("xxxxx"));
+        USB.print(  strlen(  filename_a  ));
+        USB.println(F("xxxxx"));
 
       */
     }
@@ -300,7 +300,7 @@ void INFO_4G_MDD()
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println("Start INFO_4G_MDD");
   delay(5000);
-/////////////////////////////////////////////////
+  /////////////////////////////////////////////////
   // 1. Switch on the 4G module
   //////////////////////////////////////////////////
   error = _4G.ON();
@@ -461,7 +461,7 @@ void INFO_4G_NET()
   //////////////////////////////////////////////////
   _4G.show_APN();
 
-//////////////////////////////////////////////////
+  //////////////////////////////////////////////////
   // 1. Switch ON the 4G module
   //////////////////////////////////////////////////
   error = _4G.ON();
@@ -507,24 +507,24 @@ void INFO_4G_NET()
         USB.print(F("1.3. Network type: "));
         switch (_4G._networkType)
         {
-        case Wasp4G::NETWORK_GPRS:
-          USB.println(F("GPRS"));
-          break;
-        case Wasp4G::NETWORK_EGPRS:
-          USB.println(F("EGPRS"));
-          break;
-        case Wasp4G::NETWORK_WCDMA:
-          USB.println(F("WCDMA"));
-          break;
-        case Wasp4G::NETWORK_HSDPA:
-          USB.println(F("HSDPA"));
-          break;
-        case Wasp4G::NETWORK_LTE:
-          USB.println(F("LTE"));
-          break;
-        case Wasp4G::NETWORK_UNKNOWN:
-          USB.println(F("Unknown or not registered"));
-          break;
+          case Wasp4G::NETWORK_GPRS:
+            USB.println(F("GPRS"));
+            break;
+          case Wasp4G::NETWORK_EGPRS:
+            USB.println(F("EGPRS"));
+            break;
+          case Wasp4G::NETWORK_WCDMA:
+            USB.println(F("WCDMA"));
+            break;
+          case Wasp4G::NETWORK_HSDPA:
+            USB.println(F("HSDPA"));
+            break;
+          case Wasp4G::NETWORK_LTE:
+            USB.println(F("LTE"));
+            break;
+          case Wasp4G::NETWORK_UNKNOWN:
+            USB.println(F("Unknown or not registered"));
+            break;
         }
       }
       else
@@ -573,15 +573,15 @@ void INFO_4G_NET()
 void HTTP_GET_4G()
 {
   // SERVER settings
-///////////////////////////////////////
+  ///////////////////////////////////////
   char host[] = "test.libelium.com";
   uint16_t port = 80;
   char resource[] = "/test-get-post.php?varA=1&varB=2&varC=3&varD=4&varE=5&varF=6&varG=7&varH=8&varI=9&varJ=10&varK=11&varL=12&varM=13&varN=14&varO=15";
-///////////////////////////////////////
+  ///////////////////////////////////////
 
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("STARTING HTTP_GET_4G"));
-//////////////////////////////////////////////////
+  //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
   error = _4G.ON();
@@ -635,12 +635,12 @@ void HTTP_GET_4G()
 void HTTP_POST_4G()
 {
   // SERVER settings
-///////////////////////////////////////
+  ///////////////////////////////////////
   char host[] = "test.libelium.com";
   uint16_t port = 80;
   char resource[] = "/test-get-post.php";
   char data[] = "varA=1&varB=2&varC=3&varD=4&varE=5";
-///////////////////////////////////////
+  ///////////////////////////////////////
 
   USB.ON();
   USB.println(F("Starting program HTTP_POST_4G"));
@@ -657,7 +657,7 @@ void HTTP_POST_4G()
   _4G.show_APN();
 
 
-//////////////////////////////////////////////////
+  //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
   error = _4G.ON();
@@ -714,7 +714,7 @@ int HTTP_4G_TRIMITATOR_FRAME()
 {
 
   int ssent;
-//////////////////////////////////////////////////
+  //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
   error = _4G.ON();
@@ -833,9 +833,9 @@ kyuubi:
 
 
 
-void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
+void IN_LOOP_RTC_CHECK( bool S)
 {
-  if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)   )
+  if (  (S = false) || (intFlag & RTC_INT)   )
   {
     SET_RTC_4G();
   }
@@ -852,55 +852,55 @@ void printErrorxx(uint8_t err)
 {
   switch (err)
   {
-  case 1:  USB.println(F("SD not present"));
-    break;
-  case 2:  USB.println(F("error downloading UPGRADE.TXT"));
-    break;
-  case 3:  USB.println(F("error opening FTP session"));
-    break;
-  case 4:  USB.println(F("filename is different to 7 bytes"));
-    break;
-  case 5:  USB.println(F("no 'FILE' pattern found"));
-    break;
-  case 6:  USB.println(F("'NO_FILE' is the filename"));
-    break;
-  case 7:  USB.println(F("no 'PATH' pattern found"));
-    break;
-  case 8:  USB.println(F("no 'SIZE' pattern found"));
-    break;
-  case 9:  USB.println(F("no 'VERSION' pattern found"));
-    break;
-  case 10: USB.println(F("invalid program version number"));
-    break;
-  case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
-    break;
-  case 12: USB.println(F("error downloading binary file: server file size is zero"));
-    break;
-  case 13: USB.println(F("error downloading binary file: reading the file size"));
-    break;
-  case 14: USB.println(F("error downloading binary file: SD not present"));
-    break;
-  case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
-    break;
-  case 16: USB.println(F("error downloading binary file: error opening the file"));
-    break;
-  case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
-    break;
-  case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
-    break;
-  case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
-    break;
-  case 20: USB.println(F("error downloading binary file: error  getting packet size"));
-    break;
-  case 21: USB.println(F("error downloading binary file: packet size mismatch"));
-    break;
-  case 22: USB.println(F("error downloading binary file: error writing SD"));
-    break;
-  case 23: USB.println(F("error downloading binary file: no more retries getting data"));
-    break;
-  case 24: USB.println(F("error downloading binary file: size mismatch"));
-    break;
-  default : USB.println(F("unknown"));
+    case 1:  USB.println(F("SD not present"));
+      break;
+    case 2:  USB.println(F("error downloading UPGRADE.TXT"));
+      break;
+    case 3:  USB.println(F("error opening FTP session"));
+      break;
+    case 4:  USB.println(F("filename is different to 7 bytes"));
+      break;
+    case 5:  USB.println(F("no 'FILE' pattern found"));
+      break;
+    case 6:  USB.println(F("'NO_FILE' is the filename"));
+      break;
+    case 7:  USB.println(F("no 'PATH' pattern found"));
+      break;
+    case 8:  USB.println(F("no 'SIZE' pattern found"));
+      break;
+    case 9:  USB.println(F("no 'VERSION' pattern found"));
+      break;
+    case 10: USB.println(F("invalid program version number"));
+      break;
+    case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
+      break;
+    case 12: USB.println(F("error downloading binary file: server file size is zero"));
+      break;
+    case 13: USB.println(F("error downloading binary file: reading the file size"));
+      break;
+    case 14: USB.println(F("error downloading binary file: SD not present"));
+      break;
+    case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
+      break;
+    case 16: USB.println(F("error downloading binary file: error opening the file"));
+      break;
+    case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
+      break;
+    case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
+      break;
+    case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
+      break;
+    case 20: USB.println(F("error downloading binary file: error  getting packet size"));
+      break;
+    case 21: USB.println(F("error downloading binary file: packet size mismatch"));
+      break;
+    case 22: USB.println(F("error downloading binary file: error writing SD"));
+      break;
+    case 23: USB.println(F("error downloading binary file: no more retries getting data"));
+      break;
+    case 24: USB.println(F("error downloading binary file: size mismatch"));
+      break;
+    default : USB.println(F("unknown"));
 
   }
 }
@@ -1057,22 +1057,22 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 
     switch (status)
     {
-    case 0:
-      USB.println(F("REPROGRAMMING ERROR"));
-      Utils.blinkRedLED(300, 3);
-      q++;
-      break;
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-    case 1:
-      USB.println(F("REPROGRAMMING OK"));
-      Utils.blinkGreenLED(300, 3);
-      w = true;
-      break;
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-    default:
-      USB.println(F("RESTARTING"));
-      Utils.blinkGreenLED(500, 1);
-      q++;
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
   }
 
@@ -1130,6 +1130,8 @@ void masurator_apa()
 
 
 
+
+  
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
   // add Socket B sensor values
@@ -1142,33 +1144,34 @@ void masurator_apa()
   frame.addSensor(WTRX_OPTOD_OS_E, myOPTOD_E.sensorOPTOD.oxygenSAT);
   frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
   frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
-
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  // set frame fields (Time from RTC)
+  frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
 
   // 4. Calculation of level percentage
-//  float levelPercentage = 100 - ((mySensor.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor.VegaPulsC21.distance));
-   
-  //use  https://development.libelium.com/data-frame-programming-guide/frame-structure#smart-water-xtreme 
-  //frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance); 
+  //  float levelPercentage = 100 - ((mySensor.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor.VegaPulsC21.distance));
+
+  //use  https://development.libelium.com/data-frame-programming-guide/frame-structure#smart-water-xtreme
+  //frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);
   //frame ul pentru level perrcentage, s-ar putea sa nu mearga
   //frame.addSensor(WTRX_C21_TC7_A, levelPercentage);
 
 
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  // set frame fields (Time from RTC)
+
   frame.showFrame();
   ssent = HTTP_4G_TRIMITATOR_FRAME();
   scriitor_SD(filename, ssent);
 
 
 
-
+  delay(2000);
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
 
 
 
-//  // add Socket D sensor values
+  // add Socket D sensor values
   frame.addSensor(WTRX_MES5_TC6_D, myMES5_D.sensorMES5.temperature);
   frame.addSensor(WTRX_MES5_SB_D, myMES5_D.sensorMES5.sludgeBlanket);
   frame.addSensor(WTRX_MES5_SS_D, myMES5_D.sensorMES5.suspendedSolids);
@@ -1185,7 +1188,7 @@ void masurator_apa()
   frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
   frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
   frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
-  frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
+
 
   frame.showFrame();
   ssent = HTTP_4G_TRIMITATOR_FRAME();
@@ -1213,7 +1216,7 @@ void setup()
 {
   USB.ON();
   RTC.ON();
-//  x=setProgramVersion(1);
+  //  x=setProgramVersion(1);
 
   INFO_4G_MDD();
   INFO_4G_NET();
@@ -1309,12 +1312,12 @@ void loop()
 
   //OTAP_4G();
 
-
-/// NU UMBLA AICI!
+ USB.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT ");
+  /// NU UMBLA AICI!
   RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
 
-
+ USB.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT ");
 
 
   cycle_time = cycle_time2 - b - 5;
