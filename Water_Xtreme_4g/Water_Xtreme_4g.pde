@@ -8,7 +8,7 @@
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[] = "FILE1.TXT";
-
+int loop_count;
 char *time_date; // stores curent date + time
 int cycle_time, x, b;
 uint8_t error, status = false;
@@ -1283,6 +1283,7 @@ void setup()
 
   // pm
   USB.ON();
+  loop_count=0;
 
 }
 
@@ -1300,6 +1301,9 @@ void loop()
 {
   // get actual time before loop
   prev = millis();
+  loop_count++;
+   USB.println(F("loop_count: "));
+  USB.println( loop_count);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1312,19 +1316,19 @@ void loop()
 
   //OTAP_4G();
 
- USB.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT ");
+ USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
   /// NU UMBLA AICI!
   RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
 
- USB.println("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT ");
+ USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
 
 
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10) {
     cycle_time = 15;
   }
-  USB.print("cycle time= ");
+  USB.print(F("cycle time= "));
   USB.println(cycle_time);
 
   x = cycle_time % 60; // sec

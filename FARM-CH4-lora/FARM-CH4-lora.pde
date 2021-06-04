@@ -97,14 +97,10 @@ uint8_t datarate = 5;
 
 
 /*
-
-#define SGX_V    ?
-char const str_NEW[] PROGMEM = "SGX_V2"; // ?
-
-#define SGX_CH4    ?
-char const str_NEW2[] PROGMEM = "SGX_CH42"; // ?
-
-
+  #define SGX_V    ?
+  char const str_NEW[] PROGMEM = "SGX_V2"; // ?
+  #define SGX_CH4    ?
+  char const str_NEW2[] PROGMEM = "SGX_CH42"; // ?
 */
 
 
@@ -115,7 +111,7 @@ char const str_NEW2[] PROGMEM = "SGX_CH42"; // ?
 ///// EDITEAZA AICI DOAR
 char node_ID[] = "FARM-CH4-1";
 int count_trials = 0;
-int N_trials = 5;
+int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
@@ -138,61 +134,61 @@ void LoRa_switchon()
   errorLoRa = LoRaWAN.ON(socketLoRa);
 
   // Check status
-  if( errorLoRa == 0 ) 
+  if ( errorLoRa == 0 )
   {
-    USB.println(F("1. Switch ON OK"));     
+    USB.println(F("1. Switch ON OK"));
   }
-  else 
+  else
   {
-    USB.print(F("1. Switch ON error = ")); 
+    USB.print(F("1. Switch ON error = "));
     USB.println(errorLoRa, DEC);
     errorLoRa_config = 1;
   }
 }
 
 void LoRa_adaptiveDR()
-{// 2. Enable Adaptive Data Rate (ADR)
+{ // 2. Enable Adaptive Data Rate (ADR)
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.setADR("on");
 
   // Check status
-  if( errorLoRa == 0 ) 
-    {
-    USB.print(F("2. Adaptive Data Rate enabled OK. "));    
+  if ( errorLoRa == 0 )
+  {
+    USB.print(F("2. Adaptive Data Rate enabled OK. "));
     USB.print(F("ADR:"));
-    USB.println(LoRaWAN._adr, DEC);   
-    }
-  else 
-    {
-    USB.print(F("2. Enable data rate error = ")); 
-    USB.println(errorLoRa, DEC);
-    }
-
+    USB.println(LoRaWAN._adr, DEC);
   }
+  else
+  {
+    USB.print(F("2. Enable data rate error = "));
+    USB.println(errorLoRa, DEC);
+  }
+
+}
 void LoRa_changeDR()
-{// 2. Change data rate
+{ // 2. Change data rate
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.setDataRate(datarate);
 
   // Check status
-  if( errorLoRa == 0 ) 
+  if ( errorLoRa == 0 )
   {
-    USB.println(F("3. Data rate set OK"));     
+    USB.println(F("3. Data rate set OK"));
   }
-  else 
+  else
   {
-    USB.print(F("3. Data rate set error= ")); 
+    USB.print(F("3. Data rate set error= "));
     USB.println(errorLoRa, DEC);
-     errorLoRa_config = 2;
+    errorLoRa_config = 2;
   }
 
-  }
+}
 
 void LoRa_getDR()
 
- {errorLoRa = LoRaWAN.getDataRate();
+{ errorLoRa = LoRaWAN.getDataRate();
 
   // Check status
   if ( errorLoRa == 0 )
@@ -207,189 +203,189 @@ void LoRa_getDR()
     USB.println(errorLoRa, DEC);
   }
 
- }
+}
 void LoRa_setDeviceEUI()
-{// 3. Set Device EUI
+{ // 3. Set Device EUI
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.setDeviceEUI(DEVICE_EUI);
 
   // Check status
-  if( errorLoRa == 0 ) 
+  if ( errorLoRa == 0 )
   {
-    USB.println(F("5. Device EUI set OK"));     
+    USB.println(F("5. Device EUI set OK"));
   }
-  else 
+  else
   {
-    USB.print(F("5. Device EUI set error = ")); 
+    USB.print(F("5. Device EUI set error = "));
     USB.println(errorLoRa, DEC);
     errorLoRa_config = 3;
   }
 
-  }
+}
 
-  void LoRa_setAppEUI()
-  {// 4. Set Application EUI
+void LoRa_setAppEUI()
+{ // 4. Set Application EUI
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.setAppEUI(APP_EUI);
 
   // Check status
-  if( errorLoRa == 0 ) 
+  if ( errorLoRa == 0 )
   {
-    USB.println(F("6. Application EUI set OK"));     
+    USB.println(F("6. Application EUI set OK"));
   }
-  else 
+  else
   {
-    USB.print(F("6. Application EUI set error = ")); 
+    USB.print(F("6. Application EUI set error = "));
     USB.println(errorLoRa, DEC);
     errorLoRa_config = 4;
   }
 }
 
 void LoRa_AppSessionKey()
-{// 5. Set Application Session Key
+{ // 5. Set Application Session Key
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.setAppKey(APP_KEY);
 
   // Check status
-  if( errorLoRa == 0 ) 
-    {
-    USB.println(F("7. Application Key set OK"));     
-    }
-  else 
-    {
-    USB.print(F("7. Application Key set error = ")); 
+  if ( errorLoRa == 0 )
+  {
+    USB.println(F("7. Application Key set OK"));
+  }
+  else
+  {
+    USB.print(F("7. Application Key set error = "));
     USB.println(errorLoRa, DEC);
     errorLoRa_config = 5;
-    }
   }
+}
 
-  void LoRa_joinOTAA()
-  {errorLoRa = LoRaWAN.joinOTAA();
+void LoRa_joinOTAA()
+{ errorLoRa = LoRaWAN.joinOTAA();
 
   // Check status
-  if( errorLoRa == 0 ) 
-    {
-    USB.println(F("8. Join network OK"));         
-    }
-  else 
-    {
-    USB.print(F("8. Join network error = ")); 
+  if ( errorLoRa == 0 )
+  {
+    USB.println(F("8. Join network OK"));
+  }
+  else
+  {
+    USB.print(F("8. Join network error = "));
     USB.println(error, DEC);
     errorLoRa_config = 6;
-    }
   }
+}
 
-  void LoRa_saveconfig()
-  {// 7. Save configuration
+void LoRa_saveconfig()
+{ // 7. Save configuration
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.saveConfig();
 
   // Check status
-  if( errorLoRa == 0 ) 
-    {
-    USB.println(F("9. Save configuration OK"));     
-    }
-  else 
-    {
-    USB.print(F("9. Save configuration error = ")); 
+  if ( errorLoRa == 0 )
+  {
+    USB.println(F("9. Save configuration OK"));
+  }
+  else
+  {
+    USB.print(F("9. Save configuration error = "));
     USB.println(errorLoRa, DEC);
     errorLoRa_config = 7;
-    }
   }
+}
 
-  void LoRa_switchoff()
-  {
-    // 8. Switch off
+void LoRa_switchoff()
+{
+  // 8. Switch off
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.OFF(socketLoRa);
 
   // Check status
-  if( errorLoRa == 0 ) 
-    {
-    USB.println(F("10. Switch OFF OK"));     
-    }
-  else 
-    {
-    USB.print(F("10. Switch OFF error = ")); 
+  if ( errorLoRa == 0 )
+  {
+    USB.println(F("10. Switch OFF OK"));
+  }
+  else
+  {
+    USB.print(F("10. Switch OFF error = "));
     USB.println(error, DEC);
     errorLoRa_config = 8;
-    }
   }
+}
 
-  void LoRa_joinABP_send()
+void LoRa_joinABP_send()
 
-  {// 2. Join network
+{ // 2. Join network
   //////////////////////////////////////////////
 
   errorLoRa = LoRaWAN.joinABP();
 
   // Check status
-  if( errorLoRa == 0 ) 
-    {
-    USB.println(F("2. Join network OK"));  
-    LoRa_changeDR();
-    LoRa_getDR();   
-    LoRa_sendconfirmed();
-    
-    }
-  else 
+  if ( errorLoRa == 0 )
   {
-    USB.print(F("2. Join network error = ")); 
+    USB.println(F("2. Join network OK"));
+    LoRa_changeDR();
+    LoRa_getDR();
+    LoRa_sendconfirmed();
+
+  }
+  else
+  {
+    USB.print(F("2. Join network error = "));
     USB.println(errorLoRa, DEC);
   }
-  
+
+}
+
+void LoRa_sendconfirmed()
+
+{ errorLoRa = LoRaWAN.sendConfirmed(PORTLORA, frame.buffer, frame.length);
+  ssent = 0;
+
+  //////////////////////////////////////////////
+  // 3. Send Confirmed packet
+  //////////////////////////////////////////////
+
+
+
+  // Error messages:
+  //    /*
+  //     * '6' : Module hasn't joined a network
+  //     * '5' : Sending error
+  //     * '4' : Error with data length
+  //     * '2' : Module didn't response
+  //     * '1' : Module communication error
+  //     */
+  // Check status
+  if ( errorLoRa == 0 )
+  {
+    USB.println(F("3. Send Confirmed packet OK"));
+    ssent = 1;
+    if (LoRaWAN._dataReceived == true)
+    {
+      USB.print(F("   There's data on port number "));
+      USB.print(LoRaWAN._port, DEC);
+      USB.print(F(".\r\n   Data: "));
+      USB.println(LoRaWAN._data);
+    }
   }
 
-  void LoRa_sendconfirmed()
+  else
+  {
+    USB.print(F("3. Send Confirmed packet error = "));
+    USB.println(errorLoRa, DEC);
+    ssent = 0;
+  }
 
-  {errorLoRa = LoRaWAN.sendConfirmed(PORTLORA, frame.buffer, frame.length);
-              ssent=0; 
 
-    //////////////////////////////////////////////
-    // 3. Send Confirmed packet 
-    //////////////////////////////////////////////
 
-    
+}
 
-    // Error messages:
-//    /*
-//     * '6' : Module hasn't joined a network
-//     * '5' : Sending error
-//     * '4' : Error with data length   
-//     * '2' : Module didn't response
-//     * '1' : Module communication error   
-//     */
-    // Check status
-    if( errorLoRa == 0 ) 
-    {
-      USB.println(F("3. Send Confirmed packet OK")); 
-      ssent=1; 
-      if (LoRaWAN._dataReceived == true)
-      { 
-        USB.print(F("   There's data on port number "));
-        USB.print(LoRaWAN._port,DEC);
-        USB.print(F(".\r\n   Data: "));
-        USB.println(LoRaWAN._data);
-      }  
-    } 
-    
-    else 
-      {
-      USB.print(F("3. Send Confirmed packet error = ")); 
-      USB.println(errorLoRa, DEC);
-            ssent=0; 
-      } 
-  
-  
-
-    }
-
-    /////////////////////LORA/////////////////////////
+/////////////////////LORA/////////////////////////
 
 
 
@@ -398,9 +394,12 @@ void RTC_setup()   // asa era in void setup si am pus tot in functia asta
   int NServers = sizeof(SERVERS) / sizeof(SERVERS[0]);
   sprintf (serbuf, "The number of available servers in the list is %d \r\n", NServers);
   USB.println(serbuf);
+  int plk = 0;
   start_prog();
   do
-  {
+  { plk++;
+    sprintf (serbuf, "We reached trial %d \r\n", plk);
+    USB.println(serbuf);
     WiFi_setup();
     statusWiFiconn = check_WiFi_conn();
     // Check if module is connected
@@ -420,7 +419,7 @@ void RTC_setup()   // asa era in void setup si am pus tot in functia asta
 SWITCHOFF:
     switchoff_WiFi();
   }
-  while (statusSetTimeServer == false);
+  while ((statusSetTimeServer == false) && (plk < N_trials));
   delay(5000);
   RTC_init();
 }
@@ -431,7 +430,7 @@ SWITCHOFF:
 /////////////////////////////FUNCTII WIFI///////////////////////////
 void switchon_WiFi()
 {
-// 1. Switch ON
+  // 1. Switch ON
   //////////////////////////////////////////////////
   error = WIFI_PRO.ON(socket);
 
@@ -561,44 +560,45 @@ void setSSID_pass_reset()
 }
 boolean WiFi_sendFrame()
 {
-// 3.2. Send Frame
-    ///////////////////////////////
-    // http frame
-    previousSendFrame = millis();
-    errorSendFrame = WIFI_PRO.sendFrameToMeshlium(type, host, port, frame.buffer, frame.length); // frame
-    // check response
-    if (errorSendFrame == 0)
-    {
-      USB.println(F("HTTP OK"));
-      ssent = 1;
-      USB.print(F("HTTP Time from OFF state (ms):"));
-      USB.println(millis() - previousSendFrame);
-      USB.println(F("ASCII FRAME SEND OK"));
-    } else
-    {
-      USB.println(F("Error calling 'getURL' function"));
-      ssent = 0;
-      WIFI_PRO.printErrorCode();
-    }
-    return ssent;
+  // 3.2. Send Frame
+  ///////////////////////////////
+  // http frame
+  previousSendFrame = millis();
+  errorSendFrame = WIFI_PRO.sendFrameToMeshlium(type, host, port, frame.buffer, frame.length); // frame
+  // check response
+  if (errorSendFrame == 0)
+  {
+    USB.println(F("HTTP OK"));
+    ssent = 1;
+    USB.print(F("HTTP Time from OFF state (ms):"));
+    USB.println(millis() - previousSendFrame);
+    USB.println(F("ASCII FRAME SEND OK"));
+  } else
+  {
+    USB.println(F("Error calling 'getURL' function"));
+    ssent = 0;
+    WIFI_PRO.printErrorCode();
+  }
+  return ssent;
 }
 void WiFi_print_status()
 {
-USB.println(F("2.1. Connection Status:"));
-    USB.println(F("-------------------------------"));
-    USB.print(F("Rate (Mbps):"));
-    USB.println(WIFI_PRO._rate);
-    USB.print(F("Signal Level (%):"));
-    USB.println(WIFI_PRO._level);
-    USB.print(F("Link Quality(%):"));
-    USB.println(WIFI_PRO._quality);
-    USB.println(F("-------------------------------"));
+  USB.println(F("2.1. Connection Status:"));
+  USB.println(F("-------------------------------"));
+  USB.print(F("Rate (Mbps):"));
+  USB.println(WIFI_PRO._rate);
+  USB.print(F("Signal Level (%):"));
+  USB.println(WIFI_PRO._level);
+  USB.print(F("Link Quality(%):"));
+  USB.println(WIFI_PRO._quality);
+  USB.println(F("-------------------------------"));
 }
 
 void WiFi_setup()
-{switchon_WiFi();
- WiFi_resetdefault();
- setSSID_pass_reset();}
+{ switchon_WiFi();
+  WiFi_resetdefault();
+  setSSID_pass_reset();
+}
 /////////////////////////////ALTE FUNCTII DE START///////////////////////////
 void start_prog()
 {
@@ -615,7 +615,7 @@ void start_prog()
 /////////////////////////////FUNCTII RTC///////////////////////////
 boolean RTC_setTimeServer(char *server)
 {
-// 3.1. Set NTP Server (option1)
+  // 3.1. Set NTP Server (option1)
   errorSetTimeServer = WIFI_PRO.setTimeServer(1, server);
 
   // check response
@@ -671,7 +671,7 @@ void RTC_setGMT()
 
 void RTC_init()
 {
-// Init RTC
+  // Init RTC
   RTC.ON();
   USB.print(F("Current RTC settings:"));
   USB.println(RTC.getTime());
@@ -680,7 +680,7 @@ void RTC_init()
 
 void RTC_setTimefromWiFi()
 {
-// 3.1. Open FTP session
+  // 3.1. Open FTP session
   errorsetTimefromWiFi = WIFI_PRO.setTimeFromWIFI();
 
   // check response
@@ -713,7 +713,7 @@ void RTC_setTimefromWiFi()
 int trimitator_WIFI()
 {
   int ssent;
-// get actual time before wifi
+  // get actual time before wifi
   previous = millis();
   //////////////////////////////////////////////////
   // 4. Switch ON
@@ -880,13 +880,12 @@ fazuzu:
 
 
       /*
-      USB.print(F("xxxxx"));
-      USB.print(  filename_a  );
-      USB.println(F("xxxxx"));
-      USB.print(F("xxxxx"));
-      USB.print(  strlen(  filename_a  ));
-      USB.println(F("xxxxx"));
-
+        USB.print(F("xxxxx"));
+        USB.print(  filename_a  );
+        USB.println(F("xxxxx"));
+        USB.print(F("xxxxx"));
+        USB.print(  strlen(  filename_a  ));
+        USB.println(F("xxxxx"));
       */
     }
     else
@@ -1062,16 +1061,13 @@ void data_maker( int x , char filename_a[]  )
 
 
 /*
-
-
-void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  try_RTC_set() de n ori
-{
+  void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  try_RTC_set() de n ori
+  {
   int atempts = 0;
   //////////////////////////////////////////////////
   // 2. Check if connected
   //////////////////////////////////////////////////
   error = WIFI_PRO.ON(socket);
-
   if (error == 0)
   {
     USB.println(F("1. WiFi switched ON"));
@@ -1079,8 +1075,6 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
   {
     USB.println(F("1. WiFi did not initialize correctly"));
   }
-
-
   while (status == false)
   {
     WiFi_init(); // initialize Wi-Fi communication
@@ -1091,7 +1085,6 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
     USB.println(atempts);
     // check connectivity
     status = WIFI_PRO.isConnected();
-
     // Check if module is connected
     if (status == true)
     {
@@ -1105,18 +1098,14 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
       USB.println(millis() - previous);
     }
   }
-
   //////////////////////////////////////////////////
   // 3. NTP server
   //////////////////////////////////////////////////
-
   // Check if module is connected
   if (status == true)
   {
-
     //    // 3.1. Set NTP Server (option1)
     error = WIFI_PRO.setTimeServer(1, SERVER1);
-
     // check response
     if (error == 0)
     {
@@ -1127,10 +1116,8 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
       WIFI_PRO.printErrorCode();
       status = false;
     }
-
     // 3.2. Set NTP Server (option2)
     error = WIFI_PRO.setTimeServer(2, SERVER2);
-
     // check response
     if (error == 0)
     {
@@ -1141,12 +1128,10 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
       WIFI_PRO.printErrorCode();
       status = false;
     }
-
     // 3.3. Enabled/Disable Time Sync
     if (status == true)
     {
       error = WIFI_PRO.timeActivationFlag(true);
-
       // check response
       if (error == 0)
       {
@@ -1158,12 +1143,10 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
         status = false;
       }
     }
-
     // 3.4. set GMT
     if (status == true)
     {
       error = WIFI_PRO.setGMT(time_zone);
-
       // check response
       if (error == 0)
       {
@@ -1176,23 +1159,19 @@ void pregatitor_RTC_set()  // trebuie rulat 1 data in setup apot se poate rula  
       }
     }
   }
-
   //
   //  //////////////////////////////////////////////////
   //  // 4. Switch OFF
   //  //////////////////////////////////////////////////
   //  USB.println(F("4. WiFi switched OFF\n"));
   //  WIFI_PRO.OFF(socket);
-
   USB.println(F("-----------------------------------------------------------"));
   USB.println(F("Once the module has the correct Time Server Settings"));
   USB.println(F("it is always possible to request for the Time and"));
   USB.println(F("synchronize it to the Waspmote's RTC"));
   USB.println(
     F("-----------------------------------------------------------\n"));
-
-}
-
+  }
 */
 
 
@@ -1387,7 +1366,7 @@ void all_in_1_frame_process()
 {
 
   LoRa_switchon();
-  LoRa_joinABP_send();  
+  LoRa_joinABP_send();
   LoRa_switchoff();
 
 
@@ -1424,22 +1403,22 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 
     switch (status)
     {
-    case 0:
-      USB.println(F("REPROGRAMMING ERROR"));
-      Utils.blinkRedLED(300, 3);
-      q++;
-      break;
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-    case 1:
-      USB.println(F("REPROGRAMMING OK"));
-      Utils.blinkGreenLED(300, 3);
-      w = true;
-      break;
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-    default:
-      USB.println(F("RESTARTING"));
-      Utils.blinkGreenLED(500, 1);
-      q++;
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
   }
 
@@ -1733,9 +1712,7 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
     case ERROR_CODE_0559: USB.println(F("RESERVED")); break;
     default: USB.println(F("UNKNOWN ***"));
   }
-
-
- */
+*/
 
 
 
@@ -1788,9 +1765,9 @@ void measurerr_CH4()
   USB.println(" ");
   VV1 = sum / 5;
   ppp = VV1 / 1024 * 50000;
-  if (ppp<0)
+  if (ppp < 0)
   {
-    ppp=0;
+    ppp = 0;
   }
   USB.println(" ");
   USB.print(F("  ||    ANALOG avg: "));
@@ -1805,37 +1782,36 @@ void measurerr_CH4()
 
 
 
-// citire pin digital
+  // citire pin digital
   /*
-  0        0      low
-  0.2      62
-
-  1.8      558    high
-  2        620
-   */
+    0        0      low
+    0.2      62
+    1.8      558    high
+    2        620
+  */
   sum = 0;
   for (  j = 1; j <= 5 ; j++)
   {
     answer13 = uart.waitFor(sensor_reading, answer4, timeout);
     switch (answer13)
     {
-    case 0:
-      USB.println(F("TIMEOUTED 10S "));
-      break;
-    case 1:
-      USB.print(F("Parse sensor info: "));
-      USB.println((char*)uart._buffer);
-      break;
-    case 2:
-      // Answer was ERROR reading sensor
-      USB.println(F("Answer was ERROR reading sensor"));
-      break;
-    default:
-      USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
-      USB.println(F("CODE IS MESSES UP HARD HERE!"));
+      case 0:
+        USB.println(F("TIMEOUTED 10S "));
+        break;
+      case 1:
+        USB.print(F("Parse sensor info: "));
+        USB.println((char*)uart._buffer);
+        break;
+      case 2:
+        // Answer was ERROR reading sensor
+        USB.println(F("Answer was ERROR reading sensor"));
+        break;
+      default:
+        USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
+        USB.println(F("CODE IS MESSES UP HARD HERE!"));
     }
     USB.print(F("UART data: "));
-    nnr=0;
+    nnr = 0;
     for (  jj = 0; jj < uart._length ; jj++)
     {
       USB.print(   uart._buffer[jj]  );
@@ -1852,7 +1828,7 @@ void measurerr_CH4()
   }
   USB.println(" ");
   ppp2 = sum / 5;
-  
+
   USB.print(F("SUM-digital: "));
   USB.println(sum);
 
@@ -1906,7 +1882,7 @@ void setup()
   //data_maker( 10000 ,  filename  );
 
 
-// Utils.setProgramVersion( verr );
+  // Utils.setProgramVersion( verr );
 
 
 
@@ -1924,7 +1900,8 @@ void setup()
   // pm
   USB.ON();
 
-//UART
+  //UART
+  
   uart.setBaudrate(115200);
   uart.setUART(SOCKET0);
   uart.beginUART();
@@ -1936,7 +1913,7 @@ void setup()
   LoRa_switchon();
   LoRa_changeDR();
   LoRa_getDR();
-//  LoRa_adaptiveDR();
+  //  LoRa_adaptiveDR();
   LoRa_setDeviceEUI();
   LoRa_setAppEUI();
   LoRa_AppSessionKey();
@@ -1977,7 +1954,7 @@ void loop()
 
 
 
-///////////////  NU UMBLA AICI !!!
+  ///////////////  NU UMBLA AICI !!!
   RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
@@ -2034,9 +2011,3 @@ void loop()
       "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
 }
-
-
-
-
-
-
