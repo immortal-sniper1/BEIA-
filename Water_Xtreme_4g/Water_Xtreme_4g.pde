@@ -18,7 +18,7 @@ bool sentence = false; // true for deletion on reboot  , false for data appended
 bool IRL_time = false; //  true for no external data source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
-bool RTC_SUCCES=false;
+bool RTC_SUCCES = false;
 
 char programID[10];
 // SERVER settings
@@ -1131,7 +1131,7 @@ void masurator_apa()
 
 
 
-  
+
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
   // add Socket B sensor values
@@ -1283,7 +1283,7 @@ void setup()
 
   // pm
   USB.ON();
-  loop_count=0;
+  loop_count = 0;
 
 }
 
@@ -1302,7 +1302,7 @@ void loop()
   // get actual time before loop
   prev = millis();
   loop_count++;
-   USB.println(F("loop_count: "));
+  USB.println(F("loop_count: "));
   USB.println( loop_count);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1316,12 +1316,12 @@ void loop()
 
   //OTAP_4G();
 
- USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
   /// NU UMBLA AICI!
   RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
   IN_LOOP_RTC_CHECK(  RTC_SUCCES);
 
- USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
 
 
   cycle_time = cycle_time2 - b - 5;
