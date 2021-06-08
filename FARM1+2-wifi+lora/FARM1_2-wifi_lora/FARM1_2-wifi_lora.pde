@@ -14,13 +14,13 @@ int x, b, cycle_time;
 uint8_t error;
 uint8_t status = false;
 char y[3];
-uint8_t sd_answer, ssent;
+uint8_t sd_answer;
 bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
 bool IRL_time = false; //  true for no external date source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous, previousSendFrame;
 bool RTC_SUCCES;
-int loop_count=0;
+int loop_count = 0;
 
 // choose socket (SELECT USER'S SOCKET)
 ///////////////////////////////////////
@@ -40,14 +40,9 @@ char ftp_port[] = "21";
 char ftp_user[] = "robi@agile.ro";
 char ftp_pass[] = "U$d(SEFA8+UC";
 ///////////////////////////////////////
+
 char programID[10];
-int8_t answer, verr = 13;
-int VV1;
-int uart_data_ch[100];
 
-
-// Variable to store function returns
-uint8_t answer13;
 
 
 
@@ -113,16 +108,7 @@ Gas CO(SOCKET_B);
 Gas NH3(SOCKET_C);
 Gas CH4(SOCKET_F);
 
-float temperature;
-float humidity;
-float pressure;
 
-float concCO;
-float concNH3;
-float concCH4;
-
-int OPC_status;
-int OPC_measure;
 
 
 
@@ -268,6 +254,7 @@ void setSSID_pass_reset()
 }
 int  WiFi_sendFrame()
 {
+  uint8_t ssent = 0;
   // 3.2. Send Frame
   ///////////////////////////////
   // http frame
@@ -328,8 +315,10 @@ boolean RTC_setTimeServer(char *server)
 
   // check response
   if (errorSetTimeServer == 0)
-  { sprintf (serbuf, "3.1. Time Server %s set OK \r\n", server);
-    USB.println(serbuf);
+  {
+    // sprintf (serbuf, "3.1. Time Server %s set OK \r\n", server);
+    USB.print(F("3.1. Time Server %s set OK \r\n"));
+    USB.println(server);
     statusSetTimeServer = true;
   }
   else
@@ -471,7 +460,7 @@ qwerty:
   WIFI_PRO.OFF(socket);
   USB.println(F("WiFi switched OFF\n\n"));
   b = (millis() - prev) / 1000;
-  USB.print("loop execution time[s]: ");
+  USB.print(F("loop execution time[s]: "));
   USB.println(b);
   return ssent;
 }
@@ -507,7 +496,7 @@ void SD_TEST_FILE_CHECK( char filename_st[] =  filename )   // eventual de adaug
     USB.println(F("file NOT created"));
   }
 
-  USB.print("loop cycle time[s]:= ");
+  USB.print(F("loop cycle time[s]:= "));
   USB.println(cycle_time2);
   sd_answer = SD.appendln(filename_st, "----------------------------------------------------------------------------");
   if (sd_answer == 1)
@@ -713,11 +702,11 @@ fazuzu:
 
   if (coruption == 15)
   {
-    USB.println("SD storage done with no errors");
+    USB.println(F("SD storage done with no errors"));
   } else {
-    USB.print("SD sorage done with:");
+    USB.print(F("SD sorage done with:"));
     USB.print(15 - coruption);
-    USB.println(" errors");
+    USB.println(F(" errors"));
   }
 }
 
@@ -733,16 +722,16 @@ void data_maker( int x , char filename_a[]  )
 
   for (int ii = 1 ; ii <= x ; ii++) //10MB per x=1
   {
-    USB.println(" cycles: ");
+    USB.println(F(" cycles: "));
     USB.println(ii);
     USB.println("/");
     USB.println(x);
     for (int g = 0; g < 324 ; g++)
     {
       SD.appendln(filename_a, " ");
-      USB.println(" subcycles: ");
+      USB.println(F(" subcycles: "));
       USB.println(g);
-      USB.println("/324");
+      USB.println(F("/324"));
       for (int k = 0 ; k < 324 ; k++)
         SD.append(filename_a, "eokfumpwqroifv4478fcmwpocfumwqgif17nwqrpn5fcmwifcwuifw7unpcwogr2rqfcnqwogfqprwfmqwfhwdjfbplpkp13pl ");   //100 byte per line
     }
@@ -940,7 +929,7 @@ void WiFi_init()
 
 void all_in_1_frame_process()
 {
-  ssent = 0;
+  uint8_t ssent = 0;
   ssent = WiFi_sendFrame();
 
   if (   ssent == 0)
@@ -1331,7 +1320,9 @@ void LoRa_joinABP_send()
 
 void LoRa_sendconfirmed()
 
-{ errorLoRa = LoRaWAN.sendConfirmed(PORTLORA, frame.buffer, frame.length);
+{
+  uint8_t  ssent;
+  errorLoRa = LoRaWAN.sendConfirmed(PORTLORA, frame.buffer, frame.length);
   ssent = 0;
 
   //////////////////////////////////////////////
@@ -1380,14 +1371,16 @@ void LoRa_sendconfirmed()
 void RTC_setup()   // asa era in void setup si am pus tot in functia asta
 {
   int NServers = sizeof(SERVERS) / sizeof(SERVERS[0]);
-  sprintf (serbuf, "The number of available servers in the list is %d \r\n", NServers);
-  USB.println(serbuf);
+  //sprintf (serbuf, "The number of available servers in the list is %d \r\n", NServers);
+  USB.print(F("The number of available servers in the list is %d \r\n"));
+  USB.println(NServers);
   int plk = 0;
   start_prog();
   do
   { plk++;
-    sprintf (serbuf, "We reached trial %d \r\n", plk);
-    USB.println(serbuf);
+    //sprintf (serbuf, "We reached trial %d \r\n", plk);
+    USB.println(F("We reached trial %d \r\n"));
+    USB.println(plk);
     WiFi_setup();
     statusWiFiconn = check_WiFi_conn();
     // Check if module is connected
@@ -1419,6 +1412,18 @@ SWITCHOFF:
 
 void measurerr()
 {
+
+
+  float temperature;
+  float humidity;
+  float pressure;
+
+  float concCO;
+  float concNH3;
+  float concCH4;
+
+  int OPC_status;
+  int OPC_measure;
   ///////////////////////////////////////////
   // 0. Turn on sensors and wait
   ///////////////////////////////////////////
@@ -1461,7 +1466,7 @@ void measurerr()
   CO.OFF();
   NH3.OFF();
   CH4.OFF();
-
+  delay(1000);
   ///////////////////////////////////////////
   // 3. Read particle matter sensor
   ///////////////////////////////////////////
@@ -1609,7 +1614,7 @@ void loop()
   USB.print(F("loop_count: "));
   USB.println( loop_count);
 
-  
+
   measurerr();
 
 
@@ -1624,7 +1629,7 @@ void loop()
   {
     cycle_time = 15;
   }
-  USB.print("cycle time: ");
+  USB.print(F("cycle time: "));
   USB.println(cycle_time);
 
   x = cycle_time % 60; // sec
@@ -1660,11 +1665,11 @@ void loop()
   // 5. deepsleep
   ////////////////////////////////////////////////
   USB.println(F("5. Enter deep sleep..."));
-  USB.print("X");
+  USB.print(F("X"));
   USB.print(rtc_str);
-  USB.println("X");
+  USB.println(F("X"));
 
-  USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+  USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
   USB.OFF();
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
