@@ -702,6 +702,8 @@ void HTTP_POST_4G()
   // 3. Powers off the 4G module
   ////////////////////////////////////////////////
   USB.println(F("3. Switch OFF 4G module"));
+  //_4G.enterPIN("0000");    // pt oranege
+
   _4G.OFF();
 
 
@@ -1302,7 +1304,12 @@ void loop()
   // get actual time before loop
   prev = millis();
   loop_count++;
-  USB.println(F("loop_count: "));
+  if (loop_count > 2000000000)
+    // 2147483647
+  {
+    loop_count = 0;
+  }
+  USB.print(F("loop_count: "));
   USB.println( loop_count);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
