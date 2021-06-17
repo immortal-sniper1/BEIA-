@@ -24,8 +24,8 @@ int loop_count = 0;
 
 // choose socket (SELECT USER'S SOCKET)
 ///////////////////////////////////////
-uint8_t socket = SOCKET0;
-uint8_t socketLoRa = SOCKET1;
+uint8_t socket = SOCKET1;
+uint8_t socketLoRa = SOCKET0;
 ///////////////////////////////////////
 // choose URL settings
 ///////////////////////////////////////
@@ -90,7 +90,7 @@ uint8_t datarate = 5;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "FARM1";
+char node_ID[] = "FARM13";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
@@ -932,7 +932,7 @@ void all_in_1_frame_process()
   uint8_t ssent = 0;
   ssent = WiFi_sendFrame();
 
-  if (   ssent == 0)
+  if (   ssent != 1)
   {
     LoRa_switchon();
     LoRa_joinABP_send();
@@ -1606,6 +1606,7 @@ void loop()
 {
   // get actual time before loop
   prev = millis();
+  loop_count++;
   if (loop_count > 2000000000)
     // 2147483647
   {

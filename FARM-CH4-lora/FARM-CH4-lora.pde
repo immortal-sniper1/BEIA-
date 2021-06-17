@@ -109,7 +109,7 @@ uint8_t datarate = 5;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "FARM-CH4-1";
+char node_ID[] = "FARM-CH4-2";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
@@ -1369,7 +1369,7 @@ void all_in_1_frame_process()
   LoRa_joinABP_send();
   LoRa_switchoff();
 
-
+  WiFi_sendFrame();
   scriitor_SD(filename, ssent);
 }
 
@@ -1756,7 +1756,7 @@ void measurerr_CH4()
   //USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));     // citirea pin analog
   for (  j = 1; j <= 5 ; j++)
   {
-    VV1 = analogRead(ANALOG5);
+    VV1 = analogRead(ANALOG6);
     USB.print(F("  ||    ANALOG: "));
     USB.print(VV1);
     sum = sum + VV1;
@@ -1845,6 +1845,7 @@ void measurerr_CH4()
   frame.showFrame();
   PWR.setSensorPower(SENS_3V3, SENS_OFF);
   Utils.setLED(LED1, LED_OFF);
+  WiFi_sendFrame();
 
 }
 
@@ -1901,7 +1902,7 @@ void setup()
   USB.ON();
 
   //UART
-  
+
   uart.setBaudrate(115200);
   uart.setUART(SOCKET0);
   uart.beginUART();
