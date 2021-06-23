@@ -1364,7 +1364,7 @@ void WiFi_init()
 
 void all_in_1_frame_process()
 {
-
+ssent=0;
   LoRa_switchon();
   LoRa_joinABP_send();
   LoRa_switchoff();
@@ -1742,11 +1742,11 @@ void measurerr_CH4()
   Utils.setLED(LED1, LED_ON);
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
-  delay(50000);
+  delay(10000);
   int ppp, ppp2, dd, j, nnr, jj;
   long int sum = 0;
   char answer4[] = {"ERROR reading sensor\r\n"};
-  uint32_t timeout = 10000;
+  uint32_t timeout = 5000;
   char sensor_reading[] = {"\r\n"};
   char kk[10];
 
@@ -1756,15 +1756,17 @@ void measurerr_CH4()
   //USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));     // citirea pin analog
   for (  j = 1; j <= 5 ; j++)
   {
-    VV1 = analogRead(ANALOG6);
+    VV1 = analogRead(ANALOG6);     // pin 6 pt pcb diy
     USB.print(F("  ||    ANALOG: "));
     USB.print(VV1);
     sum = sum + VV1;
+
     delay(1200);
   }
+
   USB.println(" ");
   VV1 = sum / 5;
-  ppp = VV1 / 1024 * 50000;
+  ppp = VV1  * 50000/ 1023;
   if (ppp < 0)
   {
     ppp = 0;
@@ -1773,7 +1775,7 @@ void measurerr_CH4()
   USB.print(F("  ||    ANALOG avg: "));
   USB.print(  VV1 );
   USB.print(F("  units and that is equivalent to: "));
-  USB.print(  VV1 * 3.33 / 1024 );
+  USB.print(  VV1 * 3.3333 / 1023 );
   USB.print(F("  V"));
   USB.println(" ");
 
@@ -2005,7 +2007,7 @@ void loop()
 
   USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
   USB.OFF();
-  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  //PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
   USB.println(
     F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"

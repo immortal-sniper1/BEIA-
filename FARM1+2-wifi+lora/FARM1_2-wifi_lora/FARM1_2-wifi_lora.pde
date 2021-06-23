@@ -934,6 +934,7 @@ void all_in_1_frame_process()
 
   if (   ssent != 1)
   {
+    USB.println(F("WIFI/4G failed to send atempting with LORAWAN "));
     LoRa_switchon();
     LoRa_joinABP_send();
     LoRa_switchoff();
