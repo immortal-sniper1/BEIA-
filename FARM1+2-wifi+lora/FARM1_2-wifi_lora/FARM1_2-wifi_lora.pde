@@ -76,9 +76,11 @@ uint8_t time_zone = 3;///for ROMANIA
 //variabile LORA
 // Device parameters for Back-End registration
 ////////////////////////////////////////////////////////////
-char DEVICE_EUI[]  = "0102030405060709";
-char APP_EUI[] = "70B3D57ED003FB39";
-char APP_KEY[] = "47F42DD94AC40EA2ED7D16DB71172080";
+char DEVICE_EUI[]  = "0102030405060809";   // eui farm 1      0102030405060809                                      eui farm 2    0102030405060909
+char APP_EUI[] = "70B3D57ED003FB39";    
+char APP_KEY[] = "BA6F80723C2198135675AC0267DDA704";      //appkey pt farm1    BA6F80723C2198135675AC0267DDA704            pt farm2  7E0FC98B59786166B3A6866BC727F48E
+
+
 ////////////////////////////////////////////////////////////
 
 // Define port to use in Back-End: from 1 to 223
