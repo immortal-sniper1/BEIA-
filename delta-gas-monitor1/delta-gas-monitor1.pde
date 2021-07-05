@@ -77,7 +77,7 @@ uint8_t time_zone = 3;///for ROMANIA
 // Device parameters for Back-End registration
 ////////////////////////////////////////////////////////////
 char DEVICE_EUI[]  = "0102030405060809";   // eui farm 1      0102030405060809                                      eui farm 2    0102030405060909
-char APP_EUI[] = "70B3D57ED003FB39";    
+char APP_EUI[] = "70B3D57ED003FB39";
 char APP_KEY[] = "BA6F80723C2198135675AC0267DDA704";      //appkey pt farm1    BA6F80723C2198135675AC0267DDA704            pt farm2  7E0FC98B59786166B3A6866BC727F48E
 
 
@@ -108,7 +108,7 @@ int cycle_time2 = 120; // in seconds
 
 
 Gas CH4(SOCKET_F);
-Gas CO2(SOCKET_C);
+Gas CO2(SOCKET_A);
 
 
 
@@ -936,10 +936,10 @@ void all_in_1_frame_process()
   if (   ssent != 1)
   {
     USB.println(F("WIFI/4G failed to send atempting with LORAWAN "));
-    LoRa_switchon();
-    LoRa_joinABP_send();
-    LoRa_switchoff();
-    ssent = 3;
+//    LoRa_switchon();
+//    LoRa_joinABP_send();
+//    LoRa_switchoff();
+//    ssent = 3;
   }
 
   scriitor_SD(filename, ssent);
@@ -975,22 +975,22 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 
     switch (status)
     {
-    case 0:
-      USB.println(F("REPROGRAMMING ERROR"));
-      Utils.blinkRedLED(300, 3);
-      q++;
-      break;
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-    case 1:
-      USB.println(F("REPROGRAMMING OK"));
-      Utils.blinkGreenLED(300, 3);
-      w = true;
-      break;
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-    default:
-      USB.println(F("RESTARTING"));
-      Utils.blinkGreenLED(500, 1);
-      q++;
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
   }
 
@@ -1464,31 +1464,9 @@ void measurerr()
   //Power off sensors
   CH4.OFF();
   CO2.OFF();
-  delay(1000);
-  ///////////////////////////////////////////
-  // 3. Read particle matter sensor
-  ///////////////////////////////////////////
 
-  // Turn on the particle matter sensor
-  OPC_status = PM.ON();
-  if (OPC_status == 1)
-  {
-    USB.println(F("Particle sensor started"));
-  }
-  else
-  {
-    USB.println(F("Error starting the particle sensor"));
-  }
 
-  // Get measurement from the particle matter sensor
-  if (OPC_status == 1)
-  {
-    // Power the fan and the laser and perform a measure of 5 seconds
-    OPC_measure = PM.getPM(5000, 5000);
-  }
 
-  PM.OFF();
-  USB.println(F("Particle sensor is done mesuring, and was turned OFF."));
 
 
   // create new frame 1
@@ -1497,30 +1475,21 @@ void measurerr()
   // add frame fields
   ////////////////////////////////////////////////////////////
 
+
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   // Add CH4 value
   frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  // add CO2 value
   frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2, 2);
-  frame.showFrame();
-
-  all_in_1_frame_process();
-
-
-
-  //frame2
-
-  frame.createFrame(ASCII);
   // Add temperature
   frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-  // Add humidity
+  //    // Add humidity
   frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-  // Add pressure value
+  //    // Add pressure value
   frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-  // frame 2 is made
   frame.showFrame();
 
   all_in_1_frame_process();
-
 
 }
 
@@ -1569,7 +1538,7 @@ void setup()
   SD_TEST_FILE_CHECK();
   // pm
 
-
+/*
   LoRa_switchon();
   LoRa_changeDR();
   LoRa_getDR();
@@ -1580,7 +1549,7 @@ void setup()
   LoRa_joinOTAA();
   LoRa_saveconfig();
   LoRa_switchoff();
-
+*/
 }
 
 
@@ -1609,8 +1578,8 @@ void loop()
   //OTA_check_loop();
 
   ///////////////  NU UMBLA AICI !!!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
-  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+  //RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
+  //IN_LOOP_RTC_CHECK(  RTC_SUCCES);
   cycle_time = cycle_time2 - b - 5;
   if (cycle_time < 10)
   {
