@@ -24,8 +24,8 @@ int loop_count = 0;
 
 // choose socket (SELECT USER'S SOCKET)
 ///////////////////////////////////////
-uint8_t socket = SOCKET1;
-uint8_t socketLoRa = SOCKET0;
+uint8_t socket = SOCKET0;
+uint8_t socketLoRa = SOCKET1;
 ///////////////////////////////////////
 // choose URL settings
 ///////////////////////////////////////
@@ -107,8 +107,8 @@ int cycle_time2 = 120; // in seconds
 
 
 
-Gas CH4(SOCKET_F);
-Gas CO2(SOCKET_A);
+Gas CH4(SOCKET_A);
+Gas CO2(SOCKET_C);
 
 
 
@@ -1521,14 +1521,14 @@ void setup()
   USB.ON();
   RTC.ON(); // Executes the init process
   USB.println(F("START"));
-  USB.println(F("FARM1/2+wifi+lora"));
+  USB.println(F("CH4 delta libelium"));
   //data_maker( 10000 ,  filename  );
 
 
   // Utils.setProgramVersion( verr );
 
   //OTA_setup_check(10);
-  RTC_setup();///////////////include WiFi_setup();
+  //RTC_setup();///////////////include WiFi_setup();
 
   USB.print(F("Current RTC settings:"));
   USB.println(RTC.getTime());
