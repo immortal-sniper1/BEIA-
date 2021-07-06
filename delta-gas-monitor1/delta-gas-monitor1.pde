@@ -99,7 +99,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 120; // in seconds
+int cycle_time2 = 150; // in seconds
 
 
 
@@ -1442,8 +1442,8 @@ float concentration;  // Stores the concentration level in ppm
   // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
  // USB.println(RTC.getTime());
   USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-  //PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
-  delay(60000);
+  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  //delay(60000);
   //USB.println(RTC.getTime());
   USB.println(F("wake up!!\r\n"));
 

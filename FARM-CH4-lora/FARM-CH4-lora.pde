@@ -116,7 +116,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 120; // in seconds
+int cycle_time2 = 150; // in seconds
 
 
 
@@ -1742,7 +1742,8 @@ void measurerr_CH4()
   Utils.setLED(LED1, LED_ON);
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
-  delay(10000);
+  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  USB.println(F("wake up!!\r\n"));
   int ppp, ppp2, dd, j, nnr, jj;
   long int sum = 0;
   char answer4[] = {"ERROR reading sensor\r\n"};
