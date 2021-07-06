@@ -106,9 +106,9 @@ int cycle_time2 = 120; // in seconds
 
 
 
-
-Gas CH4(SOCKET_A);
-Gas CO2(SOCKET_C);
+Gas gas_PRO_sensor(SOCKET_1);
+Gas CH4(SOCKET_1);
+Gas CO2(SOCKET_4);
 
 
 
@@ -1419,6 +1419,7 @@ void measurerr()
   float temperature;
   float humidity;
   float pressure;
+float concentration;  // Stores the concentration level in ppm
 
   float concCH4;
   float concCO2;
@@ -1431,16 +1432,19 @@ void measurerr()
 
   //Power on gas sensors
   CH4.ON();
-  CO2.ON();
+      gas_PRO_sensor.ON();
+
+  //CO2.ON();
 
 
   // Sensors need time to warm up and get a response from gas
   // To reduce the battery consumption, use deepSleep instead delay
   // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
-  USB.println(RTC.getTime());
+ // USB.println(RTC.getTime());
   USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
-  USB.println(RTC.getTime());
+  //PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  delay(60000);
+  //USB.println(RTC.getTime());
   USB.println(F("wake up!!\r\n"));
 
   ///////////////////////////////////////////
@@ -1449,13 +1453,15 @@ void measurerr()
 
   // Read the sensors and compensate with the temperature internally
   concCH4 = CH4.getConc();
-  concCO2 = CO2.getConc();
+      concentration = gas_PRO_sensor.getConc();
+
+  //concCO2 = CO2.getConc();
 
   // Read enviromental variables
-  temperature = CO2.getTemp();
+ // temperature = CO2.getTemp();
   //temperature=25;
-  humidity = CO2.getHumidity();
-  pressure = CO2.getPressure();
+  //humidity = CO2.getHumidity();
+ // pressure = CO2.getPressure();
 
   ///////////////////////////////////////////
   // 2. Turn off the sensors
@@ -1463,7 +1469,8 @@ void measurerr()
 
   //Power off sensors
   CH4.OFF();
-  CO2.OFF();
+ // CO2.OFF();
+    gas_PRO_sensor.OFF();
 
 
 
@@ -1480,13 +1487,13 @@ void measurerr()
   // Add CH4 value
   frame.addSensor(SENSOR_GASES_PRO_CH4, concCH4, 2);
   // add CO2 value
-  frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2, 2);
+  frame.addSensor(SENSOR_GASES_PRO_CO2, concentration, 2);
   // Add temperature
-  frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+ // frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
   //    // Add humidity
-  frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+  //frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
   //    // Add pressure value
-  frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
+  //frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
   frame.showFrame();
 
   all_in_1_frame_process();
@@ -1531,11 +1538,11 @@ void setup()
   //RTC_setup();///////////////include WiFi_setup();
 
   USB.print(F("Current RTC settings:"));
-  USB.println(RTC.getTime());
+ // USB.println(RTC.getTime());
 
 
   // Set SD ON
-  SD_TEST_FILE_CHECK();
+ // SD_TEST_FILE_CHECK();
   // pm
 
 /*
