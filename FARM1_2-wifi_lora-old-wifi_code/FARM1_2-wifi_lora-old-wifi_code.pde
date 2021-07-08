@@ -78,7 +78,7 @@ char server[25], serbuf[64];
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
 ///////////////////////////////////////
-uint8_t time_zone = 3;///for ROMANIA
+uint8_t time_zone = 4;///for ROMANIA
 ///////////////////////////////////////
 
 
@@ -110,7 +110,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 120; // in seconds
+int cycle_time2 = 1150; // in seconds
 
 
 
@@ -1266,6 +1266,10 @@ void measurerr_CH4()
   USB.print(F("SUM-digital: "));
   USB.println(sum);
 
+if(ppp2<0)
+{
+ppp2=-ppp2;
+}
 
 
 

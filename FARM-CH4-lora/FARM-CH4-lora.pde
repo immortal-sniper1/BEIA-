@@ -74,7 +74,7 @@ char server[25], serbuf[64];
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
 ///////////////////////////////////////
-uint8_t time_zone = 3;///for ROMANIA
+uint8_t time_zone = 4;///for ROMANIA
 ///////////////////////////////////////
 
 
@@ -109,7 +109,7 @@ uint8_t datarate = 5;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "NODE3";
+char node_ID[] = "FARM4";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
@@ -1370,14 +1370,13 @@ void all_in_1_frame_process()
   uint8_t ssent = 0;
   ssent = trimitator_WIFI();
 
-  if (   ssent != 1)
-  {
+
     USB.println(F("WIFI/4G failed to send atempting with LORAWAN "));
     LoRa_switchon();
     LoRa_joinABP_send();
     LoRa_switchoff();
     ssent = 3;
-  }
+  
 
   scriitor_SD(filename, ssent);
 }
@@ -1845,7 +1844,10 @@ void measurerr_CH4()
   USB.print(F("SUM-digital: "));
   USB.println(sum);
 
-
+if(ppp2<0)
+{
+ppp2=-ppp2;
+}
 
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
