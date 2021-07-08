@@ -116,7 +116,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 150; // in seconds
+int cycle_time2 = 1150; // in seconds
 
 
 
@@ -1267,6 +1267,7 @@ void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 
 
 
+
 void WiFi_init()
 {
   // 1. Switch ON the WiFi module
@@ -1364,12 +1365,20 @@ void WiFi_init()
 
 void all_in_1_frame_process()
 {
-ssent=0;
-  LoRa_switchon();
-  LoRa_joinABP_send();
-  LoRa_switchoff();
 
-  WiFi_sendFrame();
+
+  uint8_t ssent = 0;
+  ssent = trimitator_WIFI();
+
+  if (   ssent != 1)
+  {
+    USB.println(F("WIFI/4G failed to send atempting with LORAWAN "));
+    LoRa_switchon();
+    LoRa_joinABP_send();
+    LoRa_switchoff();
+    ssent = 3;
+  }
+
   scriitor_SD(filename, ssent);
 }
 
@@ -1768,7 +1777,7 @@ void measurerr_CH4()
 
   USB.println(" ");
   VV1 = sum / 5;
-  ppp = VV1  * 50000/ 1023;
+  ppp = VV1  * 50000 / 1023;
   if (ppp < 0)
   {
     ppp = 0;
@@ -1891,7 +1900,7 @@ void setup()
 
 
 
-
+  WiFi_init();
 
   //OTA_setup_check(10);
   RTC_setup();///////////////include WiFi_setup();
