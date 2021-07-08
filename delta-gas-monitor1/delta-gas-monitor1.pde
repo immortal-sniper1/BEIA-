@@ -92,7 +92,7 @@ uint8_t datarate = 5;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "FARM13";
+char node_ID[] = "node1";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";

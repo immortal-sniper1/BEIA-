@@ -109,7 +109,7 @@ uint8_t datarate = 5;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "FARM-CH4-2";
+char node_ID[] = "NODE3";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
@@ -1742,7 +1742,8 @@ void measurerr_CH4()
   Utils.setLED(LED1, LED_ON);
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  delay(120000);
   USB.println(F("wake up!!\r\n"));
   int ppp, ppp2, dd, j, nnr, jj;
   long int sum = 0;
