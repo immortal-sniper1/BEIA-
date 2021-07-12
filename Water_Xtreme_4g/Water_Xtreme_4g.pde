@@ -56,14 +56,11 @@ char ftp_pass[] = "1fENXK~0qMgw";
 ///senzori
 
 //[Sensor Class] [Sensor Name] [Selected socket]
-Aqualabo_OPTOD myOPTOD_E(XTR_SOCKET_E);
+VegaPuls_C21 mySensor_A(XTR_SOCKET_A);
 Aqualabo_PHEHT myPHEHT_B(XTR_SOCKET_B);
 Aqualabo_C4E myC4E_C(XTR_SOCKET_C);
 Aqualabo_MES5 myMES5_D(XTR_SOCKET_D);
-VegaPuls_C21 mySensor_A(XTR_SOCKET_A);
-
-
-
+Aqualabo_OPTOD myOPTOD_E(XTR_SOCKET_E);
 
 
 
@@ -74,7 +71,7 @@ VegaPuls_C21 mySensor_A(XTR_SOCKET_A);
 void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 {
   SD.ON();
-  USB.print(F("scriitor SD  "));
+  USB.println(F("scriitor SD  "));
 
   long int size, m;
   m = 104857600 ; //100MB file size
@@ -253,11 +250,11 @@ fazuzu:
 
   if (coruption == 15)
   {
-    USB.println("SD storage done with no errors");
+    USB.println(F("SD storage done with no errors"));
   } else {
-    USB.print("SD sorage done with:");
+    USB.print(F("SD sorage done with:"));
     USB.print(15 - coruption);
-    USB.println(" errors");
+    USB.println(F(" errors"));
   }
 }
 
@@ -269,16 +266,16 @@ void data_maker( int x , char filename_a[]  )
 
   for (int ii = 1 ; ii <= x ; ii++) //10MB per x=1
   {
-    USB.println(" cycles: ");
+    USB.println(F(" cycles: "));
     USB.println(ii);
-    USB.println("/");
+    USB.println(F("/"));
     USB.println(x);
     for (int g = 0; g < 324 ; g++)
     {
       SD.appendln(filename_a, " ");
-      USB.println(" subcycles: ");
+      USB.println(F(" subcycles: "));
       USB.println(g);
-      USB.println("/324");
+      USB.println(F("/324"));
       for (int k = 0 ; k < 324 ; k++)
         SD.append(filename_a, "eokfumpwqroifv4478fcmwpocfumwqgif17nwqrpn5fcmwifcwuifw7unpcwogr2rqfcnqwogfqprwfmqwfhwdjfbplpkp13plo");   //100 byte per line
     }
@@ -298,7 +295,7 @@ void INFO_4G_MDD()
   int temperature;
   USB.ON();
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
-  USB.println("Start INFO_4G_MDD");
+  USB.println(F("Start INFO_4G_MDD"));
   delay(5000);
   /////////////////////////////////////////////////
   // 1. Switch on the 4G module
@@ -605,7 +602,7 @@ void HTTP_GET_4G()
     {
       USB.print(F("Done. HTTP code: "));
       USB.println(_4G._httpCode);
-      USB.print("Server response: ");
+      USB.print(F("Server response: "));
       USB.println(_4G._buffer, _4G._length);
     }
     else
@@ -681,7 +678,7 @@ void HTTP_POST_4G()
     {
       USB.print(F("Done. HTTP code: "));
       USB.println(_4G._httpCode);
-      USB.print("Server response: ");
+      USB.print(F("Server response: "));
       USB.println(_4G._buffer, _4G._length);
     }
     else
@@ -736,7 +733,7 @@ int HTTP_4G_TRIMITATOR_FRAME()
     {
       USB.print(F("Done. HTTP code: "));
       USB.println(_4G._httpCode);
-      USB.print("Server response: ");
+      USB.print(F("Server response: "));
       USB.println(_4G._buffer, _4G._length);
       ssent = _4G._httpCode;
       if ( ssent == 200)
@@ -1269,7 +1266,7 @@ void setup()
     USB.println(F("file NOT created"));
   }
 
-  USB.print("loop cycle time[s]:= ");
+  USB.print(F("loop cycle time[s]:= "));
   USB.println(cycle_time2);
   sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
   if (sd_answer == 1)
@@ -1374,11 +1371,11 @@ void loop()
   // 5. Sleep
   ////////////////////////////////////////////////
   USB.println(F("5. Enter deep sleep..."));
-  USB.print("X");
+  USB.print(F("X"));
   USB.print(rtc_str);
-  USB.println("X");
+  USB.println(F("X"));
 
-  //USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+  //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
   USB.println(RTC.getTimestamp());
   USB.OFF();
   //delay(30000);
