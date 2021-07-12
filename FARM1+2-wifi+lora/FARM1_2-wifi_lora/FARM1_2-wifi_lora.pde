@@ -67,7 +67,7 @@ char server[25], serbuf[64];
 
 // Define Time Zone from -12 to 12 (i.e. GMT+2)
 ///////////////////////////////////////
-uint8_t time_zone = 3;///for ROMANIA
+uint8_t time_zone = 4;///for ROMANIA
 ///////////////////////////////////////
 
 
@@ -76,9 +76,9 @@ uint8_t time_zone = 3;///for ROMANIA
 //variabile LORA
 // Device parameters for Back-End registration
 ////////////////////////////////////////////////////////////
-char DEVICE_EUI[]  = "0102030405060809";   // eui farm 1      0102030405060809                                      eui farm 2    0102030405060909
-char APP_EUI[] = "70B3D57ED003FB39";    
-char APP_KEY[] = "BA6F80723C2198135675AC0267DDA704";      //appkey pt farm1    BA6F80723C2198135675AC0267DDA704            pt farm2  7E0FC98B59786166B3A6866BC727F48E
+char DEVICE_EUI[]  = "0102030405060909";   // eui farm 1      0102030405060809                                      eui farm 2    0102030405060909
+char APP_EUI[] = "70B3D57ED003FB39";
+char APP_KEY[] = "7E0FC98B59786166B3A6866BC727F48E";      //appkey pt farm1    BA6F80723C2198135675AC0267DDA704            pt farm2  7E0FC98B59786166B3A6866BC727F48E
 
 
 ////////////////////////////////////////////////////////////
@@ -92,14 +92,14 @@ uint8_t datarate = 5;
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "FARM13";
+char node_ID[] = "FARM2";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 120; // in seconds
+int cycle_time2 = 1120; // in seconds
 
 
 
@@ -933,15 +933,8 @@ void all_in_1_frame_process()
 {
   uint8_t ssent = 0;
   ssent = WiFi_sendFrame();
+  trimitator_WIFI();
 
-  if (   ssent != 1)
-  {
-    USB.println(F("WIFI/4G failed to send atempting with LORAWAN "));
-    LoRa_switchon();
-    LoRa_joinABP_send();
-    LoRa_switchoff();
-    ssent = 3;
-  }
 
   scriitor_SD(filename, ssent);
 }
@@ -976,22 +969,22 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 
     switch (status)
     {
-    case 0:
-      USB.println(F("REPROGRAMMING ERROR"));
-      Utils.blinkRedLED(300, 3);
-      q++;
-      break;
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-    case 1:
-      USB.println(F("REPROGRAMMING OK"));
-      Utils.blinkGreenLED(300, 3);
-      w = true;
-      break;
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-    default:
-      USB.println(F("RESTARTING"));
-      Utils.blinkGreenLED(500, 1);
-      q++;
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
   }
 
@@ -1104,270 +1097,6 @@ void OTA_check_loop(char server[] = ftp_server,     char port[] = ftp_port,    c
 
 
 
-
-/////////////////////LORA/////////////////////////
-
-void LoRa_switchon()
-{ // 1. Switch on
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.ON(socketLoRa);
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("1. Switch ON OK"));
-  }
-  else
-  {
-    USB.print(F("1. Switch ON error = "));
-    USB.println(errorLoRa, DEC);
-    errorLoRa_config = 1;
-  }
-}
-
-void LoRa_adaptiveDR()
-{ // 2. Enable Adaptive Data Rate (ADR)
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.setADR("on");
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.print(F("2. Adaptive Data Rate enabled OK. "));
-    USB.print(F("ADR:"));
-    USB.println(LoRaWAN._adr, DEC);
-  }
-  else
-  {
-    USB.print(F("2. Enable data rate error = "));
-    USB.println(errorLoRa, DEC);
-  }
-
-}
-void LoRa_changeDR()
-{ // 2. Change data rate
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.setDataRate(datarate);
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("3. Data rate set OK"));
-  }
-  else
-  {
-    USB.print(F("3. Data rate set error= "));
-    USB.println(errorLoRa, DEC);
-    errorLoRa_config = 2;
-  }
-
-}
-
-void LoRa_getDR()
-
-{ errorLoRa = LoRaWAN.getDataRate();
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.print(F("4. Data rate get OK. "));
-    USB.print(F("Data rate index:"));
-    USB.println(LoRaWAN._dataRate, DEC);
-  }
-  else
-  {
-    USB.print(F("4. Data rate get error = "));
-    USB.println(errorLoRa, DEC);
-  }
-
-}
-void LoRa_setDeviceEUI()
-{ // 3. Set Device EUI
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.setDeviceEUI(DEVICE_EUI);
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("5. Device EUI set OK"));
-  }
-  else
-  {
-    USB.print(F("5. Device EUI set error = "));
-    USB.println(errorLoRa, DEC);
-    errorLoRa_config = 3;
-  }
-
-}
-
-void LoRa_setAppEUI()
-{ // 4. Set Application EUI
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.setAppEUI(APP_EUI);
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("6. Application EUI set OK"));
-  }
-  else
-  {
-    USB.print(F("6. Application EUI set error = "));
-    USB.println(errorLoRa, DEC);
-    errorLoRa_config = 4;
-  }
-}
-
-void LoRa_AppSessionKey()
-{ // 5. Set Application Session Key
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.setAppKey(APP_KEY);
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("7. Application Key set OK"));
-  }
-  else
-  {
-    USB.print(F("7. Application Key set error = "));
-    USB.println(errorLoRa, DEC);
-    errorLoRa_config = 5;
-  }
-}
-
-void LoRa_joinOTAA()
-{ errorLoRa = LoRaWAN.joinOTAA();
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("8. Join network OK"));
-  }
-  else
-  {
-    USB.print(F("8. Join network error = "));
-    USB.println(error, DEC);
-    errorLoRa_config = 6;
-  }
-}
-
-void LoRa_saveconfig()
-{ // 7. Save configuration
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.saveConfig();
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("9. Save configuration OK"));
-  }
-  else
-  {
-    USB.print(F("9. Save configuration error = "));
-    USB.println(errorLoRa, DEC);
-    errorLoRa_config = 7;
-  }
-}
-
-void LoRa_switchoff()
-{
-  // 8. Switch off
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.OFF(socketLoRa);
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("10. Switch OFF OK"));
-  }
-  else
-  {
-    USB.print(F("10. Switch OFF error = "));
-    USB.println(error, DEC);
-    errorLoRa_config = 8;
-  }
-}
-
-void LoRa_joinABP_send()
-
-{ // 2. Join network
-  //////////////////////////////////////////////
-
-  errorLoRa = LoRaWAN.joinABP();
-
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("2. Join network OK"));
-    LoRa_changeDR();
-    LoRa_getDR();
-    LoRa_sendconfirmed();
-
-  }
-  else
-  {
-    USB.print(F("2. Join network error = "));
-    USB.println(errorLoRa, DEC);
-  }
-
-}
-
-void LoRa_sendconfirmed()
-
-{
-  uint8_t  ssent;
-  errorLoRa = LoRaWAN.sendConfirmed(PORTLORA, frame.buffer, frame.length);
-  ssent = 0;
-
-  //////////////////////////////////////////////
-  // 3. Send Confirmed packet
-  //////////////////////////////////////////////
-
-
-
-  // Error messages:
-  //    /*
-  //     * '6' : Module hasn't joined a network
-  //     * '5' : Sending error
-  //     * '4' : Error with data length
-  //     * '2' : Module didn't response
-  //     * '1' : Module communication error
-  //     */
-  // Check status
-  if ( errorLoRa == 0 )
-  {
-    USB.println(F("3. Send Confirmed packet OK"));
-    ssent = 1;
-    if (LoRaWAN._dataReceived == true)
-    {
-      USB.print(F("   There's data on port number "));
-      USB.print(LoRaWAN._port, DEC);
-      USB.print(F(".\r\n   Data: "));
-      USB.println(LoRaWAN._data);
-    }
-  }
-
-  else
-  {
-    USB.print(F("3. Send Confirmed packet error = "));
-    USB.println(errorLoRa, DEC);
-    ssent = 0;
-  }
-
-
-
-}
-
-/////////////////////LORA/////////////////////////
 
 
 
@@ -1587,16 +1316,7 @@ void setup()
   // pm
 
 
-  LoRa_switchon();
-  LoRa_changeDR();
-  LoRa_getDR();
-  //  LoRa_adaptiveDR();
-  LoRa_setDeviceEUI();
-  LoRa_setAppEUI();
-  LoRa_AppSessionKey();
-  LoRa_joinOTAA();
-  LoRa_saveconfig();
-  LoRa_switchoff();
+
 
 }
 
