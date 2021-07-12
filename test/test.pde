@@ -1,221 +1,138 @@
 /*  
- *  ------ WIFI Example -------- 
+ *  ------ [SD_12] - Format SD file  -------- 
  *  
- *  Explanation: This example shows how to configure the WiFi module
- *  to join a specific Access Point. So, ESSID and password must be 
- *  defined.
- *  
+ *  Explanation: Turn on the SD card. Format SD card. erasing all data
+ *  and formatting the SD card as FAT16. This example is based on the 
+ *  William Greiman's SdFat library and examples:
+ *    http://code.google.com/p/sdfatlib
+  
  *  Copyright (C) 2016 Libelium Comunicaciones Distribuidas S.L. 
  *  http://www.libelium.com 
  *  
- *  This program is free software: you can redistribute it and/or modify  
- *  it under the terms of the GNU General Public License as published by  
- *  the Free Software Foundation, either version 3 of the License, or  
- *  (at your option) any later version.  
- *   
- *  This program is distributed in the hope that it will be useful,  
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of  
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
- *  GNU General Public License for more details.  
- *   
- *  You should have received a copy of the GNU General Public License  
- *  along with this program.  If not, see .
+ *  This program is free software: you can redistribute it and/or modify 
+ *  it under the terms of the GNU General Public License as published by 
+ *  the Free Software Foundation, either version 3 of the License, or 
+ *  (at your option) any later version. 
+ *  
+ *  This program is distributed in the hope that it will be useful, 
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ *  GNU General Public License for more details. 
+ *  
+ *  You should have received a copy of the GNU General Public License 
+ *  along with this program.  If not, see . 
  *  
  *  Version:           3.0
- *  Design:            David Gascon 
+ *  Design:            David Gascón 
  *  Implementation:    Yuri Carmona
  */
 
+// variable
+boolean answer;
 
-#include <WaspWIFI_PRO.h>
+// define file name: MUST be 8.3 SHORT FILE NAME
+char filename[]="FILE.TXT";
 
+// All directory names MUST be defined 
+// according to 8.3 SHORT FILE NAME
+char foldername[]="FOLDER";
 
-// choose socket (SELECT USER'S SOCKET)
-///////////////////////////////////////
-uint8_t socket = SOCKET0;
-///////////////////////////////////////
-
-// WiFi AP settings (CHANGE TO USER'S AP)
-///////////////////////////////////////
-char ESSID[] = "LANCOMBEIA";
-char PASSW[] = "beialancom";
-///////////////////////////////////////
-
-// define variables
-uint8_t error;
-uint8_t status;
-unsigned long previous;
-
-
-
-void setup() 
+void setup()
 {
-  USB.println(F("Start program"));  
+  // Open USB port
+  USB.ON();
+  USB.println(F("SD_12 example"));
+    
+  USB.print(F("\n"
+    "This sketch erases and formats SD/SDHC cards.\n"
+    "\n"
+    "Erase uses the card's fast flash erase command.\n"
+    "Flash erase sets all data to 0X00 for most cards\n"
+    "and 0XFF for a few vendor's cards.\n"
+    "\nWarning, all data on the card will be erased.\n"));
 
-
-  //////////////////////////////////////////////////
-  // 1. Switch ON the WiFi module
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.ON(socket);
-
-  if (error == 0)
-  {    
-    USB.println(F("1. WiFi switched ON"));
-  }
-  else
-  {
-    USB.println(F("1. WiFi did not initialize correctly"));
-  }
-
-
-  //////////////////////////////////////////////////
-  // 2. Reset to default values
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.resetValues();
-
-  if (error == 0)
-  {    
-    USB.println(F("2. WiFi reset to default"));
-  }
-  else
-  {
-    USB.println(F("2. WiFi reset to default ERROR"));
-  }
-
-
-  //////////////////////////////////////////////////
-  // 3. Set ESSID
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.setESSID(ESSID);
-
-  if (error == 0)
-  {    
-    USB.println(F("3. WiFi set ESSID OK"));
-  }
-  else
-  {
-    USB.println(F("3. WiFi set ESSID ERROR"));
-  }
-
-
-  //////////////////////////////////////////////////
-  // 4. Set password key (It takes a while to generate the key)
-  // Authentication modes:
-  //    OPEN: no security
-  //    WEP64: WEP 64
-  //    WEP128: WEP 128
-  //    WPA: WPA-PSK with TKIP encryption
-  //    WPA2: WPA2-PSK with TKIP or AES encryption
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.setPassword(WPA2, PASSW);
-
-  if (error == 0)
-  {    
-    USB.println(F("4. WiFi set AUTHKEY OK"));
-  }
-  else
-  {
-    USB.println(F("4. WiFi set AUTHKEY ERROR"));
-  }
-
-
-  //////////////////////////////////////////////////
-  // 5. Software Reset 
-  // Parameters take effect following either a 
-  // hardware or software reset
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.softReset();
-
-  if (error == 0)
-  {    
-    USB.println(F("5. WiFi softReset OK"));
-  }
-  else
-  {
-    USB.println(F("5. WiFi softReset ERROR"));
-  }
-
-
-  USB.println(F("*******************************************"));
-  USB.println(F("Once the module is configured with ESSID"));
-  USB.println(F("and PASSWORD, the module will attempt to "));
-  USB.println(F("join the specified Access Point on power up"));
-  USB.println(F("*******************************************\n"));
-
-  // get current time
-  previous = millis();
 }
-
 
 
 void loop()
-{ 
-// get actual time
-  previous = millis();
-
-
-  //////////////////////////////////////////////////
-  // 1. Switch ON the WiFi module
-  //////////////////////////////////////////////////
-  error = WIFI_PRO.ON(socket);
-
-  if( error == 0 )
-  {    
-    USB.println(F("1. WiFi switched ON"));
+{
+  /* First of all, teh user executes these functions 
+  *  when the system is sure. The formatting process
+  *  must be done securely
+  */
+  char c;  
+  USB.print(F("Enter 'Y' to format the SD card: "));
+  USB.flush();
+  while (!USB.available()) {
   }
-  else
+  delay(400);
+
+  c = USB.read();
+  USB.println(c);
+
+  if (c != 'Y') 
   {
-    USB.println(F("1. WiFi did not initialize correctly"));
+    USB.print(F("Quiting, you did not enter 'Y'.\n"));
+    return;
   }
   
 
+  // Set SD ON
+  SD.ON();
 
-  //////////////////////////////////////////////////
-  // 2. Join AP
-  //////////////////////////////////////////////////  
+  // 1. list Root directory
+  USB.println(F("list Root directory:"));
+  USB.println(F("---------------------------"));
+  SD.ls(LS_R|LS_DATE|LS_SIZE);  
+  USB.println(F("---------------------------\n"));
 
-  // check connectivity
-  status =  WIFI_PRO.isConnected();
-
-  // Check if module is connected
-  if( status == true )
-  { 
-    USB.print(F("2. WiFi is connected OK"));
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);
-
-    for( int i=0; i<10; i++ )
-    {
-      // 3. ping
-      error = WIFI_PRO.ping("www.google.com"); 
-    
-      // check response
-      if( error == 0 )
-      {
-        USB.print(F("Round Trip Time (ms) = "));
-        USB.println( WIFI_PRO._rtt, DEC );      
-      }
-      else
-      {
-        USB.println(F("Error calling 'ping' function"));
-        WIFI_PRO.printErrorCode();
-      }
-      
-      delay(1000);
-    }
+  // 1. create directory
+  if(SD.mkdir(foldername)) 
+  {
+    USB.println(F("directory created"));
   }
   else
   {
-    USB.print(F("2. WiFi is connected ERROR")); 
-    USB.print(F(" Time(ms):"));    
-    USB.println(millis()-previous);  
+    USB.println(F("mkdir failed"));
+  }
+
+  // 2. create file
+  if(SD.create(filename))
+  {
+    USB.println(F("file created"));
+  }
+  else 
+  {
+    USB.println(F("file NOT created"));  
+  }  
+
+  // 3. list Root directory  
+  USB.println(F("list Root directory:"));
+  USB.println(F("---------------------------"));
+  SD.ls(LS_R|LS_DATE|LS_SIZE);  
+  USB.println(F("---------------------------\n"));
+
+  // 4. format SD card
+  USB.print(F("Formatting..."));
+  answer = SD.format();  
+
+  if( answer == true ) 
+  {
+    USB.println(F("SD format OK"));
+  }
+  else
+  {
+    USB.println(F("SD format failed"));
   }
 
 
-  //////////////////////////////////////////////////
-  // 3. Switch OFF the WiFi module
-  //////////////////////////////////////////////////
-  WIFI_PRO.OFF(socket);
-  USB.println(F("3. WiFi switched OFF\n\n"));
-  delay(10000);
+
+  USB.println(F("\n\n**************************************************\n\n"));
+
+
+  // Set SD ON
+  SD.OFF();
+
+  delay(5000);
 }
+

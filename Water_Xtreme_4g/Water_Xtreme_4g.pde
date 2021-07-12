@@ -33,11 +33,11 @@ char SD_FILE[]     = "FILE1.TXT";
 char SERVER_FILE[] = "HHKFILE2.TXT";
 uint8_t connection_status, net_in_attempt;
 char operator_name[20];
-
+uint8_t program_verrr;
 
 
 //EDITEAZA AICI!
-int  cycle_time2 = 60; // in seconds
+int  cycle_time2 = 1150; // in seconds
 char node_ID[] = "SWX1";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 // APN settings
@@ -50,8 +50,8 @@ char password[] = "";
 ///////////////////////////////////////
 char ftp_server[] = "ftp.agile.ro";
 uint16_t ftp_port = 21;
-char ftp_user[] = "robi@agile.ro";
-char ftp_pass[] = "U$d(SEFA8+UC";
+char ftp_user[] = "folderone@agile.ro";
+char ftp_pass[] = "1fENXK~0qMgw";
 
 ///senzori
 
@@ -1147,8 +1147,10 @@ void masurator_apa()
   frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
   frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  frame.addSensor(SENSOR_RAM, program_verrr );   //versiune program
   // set frame fields (Time from RTC)
   frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
+
 
   // 4. Calculation of level percentage
   //  float levelPercentage = 100 - ((mySensor.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor.VegaPulsC21.distance));
@@ -1226,7 +1228,7 @@ void setup()
   //HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  //OTA_setup_check(10);
+  OTA_setup_check(10);
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1314,21 +1316,20 @@ void loop()
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
+  program_verrr = Utils.getProgramVersion();    //versiune program
   masurator_apa();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  //OTAP_4G();
+  OTAP_4G();
 
-  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
   /// NU UMBLA AICI!
   RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
-  IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+  IN_LOOP_RTC_CHECK( RTC_SUCCES);
 
-  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
 
 
   cycle_time = cycle_time2 - b - 5;
@@ -1378,6 +1379,7 @@ void loop()
   USB.println("X");
 
   //USB.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+  USB.println(RTC.getTimestamp());
   USB.OFF();
   //delay(30000);
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
