@@ -31,11 +31,20 @@ yy = int(3)    # y will be 3
 zy = float(3)  # z will be 3.0
 
 
+fruits = ["apple", "banana", "cherry"]
+x, y, z = fruits
+
+print(x)
+print(y)
+print(z)
+print(x)
 
 
 
-
-
+x = "Python is "
+y = "SHIT"
+z =  x + y
+print(z)
 
 
 

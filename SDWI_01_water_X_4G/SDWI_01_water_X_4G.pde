@@ -1127,9 +1127,11 @@ void masurator_apa()
   // Turn off the sensor
   mySensor_A.OFF();
 
-
-
-
+  USB.print(F("radar data mySensor.VegaPulsC21.distance: "));
+  USB.println(mySensor_A.VegaPulsC21.distance);
+  USB.print(F("radar data mySensor_A.VegaPulsC21.stage: "));
+  USB.println(mySensor_A.VegaPulsC21.stage);
+  USB.println(F("  "));
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
@@ -1150,7 +1152,7 @@ void masurator_apa()
 
 
   // 4. Calculation of level percentage
-  //  float levelPercentage = 100 - ((mySensor.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor.VegaPulsC21.distance));
+  //  float levelPercentage = 100 - ((mySensor_A.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor_A.VegaPulsC21.distance));
 
   //use  https://development.libelium.com/data-frame-programming-guide/frame-structure#smart-water-xtreme
   //frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);
