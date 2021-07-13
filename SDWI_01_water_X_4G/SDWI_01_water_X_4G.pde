@@ -1,7 +1,7 @@
 #include <WaspFrame.h>
 #include <Wasp4G.h>
 #include <WaspSensorXtr.h>
-
+//#include <SensorXtr.h>
 
 
 //NU UNBLA AICI!!
@@ -712,7 +712,8 @@ void HTTP_POST_4G()
 int HTTP_4G_TRIMITATOR_FRAME()
 {
 
-  int ssent;
+  int ssent=0;
+    int ssent2;
   //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
@@ -735,8 +736,8 @@ int HTTP_4G_TRIMITATOR_FRAME()
       USB.println(_4G._httpCode);
       USB.print(F("Server response: "));
       USB.println(_4G._buffer, _4G._length);
-      ssent = _4G._httpCode;
-      if ( ssent == 200)
+      ssent2 = _4G._httpCode;
+      if ( ssent2 == 200)
       {
         ssent = 1;
       }
@@ -1084,6 +1085,7 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 
 void masurator_apa()
 {
+  int joyy;
   // Socket B sensor
   // Turn ON the sensor
   myPHEHT_B.ON();
@@ -1146,7 +1148,8 @@ void masurator_apa()
   frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
   frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  frame.addSensor(SENSOR_RAM, program_verrr );   //versiune program
+  frame.addSensor(SENSOR_VAPI, program_verrr );   //versiune program       eventual schimbat cu SENSOR_VAPI
+  //Version of API N/A SENSOR_VAPI 125 VAPI 1 uint8_t 1 N/A N/A
   // set frame fields (Time from RTC)
   frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
 
@@ -1162,7 +1165,15 @@ void masurator_apa()
 
 
   frame.showFrame();
+  joyy = 0;
+gooo:
   ssent = HTTP_4G_TRIMITATOR_FRAME();
+  if ( ssent != 1 && joyy <= resend_f)
+  {
+    joyy++;
+    delay(1000);
+    goto gooo;
+  }
   scriitor_SD(filename, ssent);
 
 
@@ -1186,15 +1197,24 @@ void masurator_apa()
   frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
   frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
 
-  // add Socket A sensor values
-  frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
-  frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
-  frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
-  frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+  // add Socket A sensor values                           // astea sunt copi a celor din socket C
+  //frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+  //frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+  //frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+  //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+  frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
 
 
   frame.showFrame();
+  joyy = 0;
+gooo2:
   ssent = HTTP_4G_TRIMITATOR_FRAME();
+  if ( ssent != 1 && joyy <= resend_f)
+  {
+    joyy++;
+    delay(1000);
+    goto gooo2;
+  }
   scriitor_SD(filename, ssent);
 }
 
