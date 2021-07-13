@@ -712,8 +712,8 @@ void HTTP_POST_4G()
 int HTTP_4G_TRIMITATOR_FRAME()
 {
 
-  int ssent=0;
-    int ssent2;
+  int ssent = 0;
+  int ssent2;
   //////////////////////////////////////////////////
   // 1. Switch ON
   //////////////////////////////////////////////////
@@ -1041,7 +1041,10 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
   bool w = false;
   while ( q <= att && w == false)
   {
-
+    USB.print(F("atempt: "));
+    USB.print(q);
+    USB.print(F("/"));
+    USB.println(att);
     // show program ID
     Utils.getProgramID(programID);
     USB.println(F("-----------------------------"));
@@ -1135,10 +1138,10 @@ void masurator_apa()
   USB.println(mySensor_A.VegaPulsC21.stage);
   USB.println(F("  "));
 
-  frame.createFrame(ASCII, node_ID); // frame1 
+  frame.createFrame(ASCII, node_ID); // frame1
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
 
-  
+
   // add Socket B sensor values
   frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
   frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
@@ -1249,7 +1252,7 @@ void setup()
   //HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  OTA_setup_check(10);
+  OTA_setup_check(5);
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
