@@ -1135,8 +1135,10 @@ void masurator_apa()
   USB.println(mySensor_A.VegaPulsC21.stage);
   USB.println(F("  "));
 
-  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
+  frame.createFrame(ASCII, node_ID); // frame1 
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
+
+  
   // add Socket B sensor values
   frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
   frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
@@ -1180,7 +1182,7 @@ gooo:
 
   delay(2000);
 
-  frame.createFrame(ASCII, node_ID); // frame1 de  stocat
+  frame.createFrame(ASCII, node_ID); // frame2
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
 
 
