@@ -1137,6 +1137,64 @@ void masurator_apa()
   USB.print(F("radar data mySensor_A.VegaPulsC21.stage: "));
   USB.println(mySensor_A.VegaPulsC21.stage);
   USB.println(F("  "));
+  // frame de trimis
+
+  frame.createFrame(BINARY, node_ID); // frame2
+  frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
+
+  // add Socket B sensor values
+  frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
+  frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
+  frame.addSensor(WTRX_PHEHT_PM_B, myPHEHT_B.sensorPHEHT.pHMV);
+  frame.addSensor(WTRX_PHEHT_RX_B, myPHEHT_B.sensorPHEHT.redox);
+  // add Socket E sensor values
+  frame.addSensor(WTRX_OPTOD_TC1_E, myOPTOD_E.sensorOPTOD.temperature);
+  frame.addSensor(WTRX_OPTOD_OS_E, myOPTOD_E.sensorOPTOD.oxygenSAT);
+  frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
+  frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  frame.addSensor(SENSOR_VAPI, program_verrr );   //versiune program       eventual schimbat cu SENSOR_VAPI
+  frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
+  // add Socket D sensor values
+  frame.addSensor(WTRX_MES5_TC6_D, myMES5_D.sensorMES5.temperature);
+  frame.addSensor(WTRX_MES5_SB_D, myMES5_D.sensorMES5.sludgeBlanket);
+  frame.addSensor(WTRX_MES5_SS_D, myMES5_D.sensorMES5.suspendedSolids);
+  frame.addSensor(WTRX_MES5_TF_D, myMES5_D.sensorMES5.turbidityFAU);
+
+  // add Socket C sensor values
+  frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+  frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+  frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+  frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+
+  // add Socket A sensor values                           // astea sunt copi a celor din socket C
+  //frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+  //frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+  //frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+  //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+  frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
+
+
+ // frame.showFrame();
+
+if ( PWR.getBatteryLevel()< 20)
+{
+    USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
+  goto RIUK;
+}
+
+  
+  joyy = 0;
+gooo:
+  ssent = HTTP_4G_TRIMITATOR_FRAME();
+  if ( ssent != 1 && joyy <= resend_f)
+  {
+    joyy++;
+    delay(1000);
+    goto gooo;
+  }
+RIUK:
+
 
   frame.createFrame(ASCII, node_ID); // frame1
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
@@ -1157,7 +1215,7 @@ void masurator_apa()
   //Version of API N/A SENSOR_VAPI 125 VAPI 1 uint8_t 1 N/A N/A
   // set frame fields (Time from RTC)
   frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
-
+  frame.showFrame();
 
   // 4. Calculation of level percentage
   //  float levelPercentage = 100 - ((mySensor_A.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor_A.VegaPulsC21.distance));
@@ -1168,22 +1226,18 @@ void masurator_apa()
   //frame.addSensor(WTRX_C21_TC7_A, levelPercentage);
 
 
-
-  frame.showFrame();
-  joyy = 0;
-gooo:
-  ssent = HTTP_4G_TRIMITATOR_FRAME();
-  if ( ssent != 1 && joyy <= resend_f)
-  {
-    joyy++;
-    delay(1000);
-    goto gooo;
-  }
-  scriitor_SD(filename, ssent);
-
-
-
-  delay(2000);
+  /*
+    joyy = 0;
+    gooo:
+    ssent = HTTP_4G_TRIMITATOR_FRAME();
+    if ( ssent != 1 && joyy <= resend_f)
+    {
+      joyy++;
+      delay(1000);
+      goto gooo;
+    }
+    scriitor_SD(filename, ssent);
+  */
 
   frame.createFrame(ASCII, node_ID); // frame2
   frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
@@ -1209,18 +1263,14 @@ gooo:
   //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
   frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
 
-
   frame.showFrame();
-  joyy = 0;
-gooo2:
-  ssent = HTTP_4G_TRIMITATOR_FRAME();
-  if ( ssent != 1 && joyy <= resend_f)
-  {
-    joyy++;
-    delay(1000);
-    goto gooo2;
-  }
+
   scriitor_SD(filename, ssent);
+
+
+
+
+
 }
 
 
