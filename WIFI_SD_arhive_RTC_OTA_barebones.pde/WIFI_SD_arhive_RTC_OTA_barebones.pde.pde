@@ -114,7 +114,7 @@ qwerty:
 
 	switchoff_WiFi();
 	b = (millis() - prev) / 1000;
-	USB.print("loop execution time[s]: ");
+	USB.print(F("loop execution time[s]: "));
 	USB.println(b);
 	return ssent;
 }
@@ -153,7 +153,7 @@ void SD_TEST_FILE_CHECK( char filename_st[] =  filename )   // eventual de adaug
 		USB.println(F("file NOT created"));
 	}
 
-	USB.print("loop cycle time[s]:= ");
+	USB.print(F("loop cycle time[s]:= "));
 	USB.println(cycle_time2);
 	sd_answer = SD.appendln(filename_st, "----------------------------------------------------------------------------");
 	if (sd_answer == 1)
@@ -410,7 +410,7 @@ void data_maker( int x , char filename_a[]  )
 
 
 
-
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
 
@@ -448,10 +448,11 @@ SWITCHOFF:
 
 
 
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
 
-
+/*
 
 
 ////////////////////FUNCTII///////////////////////////
@@ -779,79 +780,26 @@ void RTC_setTimefromWiFi()
 }
 
 
+
+
+*/
+
+
+
+
+
+
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
 void IN_LOOP_RTC_CHECK( bool RTC_SUCCES)
 {
-	if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)  )
-	{
-		USB.println(F("Atempt RTC on weekly basis to make sure it is correct"));
-		RTC_setTimefromWiFi();
-	}
+  if (  (RTC_SUCCES = false) || (intFlag & RTC_INT)  )
+  {
+    USB.println(F("Atempt RTC on weekly basis to make sure it is correct"));
+    RTC_setTimefromWiFi();
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
