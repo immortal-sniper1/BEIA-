@@ -5,6 +5,7 @@
 // define variable SD
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[] = "FILE1.TXT";
+int loop_count;
 char *time_date; // stores curent date + time
 int x, b, cycle_time;
 uint8_t error;
@@ -831,15 +832,39 @@ void all_in_1_frame_process()
   }
   else
   {
-    if ( PWR.getBatteryLevel() < 20 )
+    if ( PWR.getBatteryLevel() >= 30 )
     {
-      ssent = 0;
+      if ( loop_count % 2 == 0)
+      {
+        ssent = trimitator_WIFI();
+      }
+      else
+      {
+        USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
+      }
     }
     else
     {
-      ssent = trimitator_WIFI();  // eventual de adaugat un counter care reduce rata de trimitere la 1/2 sau 1/3
+      if ( PWR.getBatteryLevel() >= 20 )
+      {
+        if ( loop_count % 4 == 0)
+        {
+          ssent = trimitator_WIFI();
+        }
+        else
+        {
+          USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
+        }
+      }
+      else
+      {
+        ssent = 0;
+        USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
+      }
     }
+
   }
+
 
 
 
@@ -1010,6 +1035,7 @@ void setup()
   SD_TEST_FILE_CHECK();
   // pm
   USB.ON();
+  loop_count = 0;
 }
 
 
@@ -1023,7 +1049,14 @@ void loop()
 {
   // get actual time before loop
   prev = millis();
-
+  loop_count++;
+  if (loop_count > 2000000000)
+    // 2147483647
+  {
+    loop_count = 0;
+  }
+  USB.print(F("loop_count: "));
+  USB.println( loop_count);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat

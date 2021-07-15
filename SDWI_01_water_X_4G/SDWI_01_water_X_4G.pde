@@ -709,526 +709,516 @@ void HTTP_POST_4G()
 
 
 
+
+
+
+
 int HTTP_4G_TRIMITATOR_FRAME()
 {
 
   int ssent = 0;
   int ssent2;
-  //////////////////////////////////////////////////
-  // 1. Switch ON
-  //////////////////////////////////////////////////
-  error = _4G.ON();
-
-  if (error == 0)
+  // nu se trimite daca bateria e prea descarcata
+  if ( PWR.getBatteryLevel() >= 50 )
   {
-    USB.println(F("1. 4G module ready..."));
-
-    ////////////////////////////////////////////////
-    // 3. Send to Meshlium
-    ////////////////////////////////////////////////
-    USB.print(F("Sending the frame..."));
-    error = _4G.sendFrameToMeshlium( host, port, frame.buffer, frame.length);
-
-    // check the answer
-    if ( error == 0)
+    goto gato;
+  }
+  else
+  {
+    if ( PWR.getBatteryLevel() >= 30 )
     {
-      USB.print(F("Done. HTTP code: "));
-      USB.println(_4G._httpCode);
-      USB.print(F("Server response: "));
-      USB.println(_4G._buffer, _4G._length);
-      ssent2 = _4G._httpCode;
-      if ( ssent2 == 200)
+      if ( loop_count % 2 == 0)
       {
-        ssent = 1;
-      }
-      else
-      {
-        ssent = 0;
+        goto gato;
       }
     }
     else
     {
-      USB.print(F("Failed. Error code: "));
-      USB.println(error, DEC);
+      if ( (PWR.getBatteryLevel() >= 20 ) && ( loop_count % 4 == 0)   )
+      {
+        goto gato;
+      }
     }
   }
-  else
-  {
-    // Problem with the communication with the 4G module
-    USB.println(F("4G module not started"));
-    USB.print(F("Error code: "));
-    USB.println(error, DEC);
-  }
+
+    USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
+    goto not_sendeder;
+gato:
 
 
-  ////////////////////////////////////////////////
-  // 4. Powers off the 4G module
-  ////////////////////////////////////////////////
-  USB.println(F("4. Switch OFF 4G module"));
-  _4G.OFF();
-  return ssent;
-}
+    //////////////////////////////////////////////////
+    // 1. Switch ON
+    //////////////////////////////////////////////////
+    error = _4G.ON();
 
-
-
-
-
-
-
-
-
-
-
-void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
-{
-  USB.println(F(" "));
-  USB.println(F(" "));
-  USB.println(F(" "));
-  USB.println(F(" "));
-  USB.println(F("START OF THE RTC SEGMENT"));
-  //////////////////////////////////////////////////
-  // 1. Switch ON the 4G module
-  //////////////////////////////////////////////////
-kyuubi:
-  error = _4G.ON();
-
-  if (error == 0)
-  {
-    USB.println(F("1. 4G module ready"));
-
-    ////////////////////////////////////////////////
-    // 1.1. Check connection to network and continue
-    ////////////////////////////////////////////////
-    connection_status = _4G.checkDataConnection(60);
-
-    if (connection_status == 0)
-    {
-      _4G.setTimeFrom4G();
-      USB.println(F("CURENT TIME:"));
-      USB.println(RTC.getTime());
-      USB.println(RTC.getTimestamp());
-      RTC_SUCCES = true;
-    }
-  }
-  else
-  {
-    // Problem with the communication with the 4G module
-    USB.println(F("4G module not started"));
-    USB.print(F("Error code: "));
-    USB.println(error, DEC);
-    x++;
-    if (x <= g)
-    {
-      goto kyuubi;
-    }
-
-  }
-
-  //////////////////////////////////////////////////
-  // 2. Switch OFF the 4G module
-  //////////////////////////////////////////////////
-  _4G.OFF();
-  USB.println(F("2. Switch OFF 4G module"));
-}
-
-
-
-void IN_LOOP_RTC_CHECK( bool S)
-{
-  if (  (S = false) || (intFlag & RTC_INT)   )
-  {
-    SET_RTC_4G();
-  }
-}
-
-
-
-
-
-
-//printError - prints the error related to OTA
-
-void printErrorxx(uint8_t err)
-{
-  switch (err)
-  {
-    case 1:  USB.println(F("SD not present"));
-      break;
-    case 2:  USB.println(F("error downloading UPGRADE.TXT"));
-      break;
-    case 3:  USB.println(F("error opening FTP session"));
-      break;
-    case 4:  USB.println(F("filename is different to 7 bytes"));
-      break;
-    case 5:  USB.println(F("no 'FILE' pattern found"));
-      break;
-    case 6:  USB.println(F("'NO_FILE' is the filename"));
-      break;
-    case 7:  USB.println(F("no 'PATH' pattern found"));
-      break;
-    case 8:  USB.println(F("no 'SIZE' pattern found"));
-      break;
-    case 9:  USB.println(F("no 'VERSION' pattern found"));
-      break;
-    case 10: USB.println(F("invalid program version number"));
-      break;
-    case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
-      break;
-    case 12: USB.println(F("error downloading binary file: server file size is zero"));
-      break;
-    case 13: USB.println(F("error downloading binary file: reading the file size"));
-      break;
-    case 14: USB.println(F("error downloading binary file: SD not present"));
-      break;
-    case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
-      break;
-    case 16: USB.println(F("error downloading binary file: error opening the file"));
-      break;
-    case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
-      break;
-    case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
-      break;
-    case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
-      break;
-    case 20: USB.println(F("error downloading binary file: error  getting packet size"));
-      break;
-    case 21: USB.println(F("error downloading binary file: packet size mismatch"));
-      break;
-    case 22: USB.println(F("error downloading binary file: error writing SD"));
-      break;
-    case 23: USB.println(F("error downloading binary file: no more retries getting data"));
-      break;
-    case 24: USB.println(F("error downloading binary file: size mismatch"));
-      break;
-    default : USB.println(F("unknown"));
-
-  }
-}
-
-
-
-
-
-void OTAP_4G()
-{
-  USB.println(F("STARTING OTAP VERSION CHECK"));
-  //////////////////////////////
-  // 4.1. Switch ON
-  //////////////////////////////
-  error = _4G.ON();
-
-  if (error == 0)
-  {
-    USB.println(F("1. 4G module ready..."));
-
-    //////////////////////////////
-    // 4.3. Request OTA
-    //////////////////////////////
-    USB.println(F("==> Request OTA..."));
-    error = _4G.requestOTA(ftp_server, ftp_port, ftp_user, ftp_pass);
-
-    if (error != 0)
-    {
-      USB.print(F("OTA request failed. Error code: "));
-      printErrorxx(error);
-    }
-
-    // blink RED led
-    Utils.blinkRedLED(300, 3);
-
-  }
-  else
-  {
-    USB.println(F("4G module not started"));
-  }
-
-  USB.println(F("5. Switch OFF 4G module"));
-  _4G.OFF();
-
-}
-
-
-
-void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
-{
-  int previous;
-  //////////////////////////////////////////////////
-  // 1. Switch ON
-  //////////////////////////////////////////////////
-  error = _4G.ON();
-
-  if (error == 0)
-  {
-    USB.println(F("1. 4G module ready..."));
-
-    ////////////////////////////////////////////////
-    // 2.1. FTP open session
-    ////////////////////////////////////////////////
-
-    error = _4G.ftpOpenSession(ftp_server, ftp_port, ftp_user, ftp_pass);
-
-    // check answer
     if (error == 0)
     {
-      USB.println(F("2.1. FTP open session OK"));
+      USB.println(F("1. 4G module ready..."));
 
-      previous = millis();
+      ////////////////////////////////////////////////
+      // 3. Send to Meshlium
+      ////////////////////////////////////////////////
+      USB.print(F("Sending the frame..."));
+      error = _4G.sendFrameToMeshlium( host, port, frame.buffer, frame.length);
 
-      //////////////////////////////////////////////
-      // 2.2. FTP upload
-      //////////////////////////////////////////////
-
-      error = _4G.ftpUpload(SERVER_FILE, SD_FILE);
-
-      if (error == 0)
+      // check the answer
+      if ( error == 0)
       {
-
-        USB.print(F("2.2. Uploading SD file to FTP server done! "));
-        USB.print(F("Upload time: "));
-        USB.print((millis() - previous) / 1000, DEC);
-        USB.println(F(" s"));
+        USB.print(F("Done. HTTP code: "));
+        USB.println(_4G._httpCode);
+        USB.print(F("Server response: "));
+        USB.println(_4G._buffer, _4G._length);
+        ssent2 = _4G._httpCode;
+        if ( ssent2 == 200)
+        {
+          ssent = 1;
+        }
+        else
+        {
+          ssent = 0;
+        }
       }
       else
       {
-        USB.print(F("2.2. Error calling 'ftpUpload' function. Error: "));
+        USB.print(F("Failed. Error code: "));
         USB.println(error, DEC);
-      }
-
-      //////////////////////////////////////////////
-      // 2.3. FTP close session
-      //////////////////////////////////////////////
-
-      error = _4G.ftpCloseSession();
-
-      if (error == 0)
-      {
-        USB.println(F("2.3. FTP close session OK"));
-      }
-      else
-      {
-        USB.print(F("2.3. Error calling 'ftpCloseSession' function. error: "));
-        USB.println(error, DEC);
-        USB.print(F("CMEE error: "));
-        USB.println(_4G._errorCode, DEC);
       }
     }
     else
     {
-      USB.print(F( "2.1. FTP connection error: "));
+      // Problem with the communication with the 4G module
+      USB.println(F("4G module not started"));
+      USB.print(F("Error code: "));
       USB.println(error, DEC);
     }
+
+
+    ////////////////////////////////////////////////
+    // 4. Powers off the 4G module
+    ////////////////////////////////////////////////
+    USB.println(F("4. Switch OFF 4G module"));
+    _4G.OFF();
+not_sendeder:
+    return ssent;
   }
-  else
+
+
+
+
+
+
+
+
+
+
+
+  void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
   {
-    // Problem with the communication with the 4G module
-    USB.println(F("1. 4G module not started"));
-  }
+    USB.println(F(" "));
+    USB.println(F(" "));
+    USB.println(F(" "));
+    USB.println(F(" "));
+    USB.println(F("START OF THE RTC SEGMENT"));
+    //////////////////////////////////////////////////
+    // 1. Switch ON the 4G module
+    //////////////////////////////////////////////////
+kyuubi:
+    error = _4G.ON();
 
-
-  ////////////////////////////////////////////////
-  // 3. Powers off the 4G module
-  ////////////////////////////////////////////////
-  USB.println(F("3. Switch OFF 4G module"));
-  _4G.OFF();
-}
-
-
-
-
-void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
-{
-  int q = 1;
-  bool w = false;
-  while ( q <= att && w == false)
-  {
-    USB.print(F("atempt: "));
-    USB.print(q);
-    USB.print(F("/"));
-    USB.println(att);
-    // show program ID
-    Utils.getProgramID(programID);
-    USB.println(F("-----------------------------"));
-    USB.print(F("Program id: "));
-    USB.println(programID);
-
-    // show program version number
-    USB.print(F("Program version: "));
-    USB.println(Utils.getProgramVersion(), DEC);
-    USB.println(F("-----------------------------"));
-
-    status = Utils.checkNewProgram();
-
-    switch (status)
+    if (error == 0)
     {
-      case 0:
-        USB.println(F("REPROGRAMMING ERROR"));
-        Utils.blinkRedLED(300, 3);
-        q++;
-        break;
+      USB.println(F("1. 4G module ready"));
 
-      case 1:
-        USB.println(F("REPROGRAMMING OK"));
-        Utils.blinkGreenLED(300, 3);
-        w = true;
-        break;
+      ////////////////////////////////////////////////
+      // 1.1. Check connection to network and continue
+      ////////////////////////////////////////////////
+      connection_status = _4G.checkDataConnection(60);
 
-      default:
-        USB.println(F("RESTARTING"));
-        Utils.blinkGreenLED(500, 1);
-        q++;
+      if (connection_status == 0)
+      {
+        _4G.setTimeFrom4G();
+        USB.println(F("CURENT TIME:"));
+        USB.println(RTC.getTime());
+        USB.println(RTC.getTimestamp());
+        RTC_SUCCES = true;
+      }
+    }
+    else
+    {
+      // Problem with the communication with the 4G module
+      USB.println(F("4G module not started"));
+      USB.print(F("Error code: "));
+      USB.println(error, DEC);
+      x++;
+      if (x <= g)
+      {
+        goto kyuubi;
+      }
+
+    }
+
+    //////////////////////////////////////////////////
+    // 2. Switch OFF the 4G module
+    //////////////////////////////////////////////////
+    _4G.OFF();
+    USB.println(F("2. Switch OFF 4G module"));
+  }
+
+
+
+  void IN_LOOP_RTC_CHECK( bool S)
+  {
+    if (  (S = false) || (intFlag & RTC_INT)   )
+    {
+      SET_RTC_4G();
     }
   }
 
-}
 
 
 
 
 
+  //printError - prints the error related to OTA
 
-void masurator_apa()
-{
-  int joyy;
-  // Socket B sensor
-  // Turn ON the sensor
-  myPHEHT_B.ON();
-  // Read the sensor
-  myPHEHT_B.read();
-  // Turn off the sensor
-  myPHEHT_B.OFF();
-
-
-
-  // Socket E sensor
-  // Turn ON the sensor
-  myOPTOD_E.ON();
-  // Read the sensor
-  myOPTOD_E.read();
-  // Turn off the sensor
-  myOPTOD_E.OFF();
-
-
-  // Socket C sensor
-  // Turn ON the sensor
-  myC4E_C.ON();
-  // Read the sensor
-  myC4E_C.read();
-  // Turn off the sensor
-  myC4E_C.OFF();
-
-  // Socket D sensor
-  // Turn ON the sensor
-  myMES5_D.ON();
-  // Read the sensor
-  myMES5_D.read();
-  // Turn off the sensor
-  myMES5_D.OFF();
-
-  // Socket A sensor Radar VegaPuls
-  // Turn ON the sensor
-  mySensor_A.ON();
-  // Read the sensor
-  mySensor_A.read();
-  // Turn off the sensor
-  mySensor_A.OFF();
-
-  USB.print(F("radar data mySensor.VegaPulsC21.distance: "));
-  USB.println(mySensor_A.VegaPulsC21.distance);
-  USB.print(F("radar data mySensor_A.VegaPulsC21.stage: "));
-  USB.println(mySensor_A.VegaPulsC21.stage);
-  USB.println(F("  "));
-  // frame de trimis
-
-  frame.createFrame(BINARY, node_ID); // frame2
-  frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
-
-  // add Socket B sensor values
-  frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
-  frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
-  frame.addSensor(WTRX_PHEHT_PM_B, myPHEHT_B.sensorPHEHT.pHMV);
-  frame.addSensor(WTRX_PHEHT_RX_B, myPHEHT_B.sensorPHEHT.redox);
-  // add Socket E sensor values
-  frame.addSensor(WTRX_OPTOD_TC1_E, myOPTOD_E.sensorOPTOD.temperature);
-  frame.addSensor(WTRX_OPTOD_OS_E, myOPTOD_E.sensorOPTOD.oxygenSAT);
-  frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
-  frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  frame.addSensor(SENSOR_VAPI, program_verrr );   //versiune program       eventual schimbat cu SENSOR_VAPI
-  frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
-  // add Socket D sensor values
-  frame.addSensor(WTRX_MES5_TC6_D, myMES5_D.sensorMES5.temperature);
-  frame.addSensor(WTRX_MES5_SB_D, myMES5_D.sensorMES5.sludgeBlanket);
-  frame.addSensor(WTRX_MES5_SS_D, myMES5_D.sensorMES5.suspendedSolids);
-  frame.addSensor(WTRX_MES5_TF_D, myMES5_D.sensorMES5.turbidityFAU);
-
-  // add Socket C sensor values
-  frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
-  frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
-  frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
-  frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
-
-  // add Socket A sensor values                           // astea sunt copi a celor din socket C
-  //frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
-  //frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
-  //frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
-  //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
-  frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
-
-
- // frame.showFrame();
-
-if ( PWR.getBatteryLevel()< 20)
-{
-    USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
-  goto RIUK;
-}
-
-  
-  joyy = 0;
-gooo:
-  ssent = HTTP_4G_TRIMITATOR_FRAME();
-  if ( ssent != 1 && joyy <= resend_f)
+  void printErrorxx(uint8_t err)
   {
-    joyy++;
-    delay(1000);
-    goto gooo;
+    switch (err)
+    {
+      case 1:  USB.println(F("SD not present"));
+        break;
+      case 2:  USB.println(F("error downloading UPGRADE.TXT"));
+        break;
+      case 3:  USB.println(F("error opening FTP session"));
+        break;
+      case 4:  USB.println(F("filename is different to 7 bytes"));
+        break;
+      case 5:  USB.println(F("no 'FILE' pattern found"));
+        break;
+      case 6:  USB.println(F("'NO_FILE' is the filename"));
+        break;
+      case 7:  USB.println(F("no 'PATH' pattern found"));
+        break;
+      case 8:  USB.println(F("no 'SIZE' pattern found"));
+        break;
+      case 9:  USB.println(F("no 'VERSION' pattern found"));
+        break;
+      case 10: USB.println(F("invalid program version number"));
+        break;
+      case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
+        break;
+      case 12: USB.println(F("error downloading binary file: server file size is zero"));
+        break;
+      case 13: USB.println(F("error downloading binary file: reading the file size"));
+        break;
+      case 14: USB.println(F("error downloading binary file: SD not present"));
+        break;
+      case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
+        break;
+      case 16: USB.println(F("error downloading binary file: error opening the file"));
+        break;
+      case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
+        break;
+      case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
+        break;
+      case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
+        break;
+      case 20: USB.println(F("error downloading binary file: error  getting packet size"));
+        break;
+      case 21: USB.println(F("error downloading binary file: packet size mismatch"));
+        break;
+      case 22: USB.println(F("error downloading binary file: error writing SD"));
+        break;
+      case 23: USB.println(F("error downloading binary file: no more retries getting data"));
+        break;
+      case 24: USB.println(F("error downloading binary file: size mismatch"));
+        break;
+      default : USB.println(F("unknown"));
+
+    }
   }
-RIUK:
 
 
-  frame.createFrame(ASCII, node_ID); // frame1
-  frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
 
 
-  // add Socket B sensor values
-  frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
-  frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
-  frame.addSensor(WTRX_PHEHT_PM_B, myPHEHT_B.sensorPHEHT.pHMV);
-  frame.addSensor(WTRX_PHEHT_RX_B, myPHEHT_B.sensorPHEHT.redox);
-  // add Socket E sensor values
-  frame.addSensor(WTRX_OPTOD_TC1_E, myOPTOD_E.sensorOPTOD.temperature);
-  frame.addSensor(WTRX_OPTOD_OS_E, myOPTOD_E.sensorOPTOD.oxygenSAT);
-  frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
-  frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  frame.addSensor(SENSOR_VAPI, program_verrr );   //versiune program       eventual schimbat cu SENSOR_VAPI
-  //Version of API N/A SENSOR_VAPI 125 VAPI 1 uint8_t 1 N/A N/A
-  // set frame fields (Time from RTC)
-  frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
-  frame.showFrame();
 
-  // 4. Calculation of level percentage
-  //  float levelPercentage = 100 - ((mySensor_A.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor_A.VegaPulsC21.distance));
+  void OTAP_4G()
+  {
+    USB.println(F("STARTING OTAP VERSION CHECK"));
+    //////////////////////////////
+    // 4.1. Switch ON
+    //////////////////////////////
+    error = _4G.ON();
 
-  //use  https://development.libelium.com/data-frame-programming-guide/frame-structure#smart-water-xtreme
-  //frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);
-  //frame ul pentru level perrcentage, s-ar putea sa nu mearga
-  //frame.addSensor(WTRX_C21_TC7_A, levelPercentage);
+    if (error == 0)
+    {
+      USB.println(F("1. 4G module ready..."));
+
+      //////////////////////////////
+      // 4.3. Request OTA
+      //////////////////////////////
+      USB.println(F("==> Request OTA..."));
+      error = _4G.requestOTA(ftp_server, ftp_port, ftp_user, ftp_pass);
+
+      if (error != 0)
+      {
+        USB.print(F("OTA request failed. Error code: "));
+        printErrorxx(error);
+      }
+
+      // blink RED led
+      Utils.blinkRedLED(300, 3);
+
+    }
+    else
+    {
+      USB.println(F("4G module not started"));
+    }
+
+    USB.println(F("5. Switch OFF 4G module"));
+    _4G.OFF();
+
+  }
 
 
-  /*
+
+  void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
+  {
+    int previous;
+    //////////////////////////////////////////////////
+    // 1. Switch ON
+    //////////////////////////////////////////////////
+    error = _4G.ON();
+
+    if (error == 0)
+    {
+      USB.println(F("1. 4G module ready..."));
+
+      ////////////////////////////////////////////////
+      // 2.1. FTP open session
+      ////////////////////////////////////////////////
+
+      error = _4G.ftpOpenSession(ftp_server, ftp_port, ftp_user, ftp_pass);
+
+      // check answer
+      if (error == 0)
+      {
+        USB.println(F("2.1. FTP open session OK"));
+
+        previous = millis();
+
+        //////////////////////////////////////////////
+        // 2.2. FTP upload
+        //////////////////////////////////////////////
+
+        error = _4G.ftpUpload(SERVER_FILE, SD_FILE);
+
+        if (error == 0)
+        {
+
+          USB.print(F("2.2. Uploading SD file to FTP server done! "));
+          USB.print(F("Upload time: "));
+          USB.print((millis() - previous) / 1000, DEC);
+          USB.println(F(" s"));
+        }
+        else
+        {
+          USB.print(F("2.2. Error calling 'ftpUpload' function. Error: "));
+          USB.println(error, DEC);
+        }
+
+        //////////////////////////////////////////////
+        // 2.3. FTP close session
+        //////////////////////////////////////////////
+
+        error = _4G.ftpCloseSession();
+
+        if (error == 0)
+        {
+          USB.println(F("2.3. FTP close session OK"));
+        }
+        else
+        {
+          USB.print(F("2.3. Error calling 'ftpCloseSession' function. error: "));
+          USB.println(error, DEC);
+          USB.print(F("CMEE error: "));
+          USB.println(_4G._errorCode, DEC);
+        }
+      }
+      else
+      {
+        USB.print(F( "2.1. FTP connection error: "));
+        USB.println(error, DEC);
+      }
+    }
+    else
+    {
+      // Problem with the communication with the 4G module
+      USB.println(F("1. 4G module not started"));
+    }
+
+
+    ////////////////////////////////////////////////
+    // 3. Powers off the 4G module
+    ////////////////////////////////////////////////
+    USB.println(F("3. Switch OFF 4G module"));
+    _4G.OFF();
+  }
+
+
+
+
+  void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
+  {
+    int q = 1;
+    bool w = false;
+    while ( q <= att && w == false)
+    {
+      USB.print(F("atempt: "));
+      USB.print(q);
+      USB.print(F("/"));
+      USB.println(att);
+      // show program ID
+      Utils.getProgramID(programID);
+      USB.println(F("-----------------------------"));
+      USB.print(F("Program id: "));
+      USB.println(programID);
+
+      // show program version number
+      USB.print(F("Program version: "));
+      USB.println(Utils.getProgramVersion(), DEC);
+      USB.println(F("-----------------------------"));
+
+      status = Utils.checkNewProgram();
+
+      switch (status)
+      {
+        case 0:
+          USB.println(F("REPROGRAMMING ERROR"));
+          Utils.blinkRedLED(300, 3);
+          q++;
+          break;
+
+        case 1:
+          USB.println(F("REPROGRAMMING OK"));
+          Utils.blinkGreenLED(300, 3);
+          w = true;
+          break;
+
+        default:
+          USB.println(F("RESTARTING"));
+          Utils.blinkGreenLED(500, 1);
+          q++;
+      }
+    }
+
+  }
+
+
+
+
+
+
+  void masurator_apa()
+  {
+    int joyy;
+    // Socket B sensor
+    // Turn ON the sensor
+    myPHEHT_B.ON();
+    // Read the sensor
+    myPHEHT_B.read();
+    // Turn off the sensor
+    myPHEHT_B.OFF();
+
+
+
+    // Socket E sensor
+    // Turn ON the sensor
+    myOPTOD_E.ON();
+    // Read the sensor
+    myOPTOD_E.read();
+    // Turn off the sensor
+    myOPTOD_E.OFF();
+
+
+    // Socket C sensor
+    // Turn ON the sensor
+    myC4E_C.ON();
+    // Read the sensor
+    myC4E_C.read();
+    // Turn off the sensor
+    myC4E_C.OFF();
+
+    // Socket D sensor
+    // Turn ON the sensor
+    myMES5_D.ON();
+    // Read the sensor
+    myMES5_D.read();
+    // Turn off the sensor
+    myMES5_D.OFF();
+
+    // Socket A sensor Radar VegaPuls
+    // Turn ON the sensor
+    mySensor_A.ON();
+    // Read the sensor
+    mySensor_A.read();
+    // Turn off the sensor
+    mySensor_A.OFF();
+
+    USB.print(F("radar data mySensor.VegaPulsC21.distance: "));
+    USB.println(mySensor_A.VegaPulsC21.distance);
+    USB.print(F("radar data mySensor_A.VegaPulsC21.stage: "));
+    USB.println(mySensor_A.VegaPulsC21.stage);
+    USB.println(F("  "));
+    // frame de trimis
+
+    frame.createFrame(BINARY, node_ID); // frame2
+    frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
+
+    // add Socket B sensor values
+    frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
+    frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
+    frame.addSensor(WTRX_PHEHT_PM_B, myPHEHT_B.sensorPHEHT.pHMV);
+    frame.addSensor(WTRX_PHEHT_RX_B, myPHEHT_B.sensorPHEHT.redox);
+    // add Socket E sensor values
+    frame.addSensor(WTRX_OPTOD_TC1_E, myOPTOD_E.sensorOPTOD.temperature);
+    frame.addSensor(WTRX_OPTOD_OS_E, myOPTOD_E.sensorOPTOD.oxygenSAT);
+    frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
+    frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
+    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+    frame.addSensor(SENSOR_VAPI, program_verrr );   //versiune program       eventual schimbat cu SENSOR_VAPI
+    frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
+    // add Socket D sensor values
+    frame.addSensor(WTRX_MES5_TC6_D, myMES5_D.sensorMES5.temperature);
+    frame.addSensor(WTRX_MES5_SB_D, myMES5_D.sensorMES5.sludgeBlanket);
+    frame.addSensor(WTRX_MES5_SS_D, myMES5_D.sensorMES5.suspendedSolids);
+    frame.addSensor(WTRX_MES5_TF_D, myMES5_D.sensorMES5.turbidityFAU);
+
+    // add Socket C sensor values
+    frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+    frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+    frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+    frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+
+    // add Socket A sensor values                           // astea sunt copi a celor din socket C
+    //frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+    //frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+    //frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+    //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+    frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
+
+
+    // frame.showFrame();
+
+    if ( PWR.getBatteryLevel() < 20)
+    {
+      USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
+      goto RIUK;
+    }
+
+
     joyy = 0;
-    gooo:
+gooo:
     ssent = HTTP_4G_TRIMITATOR_FRAME();
     if ( ssent != 1 && joyy <= resend_f)
     {
@@ -1236,42 +1226,85 @@ RIUK:
       delay(1000);
       goto gooo;
     }
+RIUK:
+
+
+    frame.createFrame(ASCII, node_ID); // frame1
+    frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
+
+
+    // add Socket B sensor values
+    frame.addSensor(WTRX_PHEHT_TC2_B, myPHEHT_B.sensorPHEHT.temperature);
+    frame.addSensor(WTRX_PHEHT_PH_B, myPHEHT_B.sensorPHEHT.pH);
+    frame.addSensor(WTRX_PHEHT_PM_B, myPHEHT_B.sensorPHEHT.pHMV);
+    frame.addSensor(WTRX_PHEHT_RX_B, myPHEHT_B.sensorPHEHT.redox);
+    // add Socket E sensor values
+    frame.addSensor(WTRX_OPTOD_TC1_E, myOPTOD_E.sensorOPTOD.temperature);
+    frame.addSensor(WTRX_OPTOD_OS_E, myOPTOD_E.sensorOPTOD.oxygenSAT);
+    frame.addSensor(WTRX_OPTOD_OM_E, myOPTOD_E.sensorOPTOD.oxygenMGL);
+    frame.addSensor(WTRX_OPTOD_OP_E, myOPTOD_E.sensorOPTOD.oxygenPPM);
+    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+    frame.addSensor(SENSOR_VAPI, program_verrr );   //versiune program       eventual schimbat cu SENSOR_VAPI
+    //Version of API N/A SENSOR_VAPI 125 VAPI 1 uint8_t 1 N/A N/A
+    // set frame fields (Time from RTC)
+    frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
+    frame.showFrame();
+
+    // 4. Calculation of level percentage
+    //  float levelPercentage = 100 - ((mySensor_A.VegaPulsC21.distance * 100.0) / (mySensor_A.VegaPulsC21.stage + mySensor_A.VegaPulsC21.distance));
+
+    //use  https://development.libelium.com/data-frame-programming-guide/frame-structure#smart-water-xtreme
+    //frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);
+    //frame ul pentru level perrcentage, s-ar putea sa nu mearga
+    //frame.addSensor(WTRX_C21_TC7_A, levelPercentage);
+
+
+    /*
+      joyy = 0;
+      gooo:
+      ssent = HTTP_4G_TRIMITATOR_FRAME();
+      if ( ssent != 1 && joyy <= resend_f)
+      {
+        joyy++;
+        delay(1000);
+        goto gooo;
+      }
+      scriitor_SD(filename, ssent);
+    */
+
+    frame.createFrame(ASCII, node_ID); // frame2
+    frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
+
+
+
+    // add Socket D sensor values
+    frame.addSensor(WTRX_MES5_TC6_D, myMES5_D.sensorMES5.temperature);
+    frame.addSensor(WTRX_MES5_SB_D, myMES5_D.sensorMES5.sludgeBlanket);
+    frame.addSensor(WTRX_MES5_SS_D, myMES5_D.sensorMES5.suspendedSolids);
+    frame.addSensor(WTRX_MES5_TF_D, myMES5_D.sensorMES5.turbidityFAU);
+
+    // add Socket C sensor values
+    frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+    frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+    frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+    frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+
+    // add Socket A sensor values                           // astea sunt copi a celor din socket C
+    //frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
+    //frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
+    //frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
+    //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
+    frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
+
+    frame.showFrame();
+
     scriitor_SD(filename, ssent);
-  */
-
-  frame.createFrame(ASCII, node_ID); // frame2
-  frame.setFrameType(INFORMATION_FRAME_WTR_XTR);
-
-
-
-  // add Socket D sensor values
-  frame.addSensor(WTRX_MES5_TC6_D, myMES5_D.sensorMES5.temperature);
-  frame.addSensor(WTRX_MES5_SB_D, myMES5_D.sensorMES5.sludgeBlanket);
-  frame.addSensor(WTRX_MES5_SS_D, myMES5_D.sensorMES5.suspendedSolids);
-  frame.addSensor(WTRX_MES5_TF_D, myMES5_D.sensorMES5.turbidityFAU);
-
-  // add Socket C sensor values
-  frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
-  frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
-  frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
-  frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
-
-  // add Socket A sensor values                           // astea sunt copi a celor din socket C
-  //frame.addSensor(WTRX_C4E_TC3_C, myC4E_C.sensorC4E.temperature);
-  //frame.addSensor(WTRX_C4E_CN_C, myC4E_C.sensorC4E.conductivity);
-  //frame.addSensor(WTRX_C4E_SA_C, myC4E_C.sensorC4E.salinity);
-  //frame.addSensor(WTRX_C4E_TD_C, myC4E_C.sensorC4E.totalDissolvedSolids);
-  frame.addSensor(WTRX_C21_DIS_A, mySensor_A.VegaPulsC21.distance);  //distanta pana la  apa
-
-  frame.showFrame();
-
-  scriitor_SD(filename, ssent);
 
 
 
 
 
-}
+  }
 
 
 
@@ -1288,181 +1321,181 @@ RIUK:
 
 
 
-// initializare
+  // initializare
 
-void setup()
-{
-  USB.ON();
-  RTC.ON();
-  //  x=setProgramVersion(1);
-
-  INFO_4G_MDD();
-  INFO_4G_NET();
-  //HTTP_GET_4G();
-  //HTTP_POST_4G();
-  //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-  OTA_setup_check(5);
-
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-  // 1. sets operator parameters
-
-  _4G.set_APN(apn, login, password);
-  _4G.show_APN();
-
-  SET_RTC_4G(RTC_ATEMPTS);
-  USB.println(RTC.getTime());
-  USB.println(F("Water Xtreme 4G"));
-
-
-  // Set SD ON
-  SD.ON();
-
-  if (sentence == 1)
+  void setup()
   {
-    // Delete file
-    sd_answer = SD.del(filename);
+    USB.ON();
+    RTC.ON();
+    //  x=setProgramVersion(1);
+
+    INFO_4G_MDD();
+    INFO_4G_NET();
+    //HTTP_GET_4G();
+    //HTTP_POST_4G();
+    //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    OTA_setup_check(5);
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 1. sets operator parameters
+
+    _4G.set_APN(apn, login, password);
+    _4G.show_APN();
+
+    SET_RTC_4G(RTC_ATEMPTS);
+    USB.println(RTC.getTime());
+    USB.println(F("Water Xtreme 4G"));
+
+
+    // Set SD ON
+    SD.ON();
+
+    if (sentence == 1)
+    {
+      // Delete file
+      sd_answer = SD.del(filename);
+
+      if (sd_answer == 1)
+      {
+        USB.println(F("file deleted"));
+      } else
+      {
+        USB.println(F("file NOT deleted"));
+      }
+    }
+    // Create file IF id doent exist
+    sd_answer = SD.create(filename);
 
     if (sd_answer == 1)
     {
-      USB.println(F("file deleted"));
+      USB.println(F("file created"));
     } else
     {
-      USB.println(F("file NOT deleted"));
+      USB.println(F("file NOT created"));
     }
-  }
-  // Create file IF id doent exist
-  sd_answer = SD.create(filename);
 
-  if (sd_answer == 1)
-  {
-    USB.println(F("file created"));
-  } else
-  {
-    USB.println(F("file NOT created"));
-  }
+    USB.print(F("loop cycle time[s]:= "));
+    USB.println(cycle_time2);
+    sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
+    if (sd_answer == 1)
+    {
+      USB.println(F("writeing is OK"));
+    } else
+    {
+      USB.println(F("writeing is haveing errors"));
+    }
 
-  USB.print(F("loop cycle time[s]:= "));
-  USB.println(cycle_time2);
-  sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
-  if (sd_answer == 1)
-  {
-    USB.println(F("writeing is OK"));
-  } else
-  {
-    USB.println(F("writeing is haveing errors"));
-  }
-
-  USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
-  USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
-  USB.println(F("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"));
+    USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
+    USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+    USB.println(F("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"));
 
 
-  // pm
-  USB.ON();
-  loop_count = 0;
-
-}
-
-
-
-
-
-
-
-
-
-
-// main program
-void loop()
-{
-  // get actual time before loop
-  prev = millis();
-  loop_count++;
-  if (loop_count > 2000000000)
-    // 2147483647
-  {
+    // pm
+    USB.ON();
     loop_count = 0;
+
   }
-  USB.print(F("loop_count: "));
-  USB.println( loop_count);
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  program_verrr = Utils.getProgramVersion();    //versiune program
-  masurator_apa();
-
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  OTAP_4G();
-
-  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
-  /// NU UMBLA AICI!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
-  IN_LOOP_RTC_CHECK( RTC_SUCCES);
-
-  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
 
 
-  cycle_time = cycle_time2 - b - 5;
-  if (cycle_time < 10) {
-    cycle_time = 15;
+
+
+
+
+
+
+  // main program
+  void loop()
+  {
+    // get actual time before loop
+    prev = millis();
+    loop_count++;
+    if (loop_count > 2000000000)
+      // 2147483647
+    {
+      loop_count = 0;
+    }
+    USB.print(F("loop_count: "));
+    USB.println( loop_count);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    program_verrr = Utils.getProgramVersion();    //versiune program
+    masurator_apa();
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    OTAP_4G();
+
+    USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+    /// NU UMBLA AICI!
+    RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
+    IN_LOOP_RTC_CHECK( RTC_SUCCES);
+
+    USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+
+
+    cycle_time = cycle_time2 - b - 5;
+    if (cycle_time < 10) {
+      cycle_time = 15;
+    }
+    USB.print(F("cycle time= "));
+    USB.println(cycle_time);
+
+    x = cycle_time % 60; // sec
+    itoa(x, y, 10);
+    if (x < 10) {
+      y[1] = y[0];
+      y[0] = '0';
+    }
+    rtc_str[9] = y[0];
+    rtc_str[10] = y[1];
+
+    x = cycle_time / 60 % 60; // min
+    itoa(x, y, 10);
+    if (x < 10) {
+      y[1] = y[0];
+      y[0] = '0';
+    }
+    rtc_str[6] = y[0];
+    rtc_str[7] = y[1];
+
+    x = cycle_time / 3600 % 3600; // h
+    itoa(x, y, 10);
+    if (x < 10) {
+      y[1] = y[0];
+      y[0] = '0';
+    }
+    rtc_str[3] = y[0];
+    rtc_str[4] = y[1];
+
+    ///-------------
+
+    // Go to deepsleep
+
+    ////////////////////////////////////////////////
+    // 5. Sleep
+    ////////////////////////////////////////////////
+    USB.println(F("5. Enter deep sleep..."));
+    USB.print(F("X"));
+    USB.print(rtc_str);
+    USB.println(F("X"));
+
+    //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+    USB.println(RTC.getTimestamp());
+    USB.OFF();
+    //delay(30000);
+    PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+    USB.ON();
+    USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+    USB.println(F("6. Wake up!!\n\n"));
+
+
   }
-  USB.print(F("cycle time= "));
-  USB.println(cycle_time);
-
-  x = cycle_time % 60; // sec
-  itoa(x, y, 10);
-  if (x < 10) {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  rtc_str[9] = y[0];
-  rtc_str[10] = y[1];
-
-  x = cycle_time / 60 % 60; // min
-  itoa(x, y, 10);
-  if (x < 10) {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  rtc_str[6] = y[0];
-  rtc_str[7] = y[1];
-
-  x = cycle_time / 3600 % 3600; // h
-  itoa(x, y, 10);
-  if (x < 10) {
-    y[1] = y[0];
-    y[0] = '0';
-  }
-  rtc_str[3] = y[0];
-  rtc_str[4] = y[1];
-
-  ///-------------
-
-  // Go to deepsleep
-
-  ////////////////////////////////////////////////
-  // 5. Sleep
-  ////////////////////////////////////////////////
-  USB.println(F("5. Enter deep sleep..."));
-  USB.print(F("X"));
-  USB.print(rtc_str);
-  USB.println(F("X"));
-
-  //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
-  USB.println(RTC.getTimestamp());
-  USB.OFF();
-  //delay(30000);
-  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-  USB.ON();
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
-  USB.println(F("6. Wake up!!\n\n"));
-
-
-}
 
 
 
