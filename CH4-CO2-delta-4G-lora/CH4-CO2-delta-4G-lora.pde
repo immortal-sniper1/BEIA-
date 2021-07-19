@@ -1236,6 +1236,8 @@ void masurator_aer()
   // Add pressure value
   frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  // Add CO2 value
+  frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
 
 
   frame.showFrame();
