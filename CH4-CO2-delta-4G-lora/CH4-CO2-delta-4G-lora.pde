@@ -54,7 +54,7 @@ char ftp_user[] = "folderone@agile.ro";
 char ftp_pass[] = "1fENXK~0qMgw";
 
 ///senzori
-Gas CO2(SOCKET_B);
+Gas CO2(SOCKET_C);
 Gas CH4(SOCKET_A);
 
 ////////////
