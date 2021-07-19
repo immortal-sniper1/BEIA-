@@ -1149,7 +1149,8 @@ kyuubi:
   // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
   USB.println(RTC.getTime());
   USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  delay(120000);
   USB.println(RTC.getTime());
   USB.println(F("wake up!!\r\n"));
 
