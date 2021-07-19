@@ -727,7 +727,15 @@ int HTTP_4G_TRIMITATOR_FRAME()
 {
 
   int ssent = 0;
+  int  joyy = 0;
   int ssent2;
+
+  if ( PWR.getBatteryLevel() < 20)
+  {
+    USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
+    goto RIUK;
+  }
+
   // nu se trimite daca bateria e prea descarcata
   if ( PWR.getBatteryLevel() >= 50 )
   {
@@ -751,387 +759,405 @@ int HTTP_4G_TRIMITATOR_FRAME()
     }
   }
 
-    USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
-    goto not_sendeder;
+  USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
+  goto RIUK;
 gato:
 
 
-    //////////////////////////////////////////////////
-    // 1. Switch ON
-    //////////////////////////////////////////////////
-    error = _4G.ON();
 
-    if (error == 0)
+
+  //////////////////////////////////////////////////
+  // 1. Switch ON
+  //////////////////////////////////////////////////
+  error = _4G.ON();
+
+  if (error == 0)
+  {
+    USB.println(F("1. 4G module ready..."));
+
+    ////////////////////////////////////////////////
+    // 3. Send to Meshlium
+    ////////////////////////////////////////////////
+
+gato2:
+
+    USB.print(F("Sending the frame..."));
+    error = _4G.sendFrameToMeshlium( host, port, frame.buffer, frame.length);
+
+    // check the answer
+    if ( error == 0)
     {
-      USB.println(F("1. 4G module ready..."));
-
-      ////////////////////////////////////////////////
-      // 3. Send to Meshlium
-      ////////////////////////////////////////////////
-      USB.print(F("Sending the frame..."));
-      error = _4G.sendFrameToMeshlium( host, port, frame.buffer, frame.length);
-
-      // check the answer
-      if ( error == 0)
+      USB.print(F("Done. HTTP code: "));
+      USB.println(_4G._httpCode);
+      USB.print(F("Server response: "));
+      USB.println(_4G._buffer, _4G._length);
+      ssent2 = _4G._httpCode;
+      if ( ssent2 == 200)
       {
-        USB.print(F("Done. HTTP code: "));
-        USB.println(_4G._httpCode);
-        USB.print(F("Server response: "));
-        USB.println(_4G._buffer, _4G._length);
-        ssent2 = _4G._httpCode;
-        if ( ssent2 == 200)
-        {
-          ssent = 1;
-        }
-        else
-        {
-          ssent = 0;
-        }
+        ssent = 1;
       }
       else
       {
-        USB.print(F("Failed. Error code: "));
-        USB.println(error, DEC);
+        ssent = 0;
+
       }
     }
     else
     {
-      // Problem with the communication with the 4G module
-      USB.println(F("4G module not started"));
-      USB.print(F("Error code: "));
+      USB.print(F("Failed. Error code: "));
       USB.println(error, DEC);
+
     }
+  }
+  else
+  {
+    // Problem with the communication with the 4G module
+    USB.println(F("4G module not started"));
+    USB.print(F("Error code: "));
+    USB.println(error, DEC);
+  }
 
 
-    ////////////////////////////////////////////////
-    // 4. Powers off the 4G module
-    ////////////////////////////////////////////////
-    USB.println(F("4. Switch OFF 4G module"));
-    _4G.OFF();
-not_sendeder:
-    return ssent;
+
+  if ( ssent != 1 && joyy <= resend_f)
+  {
+    joyy++;
+    goto gato2;
   }
 
 
 
 
 
+  ////////////////////////////////////////////////
+  // 4. Powers off the 4G module
+  ////////////////////////////////////////////////
+  USB.println(F("4. Switch OFF 4G module"));
+  _4G.OFF();
+RIUK:
+  return ssent;
+}
 
 
 
 
 
 
-  void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
-  {
-    USB.println(F(" "));
-    USB.println(F(" "));
-    USB.println(F(" "));
-    USB.println(F(" "));
-    USB.println(F("START OF THE RTC SEGMENT"));
-    //////////////////////////////////////////////////
-    // 1. Switch ON the 4G module
-    //////////////////////////////////////////////////
+
+
+
+
+
+void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
+{
+  USB.println(F(" "));
+  USB.println(F(" "));
+  USB.println(F(" "));
+  USB.println(F(" "));
+  USB.println(F("START OF THE RTC SEGMENT"));
+  //////////////////////////////////////////////////
+  // 1. Switch ON the 4G module
+  //////////////////////////////////////////////////
 kyuubi:
-    error = _4G.ON();
+  error = _4G.ON();
 
-    if (error == 0)
-    {
-      USB.println(F("1. 4G module ready"));
-
-      ////////////////////////////////////////////////
-      // 1.1. Check connection to network and continue
-      ////////////////////////////////////////////////
-      connection_status = _4G.checkDataConnection(60);
-
-      if (connection_status == 0)
-      {
-        _4G.setTimeFrom4G();
-        USB.println(F("CURENT TIME:"));
-        USB.println(RTC.getTime());
-        USB.println(RTC.getTimestamp());
-        RTC_SUCCES = true;
-      }
-    }
-    else
-    {
-      // Problem with the communication with the 4G module
-      USB.println(F("4G module not started"));
-      USB.print(F("Error code: "));
-      USB.println(error, DEC);
-      x++;
-      if (x <= g)
-      {
-        goto kyuubi;
-      }
-
-    }
-
-    //////////////////////////////////////////////////
-    // 2. Switch OFF the 4G module
-    //////////////////////////////////////////////////
-    _4G.OFF();
-    USB.println(F("2. Switch OFF 4G module"));
-  }
-
-
-
-  void IN_LOOP_RTC_CHECK( bool S)
+  if (error == 0)
   {
-    if (  (S = false) || (intFlag & RTC_INT)   )
+    USB.println(F("1. 4G module ready"));
+
+    ////////////////////////////////////////////////
+    // 1.1. Check connection to network and continue
+    ////////////////////////////////////////////////
+    connection_status = _4G.checkDataConnection(60);
+
+    if (connection_status == 0)
     {
-      SET_RTC_4G();
+      _4G.setTimeFrom4G();
+      USB.println(F("CURENT TIME:"));
+      USB.println(RTC.getTime());
+      USB.println(RTC.getTimestamp());
+      RTC_SUCCES = true;
     }
   }
-
-
-
-
-
-
-  //printError - prints the error related to OTA
-
-  void printErrorxx(uint8_t err)
+  else
   {
-    switch (err)
+    // Problem with the communication with the 4G module
+    USB.println(F("4G module not started"));
+    USB.print(F("Error code: "));
+    USB.println(error, DEC);
+    x++;
+    if (x <= g)
     {
-      case 1:  USB.println(F("SD not present"));
-        break;
-      case 2:  USB.println(F("error downloading UPGRADE.TXT"));
-        break;
-      case 3:  USB.println(F("error opening FTP session"));
-        break;
-      case 4:  USB.println(F("filename is different to 7 bytes"));
-        break;
-      case 5:  USB.println(F("no 'FILE' pattern found"));
-        break;
-      case 6:  USB.println(F("'NO_FILE' is the filename"));
-        break;
-      case 7:  USB.println(F("no 'PATH' pattern found"));
-        break;
-      case 8:  USB.println(F("no 'SIZE' pattern found"));
-        break;
-      case 9:  USB.println(F("no 'VERSION' pattern found"));
-        break;
-      case 10: USB.println(F("invalid program version number"));
-        break;
-      case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
-        break;
-      case 12: USB.println(F("error downloading binary file: server file size is zero"));
-        break;
-      case 13: USB.println(F("error downloading binary file: reading the file size"));
-        break;
-      case 14: USB.println(F("error downloading binary file: SD not present"));
-        break;
-      case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
-        break;
-      case 16: USB.println(F("error downloading binary file: error opening the file"));
-        break;
-      case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
-        break;
-      case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
-        break;
-      case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
-        break;
-      case 20: USB.println(F("error downloading binary file: error  getting packet size"));
-        break;
-      case 21: USB.println(F("error downloading binary file: packet size mismatch"));
-        break;
-      case 22: USB.println(F("error downloading binary file: error writing SD"));
-        break;
-      case 23: USB.println(F("error downloading binary file: no more retries getting data"));
-        break;
-      case 24: USB.println(F("error downloading binary file: size mismatch"));
-        break;
-      default : USB.println(F("unknown"));
-
+      goto kyuubi;
     }
+
   }
 
+  //////////////////////////////////////////////////
+  // 2. Switch OFF the 4G module
+  //////////////////////////////////////////////////
+  _4G.OFF();
+  USB.println(F("2. Switch OFF 4G module"));
+}
 
 
 
-
-  void OTAP_4G()
+void IN_LOOP_RTC_CHECK( bool S)
+{
+  if (  (S = false) || (intFlag & RTC_INT)   )
   {
-    USB.println(F("STARTING OTAP VERSION CHECK"));
+    SET_RTC_4G();
+  }
+}
+
+
+
+
+
+
+//printError - prints the error related to OTA
+
+void printErrorxx(uint8_t err)
+{
+  switch (err)
+  {
+    case 1:  USB.println(F("SD not present"));
+      break;
+    case 2:  USB.println(F("error downloading UPGRADE.TXT"));
+      break;
+    case 3:  USB.println(F("error opening FTP session"));
+      break;
+    case 4:  USB.println(F("filename is different to 7 bytes"));
+      break;
+    case 5:  USB.println(F("no 'FILE' pattern found"));
+      break;
+    case 6:  USB.println(F("'NO_FILE' is the filename"));
+      break;
+    case 7:  USB.println(F("no 'PATH' pattern found"));
+      break;
+    case 8:  USB.println(F("no 'SIZE' pattern found"));
+      break;
+    case 9:  USB.println(F("no 'VERSION' pattern found"));
+      break;
+    case 10: USB.println(F("invalid program version number"));
+      break;
+    case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
+      break;
+    case 12: USB.println(F("error downloading binary file: server file size is zero"));
+      break;
+    case 13: USB.println(F("error downloading binary file: reading the file size"));
+      break;
+    case 14: USB.println(F("error downloading binary file: SD not present"));
+      break;
+    case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
+      break;
+    case 16: USB.println(F("error downloading binary file: error opening the file"));
+      break;
+    case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
+      break;
+    case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
+      break;
+    case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
+      break;
+    case 20: USB.println(F("error downloading binary file: error  getting packet size"));
+      break;
+    case 21: USB.println(F("error downloading binary file: packet size mismatch"));
+      break;
+    case 22: USB.println(F("error downloading binary file: error writing SD"));
+      break;
+    case 23: USB.println(F("error downloading binary file: no more retries getting data"));
+      break;
+    case 24: USB.println(F("error downloading binary file: size mismatch"));
+      break;
+    default : USB.println(F("unknown"));
+
+  }
+}
+
+
+
+
+
+void OTAP_4G()
+{
+  USB.println(F("STARTING OTAP VERSION CHECK"));
+  //////////////////////////////
+  // 4.1. Switch ON
+  //////////////////////////////
+  error = _4G.ON();
+
+  if (error == 0)
+  {
+    USB.println(F("1. 4G module ready..."));
+
     //////////////////////////////
-    // 4.1. Switch ON
+    // 4.3. Request OTA
     //////////////////////////////
-    error = _4G.ON();
+    USB.println(F("==> Request OTA..."));
+    error = _4G.requestOTA(ftp_server, ftp_port, ftp_user, ftp_pass);
 
-    if (error == 0)
+    if (error != 0)
     {
-      USB.println(F("1. 4G module ready..."));
-
-      //////////////////////////////
-      // 4.3. Request OTA
-      //////////////////////////////
-      USB.println(F("==> Request OTA..."));
-      error = _4G.requestOTA(ftp_server, ftp_port, ftp_user, ftp_pass);
-
-      if (error != 0)
-      {
-        USB.print(F("OTA request failed. Error code: "));
-        printErrorxx(error);
-      }
-
-      // blink RED led
-      Utils.blinkRedLED(300, 3);
-
-    }
-    else
-    {
-      USB.println(F("4G module not started"));
+      USB.print(F("OTA request failed. Error code: "));
+      printErrorxx(error);
     }
 
-    USB.println(F("5. Switch OFF 4G module"));
-    _4G.OFF();
+    // blink RED led
+    Utils.blinkRedLED(300, 3);
 
   }
-
-
-
-  void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
+  else
   {
-    int previous;
-    //////////////////////////////////////////////////
-    // 1. Switch ON
-    //////////////////////////////////////////////////
-    error = _4G.ON();
+    USB.println(F("4G module not started"));
+  }
 
+  USB.println(F("5. Switch OFF 4G module"));
+  _4G.OFF();
+
+}
+
+
+
+void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
+{
+  int previous;
+  //////////////////////////////////////////////////
+  // 1. Switch ON
+  //////////////////////////////////////////////////
+  error = _4G.ON();
+
+  if (error == 0)
+  {
+    USB.println(F("1. 4G module ready..."));
+
+    ////////////////////////////////////////////////
+    // 2.1. FTP open session
+    ////////////////////////////////////////////////
+
+    error = _4G.ftpOpenSession(ftp_server, ftp_port, ftp_user, ftp_pass);
+
+    // check answer
     if (error == 0)
     {
-      USB.println(F("1. 4G module ready..."));
+      USB.println(F("2.1. FTP open session OK"));
 
-      ////////////////////////////////////////////////
-      // 2.1. FTP open session
-      ////////////////////////////////////////////////
+      previous = millis();
 
-      error = _4G.ftpOpenSession(ftp_server, ftp_port, ftp_user, ftp_pass);
+      //////////////////////////////////////////////
+      // 2.2. FTP upload
+      //////////////////////////////////////////////
 
-      // check answer
+      error = _4G.ftpUpload(SERVER_FILE, SD_FILE);
+
       if (error == 0)
       {
-        USB.println(F("2.1. FTP open session OK"));
 
-        previous = millis();
-
-        //////////////////////////////////////////////
-        // 2.2. FTP upload
-        //////////////////////////////////////////////
-
-        error = _4G.ftpUpload(SERVER_FILE, SD_FILE);
-
-        if (error == 0)
-        {
-
-          USB.print(F("2.2. Uploading SD file to FTP server done! "));
-          USB.print(F("Upload time: "));
-          USB.print((millis() - previous) / 1000, DEC);
-          USB.println(F(" s"));
-        }
-        else
-        {
-          USB.print(F("2.2. Error calling 'ftpUpload' function. Error: "));
-          USB.println(error, DEC);
-        }
-
-        //////////////////////////////////////////////
-        // 2.3. FTP close session
-        //////////////////////////////////////////////
-
-        error = _4G.ftpCloseSession();
-
-        if (error == 0)
-        {
-          USB.println(F("2.3. FTP close session OK"));
-        }
-        else
-        {
-          USB.print(F("2.3. Error calling 'ftpCloseSession' function. error: "));
-          USB.println(error, DEC);
-          USB.print(F("CMEE error: "));
-          USB.println(_4G._errorCode, DEC);
-        }
+        USB.print(F("2.2. Uploading SD file to FTP server done! "));
+        USB.print(F("Upload time: "));
+        USB.print((millis() - previous) / 1000, DEC);
+        USB.println(F(" s"));
       }
       else
       {
-        USB.print(F( "2.1. FTP connection error: "));
+        USB.print(F("2.2. Error calling 'ftpUpload' function. Error: "));
         USB.println(error, DEC);
+      }
+
+      //////////////////////////////////////////////
+      // 2.3. FTP close session
+      //////////////////////////////////////////////
+
+      error = _4G.ftpCloseSession();
+
+      if (error == 0)
+      {
+        USB.println(F("2.3. FTP close session OK"));
+      }
+      else
+      {
+        USB.print(F("2.3. Error calling 'ftpCloseSession' function. error: "));
+        USB.println(error, DEC);
+        USB.print(F("CMEE error: "));
+        USB.println(_4G._errorCode, DEC);
       }
     }
     else
     {
-      // Problem with the communication with the 4G module
-      USB.println(F("1. 4G module not started"));
+      USB.print(F( "2.1. FTP connection error: "));
+      USB.println(error, DEC);
     }
-
-
-    ////////////////////////////////////////////////
-    // 3. Powers off the 4G module
-    ////////////////////////////////////////////////
-    USB.println(F("3. Switch OFF 4G module"));
-    _4G.OFF();
+  }
+  else
+  {
+    // Problem with the communication with the 4G module
+    USB.println(F("1. 4G module not started"));
   }
 
 
+  ////////////////////////////////////////////////
+  // 3. Powers off the 4G module
+  ////////////////////////////////////////////////
+  USB.println(F("3. Switch OFF 4G module"));
+  _4G.OFF();
+}
 
 
-  void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
+
+
+void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
+{
+  int q = 1;
+  bool w = false;
+  while ( q <= att && w == false)
   {
-    int q = 1;
-    bool w = false;
-    while ( q <= att && w == false)
+    USB.print(F("atempt: "));
+    USB.print(q);
+    USB.print(F("/"));
+    USB.println(att);
+    // show program ID
+    Utils.getProgramID(programID);
+    USB.println(F("-----------------------------"));
+    USB.print(F("Program id: "));
+    USB.println(programID);
+
+    // show program version number
+    USB.print(F("Program version: "));
+    USB.println(Utils.getProgramVersion(), DEC);
+    USB.println(F("-----------------------------"));
+
+    status = Utils.checkNewProgram();
+
+    switch (status)
     {
-      USB.print(F("atempt: "));
-      USB.print(q);
-      USB.print(F("/"));
-      USB.println(att);
-      // show program ID
-      Utils.getProgramID(programID);
-      USB.println(F("-----------------------------"));
-      USB.print(F("Program id: "));
-      USB.println(programID);
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-      // show program version number
-      USB.print(F("Program version: "));
-      USB.println(Utils.getProgramVersion(), DEC);
-      USB.println(F("-----------------------------"));
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-      status = Utils.checkNewProgram();
-
-      switch (status)
-      {
-        case 0:
-          USB.println(F("REPROGRAMMING ERROR"));
-          Utils.blinkRedLED(300, 3);
-          q++;
-          break;
-
-        case 1:
-          USB.println(F("REPROGRAMMING OK"));
-          Utils.blinkGreenLED(300, 3);
-          w = true;
-          break;
-
-        default:
-          USB.println(F("RESTARTING"));
-          Utils.blinkGreenLED(500, 1);
-          q++;
-      }
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
-
   }
 
+}
 
 
 
 
 
-  void masurator_aer()
-  {
-    int joyy;
+
+void masurator_aer()
+{
+
   float temperature;
   float humidity;
   float pressure;
@@ -1179,10 +1205,10 @@ kyuubi:
 
 
 
-    
-    // frame de trimis
 
-    frame.createFrame(BINARY, node_ID); // frame
+  // frame de trimis
+
+  frame.createFrame(BINARY, node_ID); // frame
 
   frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
   // Add humidity
@@ -1190,32 +1216,19 @@ kyuubi:
   // Add pressure value
   frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-    // Add CO2 value
-    frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
+  // Add CO2 value
+  frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
 
 
-    // frame.showFrame();
-
-    if ( PWR.getBatteryLevel() < 20)
-    {
-      USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
-      goto RIUK;
-    }
+  // frame.showFrame();
 
 
-    joyy = 0;
-gooo:
-    ssent = HTTP_4G_TRIMITATOR_FRAME();
-    if ( ssent != 1 && joyy <= resend_f)
-    {
-      joyy++;
-      delay(1000);
-      goto gooo;
-    }
-RIUK:
 
 
-    frame.createFrame(ASCII, node_ID); // frame
+  ssent = HTTP_4G_TRIMITATOR_FRAME();
+
+
+  frame.createFrame(ASCII, node_ID); // frame
 
   frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
   // Add humidity
@@ -1224,207 +1237,207 @@ RIUK:
   frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
 
-   
-    frame.showFrame();
 
-    scriitor_SD(filename, ssent);
+  frame.showFrame();
 
-
+  scriitor_SD(filename, ssent);
 
 
 
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// initializare
+
+void setup()
+{
+  USB.ON();
+  RTC.ON();
+  //  x=setProgramVersion(1);
+
+  INFO_4G_MDD();
+  INFO_4G_NET();
+  //HTTP_GET_4G();
+  //HTTP_POST_4G();
+  //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  OTA_setup_check(5);
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 1. sets operator parameters
+
+  _4G.set_APN(apn, login, password);
+  _4G.show_APN();
+
+  SET_RTC_4G(RTC_ATEMPTS);
+  USB.println(RTC.getTime());
+  USB.println(F("Water Xtreme 4G"));
+
+
+  // Set SD ON
+  SD.ON();
+
+  if (sentence == 1)
+  {
+    // Delete file
+    sd_answer = SD.del(filename);
+
+    if (sd_answer == 1)
+    {
+      USB.println(F("file deleted"));
+    } else
+    {
+      USB.println(F("file NOT deleted"));
+    }
+  }
+  // Create file IF id doent exist
+  sd_answer = SD.create(filename);
+
+  if (sd_answer == 1)
+  {
+    USB.println(F("file created"));
+  } else
+  {
+    USB.println(F("file NOT created"));
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // initializare
-
-  void setup()
+  USB.print(F("loop cycle time[s]:= "));
+  USB.println(cycle_time2);
+  sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
+  if (sd_answer == 1)
   {
-    USB.ON();
-    RTC.ON();
-    //  x=setProgramVersion(1);
+    USB.println(F("writeing is OK"));
+  } else
+  {
+    USB.println(F("writeing is haveing errors"));
+  }
 
-    INFO_4G_MDD();
-    INFO_4G_NET();
-    //HTTP_GET_4G();
-    //HTTP_POST_4G();
-    //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    OTA_setup_check(5);
+  USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
+  USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+  USB.println(F("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"));
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    // 1. sets operator parameters
+  // pm
+  USB.ON();
+  loop_count = 0;
 
-    _4G.set_APN(apn, login, password);
-    _4G.show_APN();
-
-    SET_RTC_4G(RTC_ATEMPTS);
-    USB.println(RTC.getTime());
-    USB.println(F("Water Xtreme 4G"));
+}
 
 
-    // Set SD ON
-    SD.ON();
-
-    if (sentence == 1)
-    {
-      // Delete file
-      sd_answer = SD.del(filename);
-
-      if (sd_answer == 1)
-      {
-        USB.println(F("file deleted"));
-      } else
-      {
-        USB.println(F("file NOT deleted"));
-      }
-    }
-    // Create file IF id doent exist
-    sd_answer = SD.create(filename);
-
-    if (sd_answer == 1)
-    {
-      USB.println(F("file created"));
-    } else
-    {
-      USB.println(F("file NOT created"));
-    }
-
-    USB.print(F("loop cycle time[s]:= "));
-    USB.println(cycle_time2);
-    sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
-    if (sd_answer == 1)
-    {
-      USB.println(F("writeing is OK"));
-    } else
-    {
-      USB.println(F("writeing is haveing errors"));
-    }
-
-    USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
-    USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
-    USB.println(F("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"));
 
 
-    // pm
-    USB.ON();
+
+
+
+
+
+
+// main program
+void loop()
+{
+  // get actual time before loop
+  prev = millis();
+  loop_count++;
+  if (loop_count > 2000000000)
+    // 2147483647
+  {
     loop_count = 0;
-
   }
+  USB.print(F("loop_count: "));
+  USB.println( loop_count);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  program_verrr = Utils.getProgramVersion();    //versiune program
+  masurator_aer();
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+  OTAP_4G();
+
+  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
+  /// NU UMBLA AICI!
+  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
+  IN_LOOP_RTC_CHECK( RTC_SUCCES);
+
+  USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
 
 
-
-
-
-
-
-
-  // main program
-  void loop()
-  {
-    // get actual time before loop
-    prev = millis();
-    loop_count++;
-    if (loop_count > 2000000000)
-      // 2147483647
-    {
-      loop_count = 0;
-    }
-    USB.print(F("loop_count: "));
-    USB.println( loop_count);
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    program_verrr = Utils.getProgramVersion();    //versiune program
-    masurator_aer();
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    OTAP_4G();
-
-    USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
-    /// NU UMBLA AICI!
-    RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
-    IN_LOOP_RTC_CHECK( RTC_SUCCES);
-
-    USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
-
-
-    cycle_time = cycle_time2 - b - 5;
-    if (cycle_time < 10) {
-      cycle_time = 15;
-    }
-    USB.print(F("cycle time= "));
-    USB.println(cycle_time);
-
-    x = cycle_time % 60; // sec
-    itoa(x, y, 10);
-    if (x < 10) {
-      y[1] = y[0];
-      y[0] = '0';
-    }
-    rtc_str[9] = y[0];
-    rtc_str[10] = y[1];
-
-    x = cycle_time / 60 % 60; // min
-    itoa(x, y, 10);
-    if (x < 10) {
-      y[1] = y[0];
-      y[0] = '0';
-    }
-    rtc_str[6] = y[0];
-    rtc_str[7] = y[1];
-
-    x = cycle_time / 3600 % 3600; // h
-    itoa(x, y, 10);
-    if (x < 10) {
-      y[1] = y[0];
-      y[0] = '0';
-    }
-    rtc_str[3] = y[0];
-    rtc_str[4] = y[1];
-
-    ///-------------
-
-    // Go to deepsleep
-
-    ////////////////////////////////////////////////
-    // 5. Sleep
-    ////////////////////////////////////////////////
-    USB.println(F("5. Enter deep sleep..."));
-    USB.print(F("X"));
-    USB.print(rtc_str);
-    USB.println(F("X"));
-
-    //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
-    USB.println(RTC.getTimestamp());
-    USB.OFF();
-    //delay(30000);
-    PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
-    USB.ON();
-    USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
-    USB.println(F("6. Wake up!!\n\n"));
-
-
+  cycle_time = cycle_time2 - b - 5;
+  if (cycle_time < 10) {
+    cycle_time = 15;
   }
+  USB.print(F("cycle time= "));
+  USB.println(cycle_time);
+
+  x = cycle_time % 60; // sec
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[9] = y[0];
+  rtc_str[10] = y[1];
+
+  x = cycle_time / 60 % 60; // min
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[6] = y[0];
+  rtc_str[7] = y[1];
+
+  x = cycle_time / 3600 % 3600; // h
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[3] = y[0];
+  rtc_str[4] = y[1];
+
+  ///-------------
+
+  // Go to deepsleep
+
+  ////////////////////////////////////////////////
+  // 5. Sleep
+  ////////////////////////////////////////////////
+  USB.println(F("5. Enter deep sleep..."));
+  USB.print(F("X"));
+  USB.print(rtc_str);
+  USB.println(F("X"));
+
+  //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+  USB.println(RTC.getTimestamp());
+  USB.OFF();
+  //delay(30000);
+  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  USB.ON();
+  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  USB.println(F("6. Wake up!!\n\n"));
+
+
+}
 
 
 
