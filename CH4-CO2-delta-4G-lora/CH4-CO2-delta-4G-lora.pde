@@ -15,7 +15,7 @@ uint8_t error, status = false;
 char y[3];
 uint8_t sd_answer, ssent = 0, resend_f = 2; // frame resend atempts
 bool sentence = false; // true for deletion on reboot  , false for data appended to end of file
-bool IRL_time = false; //  true for no external data source
+bool IRL_time = true; //  true for no external date source  ( RTC)
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous;
 bool RTC_SUCCES = false;
@@ -1175,8 +1175,9 @@ void masurator_aer()
   // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
   USB.println(RTC.getTime());
   USB.println(F("Enter deep sleep mode to wait for sensors heating time..."));   // maybe add sleep time in here too
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
-  //delay(120000);
+  // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
+  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  delay(120000);
   USB.println(RTC.getTime());
   USB.println(F("wake up!!\r\n"));
 
