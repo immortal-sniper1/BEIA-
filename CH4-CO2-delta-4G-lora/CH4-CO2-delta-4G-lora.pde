@@ -79,7 +79,7 @@ uint8_t errorSetTimeServer, errorEnableTimeSync, errorSetGMT, errorsetTimefromWi
 uint8_t statusWiFiconn, statusSetTimeServer, statusTimeSync, statusSetGMT, statussetTimefromWiFi;
 uint8_t socketLoRa = SOCKET1;
 uint8_t errorLoRa, errorLoRa_config;
-
+int VV1, ppp, ppp2, nnr;
 
 
 // subprograme
@@ -850,11 +850,6 @@ RIUK:
 
 
 
-
-
-
-
-
 void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
 {
   USB.println(F(" "));
@@ -1422,6 +1417,145 @@ void LoRa_sendconfirmed()
 
 /////////////////////LORA/////////////////////////
 
+
+
+
+
+
+
+
+
+void measurerr_CH4()
+{
+
+  USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
+  //PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
+  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  delay(120000);
+  USB.println(F("wake up!!\r\n"));
+  int ppp, ppp2, dd, j, nnr, jj;
+  long int sum = 0;
+  char answer4[] = {"ERROR reading sensor\r\n"};
+  uint32_t timeout = 5000;
+  char sensor_reading[] = {"\r\n"};
+  char kk[10];
+
+
+
+
+  //USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));     // citirea pin analog
+  for (  j = 1; j <= 5 ; j++)
+  {
+    VV1 = analogRead(ANALOG2);     // 2 pt socket C                5 pt socket F
+    USB.print(F("  ||    ANALOG: "));
+    USB.print(VV1);
+    sum = sum + VV1;
+
+    delay(1200);
+  }
+
+  USB.println(" ");
+  VV1 = sum / 5;
+  ppp = VV1  * 50000 / 1023;
+  if (ppp < 0)
+  {
+    ppp = 0;
+  }
+  USB.println(" ");
+  USB.print(F("  ||    ANALOG avg: "));
+  USB.print(  VV1 );
+  USB.print(F("  units and that is equivalent to: "));
+  USB.print(  VV1 * 3.3333 / 1023 );
+  USB.print(F("  V"));
+  USB.println(" ");
+
+
+
+
+
+
+  // citire pin digital
+  /*
+    0        0      low
+    0.2      62
+    1.8      558    high
+    2        620
+  */
+  sum = 0;
+
+
+
+  //citirea digitala
+  /*
+    for (  j = 1; j <= 5 ; j++)
+    {
+    answer13 = uart.waitFor(sensor_reading, answer4, timeout);
+    switch (answer13)
+    {
+      case 0:
+        USB.println(F("TIMEOUTED 10S "));
+        break;
+      case 1:
+        USB.print(F("Parse sensor info: "));
+        USB.println((char*)uart._buffer);
+        break;
+      case 2:
+        // Answer was ERROR reading sensor
+        USB.println(F("Answer was ERROR reading sensor"));
+        break;
+      default:
+        USB.println(F("HOW IS THIS EVEN POSSIBLE??!!"));
+        USB.println(F("CODE IS MESSES UP HARD HERE!"));
+    }
+    USB.print(F("UART data: "));
+    nnr = 0;
+    for (  jj = 0; jj < uart._length ; jj++)
+    {
+      USB.print(   uart._buffer[jj]  );
+      nnr = nnr * 10 + uart._buffer[jj];
+      uart_data_ch[j * 5 + jj] = uart._buffer[jj];
+    }
+    USB.println(" " );
+    ppp2 = binaryToDecimal( nnr);
+    USB.println(F("DIgital data: "));
+    USB.println( ppp2 );
+    sum = sum + ppp2;
+    delay(1200);
+
+    }
+    USB.println(" ");
+    ppp2 = sum / 5;
+
+    USB.print(F("SUM-digital: "));
+    USB.println(sum);
+  */
+  if (ppp2 < 0)
+  {
+    ppp2 = -ppp2;
+  }
+
+  /*
+    frame.createFrame(ASCII, node_ID); // frame1 de  stocat
+    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+    frame.addSensor(SENSOR_GASES_CH4, ppp  );     // CH4 analogic
+    frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
+    frame.addTimestamp();
+    frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
+    frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
+    frame.showFrame();
+    //PWR.setSensorPower(SENS_3V3, SENS_OFF);
+
+  */
+}
+
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void masurator_aer()
 {
@@ -1468,8 +1602,8 @@ void masurator_aer()
 
   //Power off sensors
   CO2.OFF();
-
-
+  delay(500);
+measurerr_CH4();
 
 
 
@@ -1487,7 +1621,11 @@ void masurator_aer()
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   // Add CO2 value
   frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
-
+  frame.addSensor(SENSOR_GASES_CH4, ppp  );     // CH4 analogic
+  frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
+  frame.addTimestamp();
+  frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
+  frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
 
   // frame.showFrame();
 
@@ -1509,7 +1647,11 @@ void masurator_aer()
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   // Add CO2 value
   frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
-
+  frame.addSensor(SENSOR_GASES_CH4, ppp  );     // CH4 analogic
+  frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
+  frame.addTimestamp();
+  frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
+  frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
 
   frame.showFrame();
 
