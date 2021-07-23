@@ -1603,7 +1603,7 @@ void masurator_aer()
   //Power off sensors
   CO2.OFF();
   delay(500);
-measurerr_CH4();
+  measurerr_CH4();
 
 
 
@@ -1686,6 +1686,7 @@ void setup()
   RTC.ON();
   //  x=setProgramVersion(1);
 
+
   INFO_4G_MDD();
   INFO_4G_NET();
   //HTTP_GET_4G();
@@ -1753,6 +1754,15 @@ void setup()
   USB.ON();
   loop_count = 0;
 
+
+
+  //error = LoRaWAN.getDeviceEUI();
+  USB.print(F("EUI : "));
+  USB.println(LoRaWAN.getDeviceEUI());
+
+  //error = LoRaWAN.getDeviceAddr();
+  USB.print(F("Adress : "));
+  USB.println( LoRaWAN.getDeviceAddr());
 }
 
 
