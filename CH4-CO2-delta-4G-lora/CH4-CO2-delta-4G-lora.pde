@@ -1631,9 +1631,10 @@ void masurator_aer()
   // frame.showFrame();
 
 
-/*
+
 
   ssent = HTTP_4G_TRIMITATOR_FRAME();
+  /*
   LoRa_switchon();
   LoRa_joinABP_send();
   LoRa_switchoff();
