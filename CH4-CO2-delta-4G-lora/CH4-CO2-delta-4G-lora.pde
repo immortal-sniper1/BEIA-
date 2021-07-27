@@ -1696,7 +1696,7 @@ void setup()
   //HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  OTA_setup_check(5);
+ // OTA_setup_check(5);
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1760,12 +1760,12 @@ void setup()
 
 
   //error = LoRaWAN.getDeviceEUI();
-  USB.print(F("EUI : "));
-  USB.println(LoRaWAN.getDeviceEUI());
+ // USB.print(F("EUI : "));
+ // USB.println(LoRaWAN.getDeviceEUI());
 
   //error = LoRaWAN.getDeviceAddr();
-  USB.print(F("Adress : "));
-  USB.println( LoRaWAN.getDeviceAddr());
+//  USB.print(F("Adress : "));
+//  USB.println( LoRaWAN.getDeviceAddr());
 }
 
 
@@ -1793,18 +1793,18 @@ void loop()
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  program_verrr = Utils.getProgramVersion();    //versiune program
+//  program_verrr = Utils.getProgramVersion();    //versiune program
   masurator_aer();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  OTAP_4G();
+//  OTAP_4G();
 
   USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
   /// NU UMBLA AICI!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
-  IN_LOOP_RTC_CHECK( RTC_SUCCES);
+//  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
+//  IN_LOOP_RTC_CHECK( RTC_SUCCES);
 
   USB.println(F("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT "));
 
