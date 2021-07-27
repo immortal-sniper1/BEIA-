@@ -1563,7 +1563,7 @@ void masurator_aer()
   float temperature;
   float humidity;
   float pressure;
-
+  float concO3;
   float concCO2;
   float concCH4;
 
@@ -1602,9 +1602,9 @@ void masurator_aer()
 
   //Power off sensors
   CO2.OFF();
-  delay(500);
+  delay(1500);
   measurerr_CH4();
-
+  concO3=50000 -ppp;
 
 
 
@@ -1622,6 +1622,7 @@ void masurator_aer()
   // Add CO2 value
   frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
   frame.addSensor(SENSOR_GASES_CH4, ppp  );     // CH4 analogic
+  frame.addSensor(SENSOR_GASES_PRO_O3, concO3); // CH4 complement analogic
   frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
   frame.addTimestamp();
   frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
@@ -1630,13 +1631,13 @@ void masurator_aer()
   // frame.showFrame();
 
 
-
+/*
 
   ssent = HTTP_4G_TRIMITATOR_FRAME();
   LoRa_switchon();
   LoRa_joinABP_send();
   LoRa_switchoff();
-
+*/
   frame.createFrame(ASCII, node_ID); // frame
 
   frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
@@ -1648,6 +1649,7 @@ void masurator_aer()
   // Add CO2 value
   frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2);
   frame.addSensor(SENSOR_GASES_CH4, ppp  );     // CH4 analogic
+  frame.addSensor(SENSOR_GASES_PRO_O3, concO3); // CH4 complement analogic
   frame.addSensor(SENSOR_GASES_US, VV1);       // tensiune RAW de la output analogic
   frame.addTimestamp();
   frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
