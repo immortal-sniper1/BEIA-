@@ -1429,8 +1429,8 @@ void measurerr_CH4()
 {
 
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
-  //PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
-  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
+  PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
+  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
   delay(120000);
   USB.println(F("wake up!!\r\n"));
   int ppp, ppp2, dd, j, nnr, jj;
@@ -1543,9 +1543,10 @@ void measurerr_CH4()
     frame.addSensor(SENSOR_GASES_O2, ppp2  );     // CH4 digital
     frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
     frame.showFrame();
-    //PWR.setSensorPower(SENS_3V3, SENS_OFF);
 
   */
+      PWR.setSensorPower(SENS_3V3, SENS_OFF);
+
 }
 
 
