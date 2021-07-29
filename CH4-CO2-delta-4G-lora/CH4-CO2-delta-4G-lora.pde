@@ -1432,7 +1432,7 @@ void measurerr_CH4()
 
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
-  //  PWR.setSensorPower(SENS_5, SENS_ON);   // power sensor on daca nu merge cu prima
+  //  PWR.setSensorPower(SENS_5V, SENS_ON);   // power sensor on daca nu merge cu prima
   PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
   delay(120000);
   USB.println(F("wake up!!\r\n"));
@@ -1549,7 +1549,7 @@ void measurerr_CH4()
 
   */
       PWR.setSensorPower(SENS_3V3, SENS_OFF);
-            PWR.setSensorPower(SENS_5, SENS_OFF);
+            PWR.setSensorPower(SENS_5V, SENS_OFF);
 
 }
 
