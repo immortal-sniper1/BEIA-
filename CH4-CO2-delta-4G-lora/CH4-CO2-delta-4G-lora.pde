@@ -867,7 +867,7 @@ void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
     RTC.setTime("10:01:01:06:01:00:00");
     USB.println(RTC.getTime());
     delay(1000);
-    break;
+    goto eend;
   }
   
 kyuubi:
@@ -910,6 +910,7 @@ kyuubi:
   //////////////////////////////////////////////////
   _4G.OFF();
   USB.println(F("2. Switch OFF 4G module"));
+  eend:
 }
 
 
