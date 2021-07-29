@@ -860,6 +860,16 @@ void SET_RTC_4G( int g = 2) // 2 pt GMT+2 adica ora Romaniei
   //////////////////////////////////////////////////
   // 1. Switch ON the 4G module
   //////////////////////////////////////////////////
+  
+    if (IRL_time)   // se activeaza doar daca setam manual ca nu avem RTC
+  {
+    // Setting time [yy:mm:dd:dow:hh:mm:ss]
+    RTC.setTime("10:01:01:06:01:00:00");
+    USB.println(RTC.getTime());
+    delay(1000);
+    break;
+  }
+  
 kyuubi:
   error = _4G.ON();
 
