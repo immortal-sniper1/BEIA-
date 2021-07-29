@@ -54,7 +54,7 @@ char ftp_user[] = "folderone@agile.ro";
 char ftp_pass[] = "1fENXK~0qMgw";
 
 ///senzori
-Gas CO2(SOCKET_A);
+Gas CO2(SOCKET_F);
 Gas CH4(SOCKET_C);
 
 ////////////
@@ -1153,7 +1153,7 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 
 /////////////////////LORA/////////////////////////
 
@@ -1419,7 +1419,7 @@ void LoRa_sendconfirmed()
 
 
 
-
+*/
 
 
 
@@ -1430,6 +1430,7 @@ void measurerr_CH4()
 
   USB.println(" Inceputuul citirii CH4 ETA 60+ SEC ");
   PWR.setSensorPower(SENS_3V3, SENS_ON);   // power sensor on
+  //  PWR.setSensorPower(SENS_5, SENS_ON);   // power sensor on daca nu merge cu prima
   PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);    // trebuie sa fie 2 min
   delay(120000);
   USB.println(F("wake up!!\r\n"));
@@ -1446,7 +1447,7 @@ void measurerr_CH4()
   //USB.println(F("Analog output (0 - 3.3V): from 0 to 1023"));     // citirea pin analog
   for (  j = 1; j <= 5 ; j++)
   {
-    VV1 = analogRead(ANALOG2);     // 2 pt socket C                5 pt socket F
+    VV1 = analogRead(ANALOG5);     // 2 pt socket C                5 pt socket F
     USB.print(F("  ||    ANALOG: "));
     USB.print(VV1);
     sum = sum + VV1;
@@ -1546,6 +1547,7 @@ void measurerr_CH4()
 
   */
       PWR.setSensorPower(SENS_3V3, SENS_OFF);
+            PWR.setSensorPower(SENS_5, SENS_OFF);
 
 }
 
