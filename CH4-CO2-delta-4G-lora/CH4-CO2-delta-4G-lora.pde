@@ -1390,6 +1390,8 @@ void LoRa_sendconfirmed()
   //     * '2' : Module didn't response
   //     * '1' : Module communication error
   //     */
+  
+  /*
   // Check status
   if ( errorLoRa == 0 )
   {
