@@ -911,6 +911,7 @@ kyuubi:
   _4G.OFF();
   USB.println(F("2. Switch OFF 4G module"));
   eend:
+  delay(100);
 }
 
 
