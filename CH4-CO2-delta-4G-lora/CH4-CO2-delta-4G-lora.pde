@@ -1872,10 +1872,10 @@ void loop()
   USB.println(F("X"));
 
   //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
-  USB.println(RTC.getTimestamp());
+  //USB.println(RTC.getTimestamp());
   USB.OFF();
-  //delay(30000);
-  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  delay(30000); //30 s 
+  //PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
   USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
   USB.println(F("6. Wake up!!\n\n"));
