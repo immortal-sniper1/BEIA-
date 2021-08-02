@@ -1560,8 +1560,8 @@ void measurerr_CH4()
     frame.showFrame();
 
   */
-      PWR.setSensorPower(SENS_3V3, SENS_OFF);
-            PWR.setSensorPower(SENS_5V, SENS_OFF);
+     PWR.setSensorPower(SENS_3V3, SENS_OFF);
+     PWR.setSensorPower(SENS_5V, SENS_OFF);
 
 }
 
@@ -1624,7 +1624,7 @@ void masurator_aer()
   concO3=50000 -ppp;
 
 
-
+/*
 
   // frame de trimis
 
@@ -1646,11 +1646,11 @@ void masurator_aer()
   frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
 
   // frame.showFrame();
+*/
 
 
 
-
-  ssent = HTTP_4G_TRIMITATOR_FRAME();
+  //ssent = HTTP_4G_TRIMITATOR_FRAME();
   /*
   LoRa_switchon();
   LoRa_joinABP_send();
@@ -1674,7 +1674,7 @@ void masurator_aer()
   frame.addSensor(SENSOR_GASES_PRES, nnr  );    // date din frame uart  RAW (binar)
 
   frame.showFrame();
-
+  ssent = HTTP_4G_TRIMITATOR_FRAME();
   scriitor_SD(filename, ssent);
 
 
