@@ -22,8 +22,7 @@ bool RTC_SUCCES;
 int loop_count = 0;
 
 
-// Create an instance of the class
-pt1000Class TemperatureSensor;
+
 // choose socket (SELECT USER'S SOCKET)
 ///////////////////////////////////////
 uint8_t socket = SOCKET0;
@@ -67,17 +66,61 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 300; // in seconds
+int cycle_time2 = 1200; // in seconds
+
+// Create an instance of the class
+pt1000Class tempSensor;
+ionSensorClass calciumSensor(SOCKET_A);
+ionSensorClass NO3Sensor(SOCKET_B);
+ionSensorClass AmmoniumSensor (SOCKET_C);
+ionSensorClass MagnesiumSensor(SOCKET_D);
 
 
 
 
 
+//======================================================================
+// Calibration concentrations solutions used in the process
+//======================================================================
+#define point1 10.0
+#define point2 100.0
+#define point3 1000.0
+//======================================================================
+// Calibration voltage values for Calcium sensor
+//======================================================================
+#define point1_volt_Ca 2.163
+#define point2_volt_Ca 2.296
+#define point3_volt_Ca 2.425
+//======================================================================
+// Calibration voltage values for NO3 sensor
+//======================================================================
+#define point1_volt_NO3 3.080
+#define point2_volt_NO3 2.900
+#define point3_volt_NO3 2.671
+//======================================================================
+// Calibration voltage values for Magnesium sensor
+//======================================================================
+#define point1_volt_MG 3.115
+#define point2_volt_MG 2.834
+#define point3_volt_MG 2.557
+//======================================================================
+// Calibration voltage values for NH4 sensor
+//======================================================================
+#define point1_volt_NH4 3.080
+#define point2_volt_NH4 2.900
+#define point3_volt_NH4 2.671
+//======================================================================
+// Define the number of calibration points
+//======================================================================
+#define NUM_POINTS 3
 
-
-
-
-
+//======================================================================
+const float concentrations[] = { point1, point2, point3 };
+const float voltages_Ca[]    = { point1_volt_Ca, point2_volt_Ca, point3_volt_Ca};
+const float voltages_NO3[]   = { point1_volt_NO3, point2_volt_NO3, point3_volt_NO3 };
+const float voltages_MG[]     = { point1_volt_MG, point2_volt_MG, point3_volt_MG };
+const float voltages_NH4[]   = { point1_volt_NH4, point2_volt_NH4, point3_volt_NH4 };
+//======================================================================
 
 
 
@@ -627,7 +670,102 @@ void all_in_1_frame_process()
   scriitor_SD(filename, ssent);
 }
 
+void IONII()
+{
+    uint8_t ssent = 0;
+  ///////////////////////////////////////////
+  // 1. Turn on the board
+  ///////////////////////////////////////////
 
+  SWIonsBoard.ON();
+  delay(2000);
+
+  ///////////////////////////////////////////
+  // 2. Read sensors
+  ///////////////////////////////////////////
+
+  // Read the Calcium sensor
+  float CaVolts = calciumSensor.read();
+  float calciumValue = calciumSensor.calculateConcentration(CaVolts);
+  delay(500);
+  // Read the NO3 sensor
+  float NO3Volts = NO3Sensor.read();
+  float NO3Value = NO3Sensor.calculateConcentration(NO3Volts);
+  delay(500);
+  // Read the Temperature sensor
+  float tempValue = tempSensor.read();
+  delay(500);
+  float AmmoniumSensorV =   AmmoniumSensor.read();
+  float AmmoniumSensorD = AmmoniumSensor.calculateConcentration( AmmoniumSensorV  );
+  delay(500);
+  float MagnesiumSensorV = MagnesiumSensor.read();
+  float MagnesiumSensorD = MagnesiumSensor.calculateConcentration( MagnesiumSensorV  );
+  delay(500);
+
+  // Delay
+  SWIonsBoard.OFF();
+  delay(500);
+
+  // Print of the results
+  USB.print(F("Temperature (Celsius degrees): "));
+  USB.println(tempValue);
+  USB.print(F("BAT "));
+  USB.println(PWR.getBatteryLevel());
+
+
+  ///////////////////////////////////////////
+  // 4. Create BINARY frame
+  ///////////////////////////////////////////
+
+  // Create new frame (BINARY)
+  frame.createFrame(BINARY);
+
+  // Add temperature
+  frame.addSensor(SENSOR_IONS_WT, tempValue);
+  // Add PH
+  frame.addSensor(SENSOR_IONS_CA, calciumValue);
+  // Add ORP value
+  frame.addSensor(SENSOR_IONS_NO3, NO3Value);
+  // Add PH
+  frame.addSensor(SENSOR_IONS_MG, MagnesiumSensorD);
+  // Add ORP value
+  frame.addSensor(SENSOR_IONS_NH4, AmmoniumSensorD);
+
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+
+
+
+  ssent = trimitator_WIFI();
+
+
+  
+  ///////////////////////////////////////////
+  // 4. Create ASCII frame
+  ///////////////////////////////////////////
+
+  // Create new frame (ASCII)
+  frame.createFrame(ASCII);
+
+  // Add temperature
+  frame.addSensor(SENSOR_IONS_WT, tempValue);
+  // Add PH
+  frame.addSensor(SENSOR_IONS_CA, calciumValue);
+  // Add ORP value
+  frame.addSensor(SENSOR_IONS_NO3, NO3Value);
+  // Add PH
+  frame.addSensor(SENSOR_IONS_MG, MagnesiumSensorD);
+  // Add ORP value
+  frame.addSensor(SENSOR_IONS_NH4, AmmoniumSensorD);
+
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+
+  // Show the frame
+  frame.showFrame();
+
+  scriitor_SD(filename, ssent);
+  
+
+}
 
 
 
@@ -662,45 +800,34 @@ void setup()
 
   // Set SD ON
   SD_TEST_FILE_CHECK();
+
+  // Calibrate the Calcium sensor
+  calciumSensor.setCalibrationPoints(voltages_Ca, concentrations, NUM_POINTS);
+  // Calibrate the NO3 sensor
+  NO3Sensor.setCalibrationPoints(voltages_NO3, concentrations, NUM_POINTS);
+  // Calibrate the Magnesium sensor
+  MagnesiumSensor.setCalibrationPoints(voltages_MG, concentrations, NUM_POINTS);
+  // Calibrate the NH4 sensor
+  AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrations, NUM_POINTS);
 }
+
+
+
+
+
 
 void loop()
 {
-  // Reading of the Temperature sensor
-  SWIonsBoard.ON();
-  delay(500);
-  float temperature = TemperatureSensor.read();
-
-  // Print of the results
-  USB.print(F("Temperature (Celsius degrees): "));
-  USB.println(temperature);
-  USB.print(F("BAT "));
-  USB.println(PWR.getBatteryLevel());
-  //
-  // Delay
-  SWIonsBoard.OFF();
-  delay(1000);
-
-  ///////////////////////////////////////////
-  // 4. Create ASCII frame
-  ///////////////////////////////////////////
-
-  // Create new frame (ASCII)
-  frame.createFrame(ASCII);
-
-  // Add temperature
-  frame.addSensor(SENSOR_IONS_WT, temperature);
-  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-
-  // Show the frame
-  frame.showFrame();
-
-  all_in_1_frame_process();
+  IONII();
 
 
 
 
-  
+
+
+
+
+
   //OTA_check_loop();
 
   ///////////////  NU UMBLA AICI !!!
