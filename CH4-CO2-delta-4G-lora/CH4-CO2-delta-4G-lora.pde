@@ -1755,7 +1755,7 @@ void setup()
   loop_count = 0;
 
 
-
+/*
   //error = LoRaWAN.getDeviceEUI();
   USB.print(F("EUI : "));
   USB.println(LoRaWAN.getDeviceEUI());
@@ -1763,6 +1763,8 @@ void setup()
   //error = LoRaWAN.getDeviceAddr();
   USB.print(F("Adress : "));
   USB.println( LoRaWAN.getDeviceAddr());
+
+  */
 }
 
 
