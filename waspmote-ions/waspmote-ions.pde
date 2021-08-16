@@ -66,7 +66,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 1200; // in seconds
+int cycle_time2 = 100; // in seconds
 
 // Create an instance of the class
 pt1000Class tempSensor;
@@ -730,11 +730,15 @@ void IONII()
 
   // Read the Calcium sensor
   float CaVolts = calciumSensor.read();
+  USB.print(F("calciumSensor: "));
+  USB.println( CaVolts );
   float calciumValue = calciumSensor.calculateConcentration(CaVolts);
   delay(500);
 
   // Read the NO3 sensor
   float NO3Volts = NO3Sensor.read();
+  USB.print(F("NO3Sensor: "));
+  USB.println( NO3Volts );
   float NO3Value = NO3Sensor.calculateConcentration(NO3Volts);
   delay(500);
 
@@ -744,11 +748,15 @@ void IONII()
 
   // Read the NH4 sensor
   float AmmoniumSensorV =   AmmoniumSensor.read();
+  USB.print(F(" AmmoniumSensor: "));
+  USB.println( AmmoniumSensorV );
   float AmmoniumSensorD = AmmoniumSensor.calculateConcentration( AmmoniumSensorV  );
   delay(500);
 
   // Read the MG sensor
   float MagnesiumSensorV = MagnesiumSensor.read();
+  USB.print(F(" MagnesiumSensor: "));
+  USB.println( MagnesiumSensorV );
   float MagnesiumSensorD = MagnesiumSensor.calculateConcentration( MagnesiumSensorV  );
   delay(500);
 
