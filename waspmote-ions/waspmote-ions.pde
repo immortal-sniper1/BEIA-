@@ -118,7 +118,7 @@ ionSensorClass MagnesiumSensor(SOCKET_D);
 const float concentrations[] = { point1, point2, point3 };
 const float voltages_Ca[]    = { point1_volt_Ca, point2_volt_Ca, point3_volt_Ca};
 const float voltages_NO3[]   = { point1_volt_NO3, point2_volt_NO3, point3_volt_NO3 };
-const float voltages_MG[]     = { point1_volt_MG, point2_volt_MG, point3_volt_MG };
+const float voltages_MG[]    = { point1_volt_MG, point2_volt_MG, point3_volt_MG };
 const float voltages_NH4[]   = { point1_volt_NH4, point2_volt_NH4, point3_volt_NH4 };
 //======================================================================
 
@@ -403,6 +403,8 @@ void SD_TEST_FILE_CHECK( char filename_st[] =  filename )   // eventual de adaug
 
 
 
+
+
 //// WIFI//////////////////////////////////////////////
 
 int trimitator_WIFI()
@@ -471,6 +473,9 @@ qwerty:
   USB.println(b);
   return ssent;
 }
+
+
+
 
 
 
@@ -658,21 +663,60 @@ void WiFi_init()
 void all_in_1_frame_process()
 {
   uint8_t ssent = 0;
-  ssent = trimitator_WIFI();
-  /*
-    if (   ssent != 1)
+  bool rr = true;
+  uint8_t lvl;
+
+  if ( PWR.getBatteryLevel() >= 50)
+  {
+    goto SS;
+  }
+  else
+  {
+    if ( (PWR.getBatteryLevel() >= 30)  && (loop_count % 2 == 0) )
     {
-      USB.println(F("WIFI/4G failed to send atempting with LORAWAN "));
-      USB.println(F("ASTA NU ARE LORA "));
-      ssent = 3;
+      goto SS;
     }
-  */
+    else
+    {
+      lvl = 1;
+      goto NSS;
+    }
+    if ( (PWR.getBatteryLevel() >= 20) && (PWR.getBatteryLevel() < 30) && (loop_count % 4 == 0) )
+    {
+      goto SS;
+    }
+    else
+    {
+      lvl = 2;
+      goto NSS;
+    }
+
+  }
+
+
+SS:
+  ssent = trimitator_WIFI();
   scriitor_SD(filename, ssent);
+  rr = false;
+NSS:
+  if ( rr)
+  {
+    USB.println(F("DATA WAS NOT SENT DUE TO LOW BATTERY BUT IT WAS RECORDED ON THE SD CARD"));
+    USB.print(F("AT THE CURENT BATTERY LEVEL DATA IS  SENT OANCE EVERY "));
+    USB.print(  pow(2, lvl)   );
+    USB.println(F(" CYCLES AND NOW IT IS ONE OF THE NON TRANSMISSION CYCLES"));
+  }
+
 }
+
+
+
+
+
 
 void IONII()
 {
-    uint8_t ssent = 0;
+  uint8_t ssent = 0;
   ///////////////////////////////////////////
   // 1. Turn on the board
   ///////////////////////////////////////////
@@ -688,16 +732,22 @@ void IONII()
   float CaVolts = calciumSensor.read();
   float calciumValue = calciumSensor.calculateConcentration(CaVolts);
   delay(500);
+
   // Read the NO3 sensor
   float NO3Volts = NO3Sensor.read();
   float NO3Value = NO3Sensor.calculateConcentration(NO3Volts);
   delay(500);
+
   // Read the Temperature sensor
   float tempValue = tempSensor.read();
   delay(500);
+
+  // Read the NH4 sensor
   float AmmoniumSensorV =   AmmoniumSensor.read();
   float AmmoniumSensorD = AmmoniumSensor.calculateConcentration( AmmoniumSensorV  );
   delay(500);
+
+  // Read the MG sensor
   float MagnesiumSensorV = MagnesiumSensor.read();
   float MagnesiumSensorD = MagnesiumSensor.calculateConcentration( MagnesiumSensorV  );
   delay(500);
@@ -738,7 +788,7 @@ void IONII()
   ssent = trimitator_WIFI();
 
 
-  
+
   ///////////////////////////////////////////
   // 4. Create ASCII frame
   ///////////////////////////////////////////
@@ -763,7 +813,7 @@ void IONII()
   frame.showFrame();
 
   scriitor_SD(filename, ssent);
-  
+
 
 }
 
@@ -818,12 +868,20 @@ void setup()
 
 void loop()
 {
+  // get actual time before loop
+  prev = millis();
+  loop_count++;
+  if (loop_count > 2000000000)
+    // 2147483647
+  {
+    loop_count = 0;
+  }
+  USB.print(F("loop_count: "));
+  USB.println( loop_count);
+
+
+
   IONII();
-
-
-
-
-
 
 
 
