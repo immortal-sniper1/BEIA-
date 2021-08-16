@@ -123,10 +123,10 @@ const float voltages_NH4[]   = { point1_volt_NH4, point2_volt_NH4, point3_volt_N
 //======================================================================
 
 
-
-
-
-
+const float concentrationsCa[]  = { 36.0,   180.0, 360.0 };
+const float concentrationsMg[]  = { 11.0,   55.0,  110.0 };
+const float concentrationsNO3[] = { 132.0,  660.0, 1320.0 };
+const float concentrationsNH4[] = { 4.0,    20.0,  40.0 };
 
 
 
