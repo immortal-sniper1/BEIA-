@@ -66,7 +66,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 100; // in seconds
+int cycle_time2 = 30; // in seconds
 
 // Create an instance of the class
 pt1000Class tempSensor;
@@ -82,40 +82,40 @@ ionSensorClass MagnesiumSensor(SOCKET_D);
 //======================================================================
 // Calibration concentrations solutions used in the process
 //======================================================================
-#define point1 10.0
-#define point2 100.0
-#define point3 1000.0
+//#define point1 10.0
+//#define point2 100.0
+//#define point3 1000.0
 //======================================================================
 // Calibration voltage values for Calcium sensor
 //======================================================================
-#define point1_volt_Ca 2.163
-#define point2_volt_Ca 2.296
-#define point3_volt_Ca 2.425
+#define point1_volt_Ca 2.950
+#define point2_volt_Ca 3.024
+#define point3_volt_Ca 3.150
 //======================================================================
 // Calibration voltage values for NO3 sensor
 //======================================================================
-#define point1_volt_NO3 3.080
-#define point2_volt_NO3 2.900
-#define point3_volt_NO3 2.671
+#define point1_volt_NO3 3.567
+#define point2_volt_NO3 3.426
+#define point3_volt_NO3 3.409
 //======================================================================
 // Calibration voltage values for Magnesium sensor
 //======================================================================
-#define point1_volt_MG 3.115
-#define point2_volt_MG 2.834
-#define point3_volt_MG 2.557
+#define point1_volt_MG 2.615
+#define point2_volt_MG 2.727
+#define point3_volt_MG 2.853
 //======================================================================
 // Calibration voltage values for NH4 sensor
 //======================================================================
-#define point1_volt_NH4 3.080
-#define point2_volt_NH4 2.900
-#define point3_volt_NH4 2.671
+#define point1_volt_NH4 2.901
+#define point2_volt_NH4 3.027
+#define point3_volt_NH4 3.170
 //======================================================================
 // Define the number of calibration points
 //======================================================================
 #define NUM_POINTS 3
 
 //======================================================================
-const float concentrations[] = { point1, point2, point3 };
+//const float concentrations[] = { point1, point2, point3 };
 const float voltages_Ca[]    = { point1_volt_Ca, point2_volt_Ca, point3_volt_Ca};
 const float voltages_NO3[]   = { point1_volt_NO3, point2_volt_NO3, point3_volt_NO3 };
 const float voltages_MG[]    = { point1_volt_MG, point2_volt_MG, point3_volt_MG };
@@ -811,7 +811,7 @@ void IONII()
 
 
 
-  ssent = trimitator_WIFI();
+ // ssent = trimitator_WIFI();
 
 
 
@@ -878,13 +878,13 @@ void setup()
   SD_TEST_FILE_CHECK();
 
   // Calibrate the Calcium sensor
-  calciumSensor.setCalibrationPoints(voltages_Ca, concentrations, NUM_POINTS);
+  calciumSensor.setCalibrationPoints(voltages_Ca, concentrationsCa, NUM_POINTS);
   // Calibrate the NO3 sensor
-  NO3Sensor.setCalibrationPoints(voltages_NO3, concentrations, NUM_POINTS);
+  NO3Sensor.setCalibrationPoints(voltages_NO3, concentrationsNO3, NUM_POINTS);
   // Calibrate the Magnesium sensor
-  MagnesiumSensor.setCalibrationPoints(voltages_MG, concentrations, NUM_POINTS);
+  MagnesiumSensor.setCalibrationPoints(voltages_MG, concentrationsMg, NUM_POINTS);
   // Calibrate the NH4 sensor
-  AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrations, NUM_POINTS);
+  AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrationsNH4, NUM_POINTS);
 
 
   x1 = 0;
