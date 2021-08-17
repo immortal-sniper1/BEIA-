@@ -69,11 +69,11 @@ uint8_t resend_f = 2; // frame resend atempts
 int cycle_time2 = 30; // in seconds
 
 // Create an instance of the class
-pt1000Class tempSensor;
-ionSensorClass calciumSensor(SOCKET_A);
-ionSensorClass NO3Sensor(SOCKET_B);
-ionSensorClass AmmoniumSensor (SOCKET_C);
-ionSensorClass MagnesiumSensor(SOCKET_D);
+pt1000Class     tempSensor;
+ionSensorClass  calciumSensor(SOCKET_A);
+ionSensorClass  NO3Sensor(SOCKET_B);
+ionSensorClass  AmmoniumSensor (SOCKET_C);
+ionSensorClass  MagnesiumSensor(SOCKET_D);
 
 
 
@@ -116,9 +116,9 @@ ionSensorClass MagnesiumSensor(SOCKET_D);
 
 //======================================================================
 //const float concentrations[] = { point1, point2, point3 };
-const float voltages_Ca[]    = { point1_volt_Ca, point2_volt_Ca, point3_volt_Ca};
+const float voltages_Ca[]    = { point1_volt_Ca,  point2_volt_Ca,  point3_volt_Ca};
 const float voltages_NO3[]   = { point1_volt_NO3, point2_volt_NO3, point3_volt_NO3 };
-const float voltages_MG[]    = { point1_volt_MG, point2_volt_MG, point3_volt_MG };
+const float voltages_MG[]    = { point1_volt_MG,  point2_volt_MG,  point3_volt_MG };
 const float voltages_NH4[]   = { point1_volt_NH4, point2_volt_NH4, point3_volt_NH4 };
 //======================================================================
 
@@ -131,7 +131,7 @@ const float concentrationsNH4[] = { 4.0,    20.0,  40.0 };
 
 
 // calibrare
-float x1 , x2, x3, x4, difff;
+//float x1 , x2, x3, x4, difff;
 
 
 
@@ -732,55 +732,55 @@ void IONII()
 
   // Read the Calcium sensor
   float CaVolts = calciumSensor.read();
-  USB.print(F("calciumSensor: "));
-  USB.println( CaVolts );
-  difff = x1 - CaVolts;
-  x1 = CaVolts;
-  USB.print(F("difff = "));
-  USB.println( difff );
+  //  USB.print(F("calciumSensor: "));
+  //  USB.println( CaVolts );
+  //  difff = x1 - CaVolts;
+  //  x1 = CaVolts;
+  //  USB.print(F("difff = "));
+  //  USB.println( difff );
   float calciumValue = calciumSensor.calculateConcentration(CaVolts);
-  delay(500);
+  delay(200);
 
   // Read the NO3 sensor
   float NO3Volts = NO3Sensor.read();
-  USB.print(F("NO3Sensor: "));
-  USB.println( NO3Volts );
-  difff = x2 - NO3Volts;
-  x2 = NO3Volts;
-  USB.print(F("difff = "));
-  USB.println( difff );
+  //  USB.print(F("NO3Sensor: "));
+  //  USB.println( NO3Volts );
+  //  difff = x2 - NO3Volts;
+  //  x2 = NO3Volts;
+  //  USB.print(F("difff = "));
+  //  USB.println( difff );
   float NO3Value = NO3Sensor.calculateConcentration(NO3Volts);
-  delay(500);
+  delay(200);
 
   // Read the Temperature sensor
   float tempValue = tempSensor.read();
-  delay(500);
+  delay(200);
 
   // Read the NH4 sensor
   float AmmoniumSensorV =   AmmoniumSensor.read();
-  USB.print(F(" AmmoniumSensor: "));
-  USB.println( AmmoniumSensorV );
-  difff =x3 - AmmoniumSensorV;
-  x3 = AmmoniumSensorV;
-  USB.print(F("difff = "));
-  USB.println( difff );
+  //  USB.print(F(" AmmoniumSensor: "));
+  //  USB.println( AmmoniumSensorV );
+  //  difff =x3 - AmmoniumSensorV;
+  //  x3 = AmmoniumSensorV;
+  //  USB.print(F("difff = "));
+  //  USB.println( difff );
   float AmmoniumSensorD = AmmoniumSensor.calculateConcentration( AmmoniumSensorV  );
-  delay(500);
+  delay(200);
 
   // Read the MG sensor
   float MagnesiumSensorV = MagnesiumSensor.read();
-  USB.print(F(" MagnesiumSensor: "));
-  USB.println( MagnesiumSensorV );
-  difff = x4 - MagnesiumSensorV;
-  x4 = MagnesiumSensorV;
-  USB.print(F("difff = "));
-  USB.println( difff );
+  //  USB.print(F(" MagnesiumSensor: "));
+  //  USB.println( MagnesiumSensorV );
+  //  difff = x4 - MagnesiumSensorV;
+  //  x4 = MagnesiumSensorV;
+  //  USB.print(F("difff = "));
+  //  USB.println( difff );
   float MagnesiumSensorD = MagnesiumSensor.calculateConcentration( MagnesiumSensorV  );
-  delay(500);
+  delay(200);
 
   // Delay
   SWIonsBoard.OFF();
-  delay(500);
+  delay(200);
 
   // Print of the results
   USB.print(F("Temperature (Celsius degrees): "));
@@ -811,7 +811,7 @@ void IONII()
 
 
 
- // ssent = trimitator_WIFI();
+   ssent = trimitator_WIFI();
 
 
 
@@ -887,10 +887,10 @@ void setup()
   AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrationsNH4, NUM_POINTS);
 
 
-  x1 = 0;
-  x2 = 0;
-  x3 = 0;
-  x4 = 0;
+//  x1 = 0;
+//  x2 = 0;
+//  x3 = 0;
+//  x4 = 0;
 }
 
 
