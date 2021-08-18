@@ -83,15 +83,25 @@ void loop()
 
 /*
 // asta e folosita in void loop la inceput de tott
-Watchdog_setup(int x, bool y = false)
+Watchdog_setup(int x, bool y = false) // x e timpul in secunde  iar y e enable
 {
+  int tt;
 
   if ( y)
   {
-    RTC.setWatchdog( 2.5 * x);
+    tt = 2.5 * x % 60;
+    if (tt > 59)  // 59 minutes max timer time
+    {
+      tt = 59;
+    }
+    if (tt < 1)
+    {
+      tt = 1;   // 1 minute is min timer time
+    }
+    RTC.setWatchdog(tt);
     USB.print(F("RTC timer reset succesful"));
     USB.print(F("        next forced restart: "));
-    USB.println(RTC.getWatchdog());
+    USB.println(  RTC.getWatchdog()  );
   }
 
 }
