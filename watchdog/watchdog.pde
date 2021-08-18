@@ -78,3 +78,31 @@ void loop()
 
 
 
+
+
+
+/*
+// asta e folosita in void loop la inceput de tott
+Watchdog_setup(int x, bool y = false)
+{
+
+  if ( y)
+  {
+    RTC.setWatchdog( 2.5 * x);
+    USB.print(F("RTC timer reset succesful"));
+    USB.print(F("        next forced restart: "));
+    USB.println(RTC.getWatchdog());
+  }
+
+}
+
+
+
+
+// asta vine in void setup
+USB.println(F("Watchdog settings: 2.5 cycle time"));
+
+
+*/
+
+
