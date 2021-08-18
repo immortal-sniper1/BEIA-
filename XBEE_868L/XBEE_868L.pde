@@ -18,7 +18,7 @@
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[] = "FILE1.TXT";
 char *time_date; // stores curent date + time
-int x, b, cycle_time, cycle_time2;
+int x, b, cycle_time;
 uint8_t status = false;
 char y[3];
 uint8_t sd_answer, ssent;
@@ -27,6 +27,10 @@ bool IRL_time = true; //  true for no external date source
 char rtc_str[] = "00:00:00:05";    // 11 char ps incepe de la 0
 unsigned long prev, previous, previousSendFrame;
 bool RTC_SUCCES;
+int cycle_time2 = 900; // in seconds
+
+
+
 
 // Destination MAC address
 // MAC LOW = 41C3ADE5
@@ -296,12 +300,12 @@ fazuzu:
 
 
       /*
-      USB.print(F("xxxxx"));
-      USB.print(  filename_a  );
-      USB.println(F("xxxxx"));
-      USB.print(F("xxxxx"));
-      USB.print(  strlen(  filename_a  ));
-      USB.println(F("xxxxx"));
+        USB.print(F("xxxxx"));
+        USB.print(  filename_a  );
+        USB.println(F("xxxxx"));
+        USB.print(F("xxxxx"));
+        USB.print(  strlen(  filename_a  ));
+        USB.println(F("xxxxx"));
 
       */
     }
@@ -373,7 +377,8 @@ fazuzu:
   coruption = coruption + sd_answer;
   x = RTC.date;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10) 
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -383,7 +388,8 @@ fazuzu:
   coruption = coruption + sd_answer;
   x = RTC.hour;
   itoa(x, y, 10);
-  if (x < 10) {
+  if (x < 10)
+  {
     y[1] = y[0];
     y[0] = '0';
   }
@@ -430,7 +436,9 @@ fazuzu:
   if (coruption == 15)
   {
     USB.println(F("SD storage done with no errors"));
-  } else {
+  }
+  else
+  {
     USB.print(F("SD sorage done with:"));
     USB.print(15 - coruption);
     USB.println(F(" errors"));
@@ -481,7 +489,7 @@ void data_maker( int x , char filename_a[]  )
 
 void gaze_Szelanya()
 {
-// 1. Turn on sensors and wait
+  // 1. Turn on sensors and wait
   ///////////////////////////////////////////
 
   //Power on gas sensors
@@ -553,28 +561,28 @@ void gaze_Szelanya()
   delay(500);
   // Create new frame (ASCII)
   frame.createFrame(ASCII);
-//    // Add PM1
-//    frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
-//      // Add PM2.5
-//    frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
-//      // Add PM10
-//    frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
+  //    // Add PM1
+  //    frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
+  //      // Add PM2.5
+  //    frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
+  //      // Add PM10
+  //    frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
   // Add BAT level
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   // Add temperature
   frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-//    // Add humidity
+  //    // Add humidity
   frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-//    // Add pressure value
+  //    // Add pressure value
   frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-//    // Add CO2 value
-//    frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2, 2);
-//    // Add NO2 value
-//    frame.addSensor(SENSOR_GASES_PRO_NO2, concNO2, 2);
-//    // Add SO2 value
-//    frame.addSensor(SENSOR_GASES_PRO_SO2, concSO2, 2);
-//    // Add O3 value
-//    frame.addSensor(SENSOR_GASES_PRO_O3, concO3, 2);
+  //    // Add CO2 value
+  //    frame.addSensor(SENSOR_GASES_PRO_CO2, concCO2, 2);
+  //    // Add NO2 value
+  //    frame.addSensor(SENSOR_GASES_PRO_NO2, concNO2, 2);
+  //    // Add SO2 value
+  //    frame.addSensor(SENSOR_GASES_PRO_SO2, concSO2, 2);
+  //    // Add O3 value
+  //    frame.addSensor(SENSOR_GASES_PRO_O3, concO3, 2);
   // Show the frame
   frame.showFrame();
 
@@ -616,20 +624,41 @@ void trimitaro_data_XXBEE()
 }
 
 
+// asta e folosita in void loop la inceput de tott
+void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable
+{
+  int tt;
 
+  if ( y)
+  {
+    tt =  x * 3 % 60;
+    if (tt > 59)  // 59 minutes max timer time
+    {
+      tt = 59;
+    }
+    if (tt < 1)
+    {
+      tt = 1;   // 1 minute is min timer time
+    }
+    RTC.setWatchdog(tt);
+    USB.print(F("RTC timer reset succesful"));
+    USB.print(F("        next forced restart: "));
+    USB.println(  RTC.getWatchdog()  );
+  }
+}
 
 
 void setup()
 {
-//    USB.ON();
-//    USB.println("Frame Utility Example for Gases Pro Sensor Board");
-//    USB.println("Sensors used:"));
-//    USB.println("- SOCKET_A: Electrochemical gas sensor (C2)"");
-//    USB.println("- SOCKET_B: Electrochemical gas sensor (NO2)");
-//    USB.println("- SOCKET_C: Electrochemical gas sensor (O3)");
-//    USB.println("- SOCKET_D: Particle matter sensor (dust)");
-//    USB.println("- SOCKET_E: BME280 sensor (temperature, humidity & pressure)");
-//    USB.println("- SOCKET_F: Electrochemical gas sensor (SO2)");
+  //    USB.ON();
+  //    USB.println("Frame Utility Example for Gases Pro Sensor Board");
+  //    USB.println("Sensors used:"));
+  //    USB.println("- SOCKET_A: Electrochemical gas sensor (C2)"");
+  //    USB.println("- SOCKET_B: Electrochemical gas sensor (NO2)");
+  //    USB.println("- SOCKET_C: Electrochemical gas sensor (O3)");
+  //    USB.println("- SOCKET_D: Particle matter sensor (dust)");
+  //    USB.println("- SOCKET_E: BME280 sensor (temperature, humidity & pressure)");
+  //    USB.println("- SOCKET_F: Electrochemical gas sensor (SO2)");
 
 
   // open USB port
@@ -638,6 +667,8 @@ void setup()
   USB.println(F("-------------------------------"));
   USB.println(F("Configure XBee 868LP"));
   USB.println(F("-------------------------------"));
+  USB.println(F("Watchdog settings: 3 cycle time"));
+
 
   XXBEE();
   SD_TEST_FILE_CHECK();
@@ -654,14 +685,72 @@ void loop()
 {
   // get actual time before loop
   prev = millis();
+  Watchdog_setup_and_reset( cycle_time2 , false );
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   gaze_Szelanya();
   trimitaro_data_XXBEE();
   scriitor_SD( filename);
 
-  delay(60000);
 
 
+
+
+  //OTA_check_loop();
+
+  ///////////////  NU UMBLA AICI !!!
+  // RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 10:00 dimineata
+  // IN_LOOP_RTC_CHECK(  RTC_SUCCES);
+  cycle_time = cycle_time2 - b - 5;
+  if (cycle_time < 10)
+  {
+    cycle_time = 15;
+  }
+  USB.print(F("cycle time: "));
+  USB.println(cycle_time);
+
+  x = cycle_time % 60; // sec
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[9] = y[0];
+  rtc_str[10] = y[1];
+
+  x = cycle_time / 60 % 60; // min
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[6] = y[0];
+  rtc_str[7] = y[1];
+
+  x = cycle_time / 3600 % 3600; // h
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[3] = y[0];
+  rtc_str[4] = y[1];
+
+  ////////////////////////////////////////////////
+  // 5. deepsleep
+  ////////////////////////////////////////////////
+  USB.println(F("5. Enter deep sleep..."));
+  USB.print(F("X"));
+  USB.print(rtc_str);
+  USB.println(F("X"));
+
+  USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+  USB.OFF();
+  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  USB.ON();
+  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  USB.println(F("6. Wake up!!\n\n"));
 
 }
 

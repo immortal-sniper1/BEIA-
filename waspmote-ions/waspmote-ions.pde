@@ -66,7 +66,7 @@ char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 30; // in seconds
+int cycle_time2 = 1200; // in seconds
 
 // Create an instance of the class
 pt1000Class     tempSensor;
@@ -844,7 +844,28 @@ void IONII()
 }
 
 
+// asta e folosita in void loop la inceput de tott
+void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable
+{
+  int tt;
 
+  if ( y)
+  {
+    tt =  x * 3 % 60;
+    if (tt > 59)  // 59 minutes max timer time
+    {
+      tt = 59;
+    }
+    if (tt < 1)
+    {
+      tt = 1;   // 1 minute is min timer time
+    }
+    RTC.setWatchdog(tt);
+    USB.print(F("RTC timer reset succesful"));
+    USB.print(F("        next forced restart: "));
+    USB.println(  RTC.getWatchdog()  );
+  }
+}
 
 
 
@@ -916,7 +937,7 @@ void loop()
   IONII();
 
 
-
+ Watchdog_setup_and_reset( cycle_time2 , true );
 
   //OTA_check_loop();
 

@@ -83,13 +83,13 @@ void loop()
 
 /*
 // asta e folosita in void loop la inceput de tott
-Watchdog_setup(int x, bool y = false) // x e timpul in secunde  iar y e enable
+void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable
 {
   int tt;
 
   if ( y)
   {
-    tt = 2.5 * x % 60;
+    tt = 3 * x % 60;
     if (tt > 59)  // 59 minutes max timer time
     {
       tt = 59;
@@ -110,7 +110,7 @@ Watchdog_setup(int x, bool y = false) // x e timpul in secunde  iar y e enable
 
 
 // asta vine in void setup
-USB.println(F("Watchdog settings: 2.5 cycle time"));
+USB.println(F("Watchdog settings: 3 cycle time"));
 
 
 */
