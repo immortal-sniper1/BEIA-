@@ -362,7 +362,7 @@ void loop()
    ///////////////////////////////////////////
   // 2. Send packet
   ///////////////////////////////////////////  
-fuuuu:
+
   // send XBee packet
   error = xbee868LP.send( RX_ADDRESS, frame.buffer, frame.length );   
   
@@ -381,7 +381,6 @@ fuuuu:
     
     // blink red LED
     Utils.blinkRedLED();
-    goto fuuuu;
   }
 
   // wait for five seconds
