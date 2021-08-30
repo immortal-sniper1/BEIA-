@@ -697,9 +697,9 @@ void all_in_1_frame_process()
 
 SS:
   ssent = trimitator_WIFI();
-  scriitor_SD(filename, ssent);
   rr = false;
 NSS:
+  scriitor_SD(filename, ssent);
   if ( rr)
   {
     USB.println(F("DATA WAS NOT SENT DUE TO LOW BATTERY BUT IT WAS RECORDED ON THE SD CARD"));
