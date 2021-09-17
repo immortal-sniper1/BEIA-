@@ -20,14 +20,14 @@
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
             <y:GroupNode>
-              <y:Geometry height="401.37646484375" width="560.0" x="197.76071428571424" y="-37.37646484375"/>
+              <y:Geometry height="353.4665770457136" width="346.91746031746027" x="245.7813492063492" y="-37.37646484375"/>
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
-              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="560.0" x="0.0" xml:space="preserve" y="0.0">Power</y:NodeLabel>
+              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="346.91746031746027" x="0.0" xml:space="preserve" y="0.0">Alimentarea</y:NodeLabel>
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="0" bottomF="0.0" left="0" leftF="5.6843418860808015E-14" right="0" rightF="0.0" top="0" topF="0.0"/>
+              <y:BorderInsets bottom="0" bottomF="0.0" left="0" leftF="0.0" right="0" rightF="5.231639170233393E-5" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
@@ -46,7 +46,7 @@
         <node id="n0::n0">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="108.0" width="183.0" x="238.2607142857143" y="0.0"/>
+              <y:Geometry height="108.0" width="183.0" x="286.2813492063492" y="0.0"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="151.880859375" x="15.5595703125" xml:space="preserve" y="39.7490234375">Panou solar 12V<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -57,10 +57,10 @@
         <node id="n0::n1">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="108.0" width="183.0" x="212.7607142857143" y="223.5"/>
+              <y:Geometry height="70.34011220196362" width="143.45862552594667" x="260.78140152274096" y="222.0"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="47.33984375" x="67.830078125" xml:space="preserve" y="39.7490234375">BMS<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="47.33984375" x="48.059390887973336" xml:space="preserve" y="20.91907953848181">BMS<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:Shape type="rectangle"/>
             </y:ShapeNode>
           </data>
@@ -68,14 +68,10 @@
         <node id="n0::n2">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="143.0" width="317.0" x="425.76071428571424" y="206.0"/>
+              <y:Geometry height="87.84011220196362" width="143.45862552594667" x="434.2401316814711" y="213.25"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="126.509765625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="245.26953125" x="35.865234375" xml:space="preserve" y="8.2451171875">Baterie 4XLi-Ion 18650
-2.4-4.2V pe celula
-9.6-16.8V pe intreaga serie
-efective 4x3.7V =14.8V
-SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="72.92578125" x="35.266422137973336" xml:space="preserve" y="29.66907953848181">Baterie <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:Shape type="rectangle"/>
             </y:ShapeNode>
           </data>
@@ -83,7 +79,7 @@ SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></
         <node id="n0::n3">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="63.0" width="234.0" x="212.7607142857143" y="128.0"/>
+              <y:Geometry height="63.0" width="234.0" x="260.7813492063492" y="128.0"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="199.693359375" x="17.1533203125" xml:space="preserve" y="17.2490234375">Regulator de tensiune<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -96,7 +92,7 @@ SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></
     <node id="n1">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="20.000181994256288" y="948.2544452084063"/>
+          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="20.000181994256288" y="916.3445574103699"/>
           <y:Fill color="#FFCC00" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="65.15234375" x="11.34388422598181" xml:space="preserve" y="29.66907953848181">Valva1<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -107,10 +103,10 @@ SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></
     <node id="n2">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="255.68113437520867" y="948.2544452084063"/>
+          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="373.52161056568485" y="916.3445574103699"/>
           <y:Fill color="#FFCC00" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="65.15234375" x="11.34388422598181" xml:space="preserve" y="29.66907953848181">Valva2<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="65.15234375" x="11.34388422598181" xml:space="preserve" y="29.66907953848181">Valva4<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
         </y:ShapeNode>
       </data>
@@ -118,7 +114,7 @@ SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></
     <node id="n3">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="137.84065818473246" y="948.2544452084063"/>
+          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="255.68113437520867" y="916.3445574103699"/>
           <y:Fill color="#FFCC00" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="65.15234375" x="11.34388422598181" xml:space="preserve" y="29.66907953848181">Valva3<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -132,14 +128,14 @@ SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
             <y:GroupNode>
-              <y:Geometry height="522.2544452084064" width="441.50000000000006" x="53.76071428571427" y="394.99999999999994"/>
+              <y:Geometry height="522.2544452084064" width="441.5" x="82.01071428571427" y="347.09011220196356"/>
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
-              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="441.50000000000006" x="0.0" xml:space="preserve" y="0.0">Control</y:NodeLabel>
+              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="441.5" x="0.0" xml:space="preserve" y="0.0">Control</y:NodeLabel>
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="0" bottomF="0.0" left="0" leftF="0.0" right="0" rightF="5.6843418860808015E-14" top="0" topF="5.6843418860808015E-14"/>
+              <y:BorderInsets bottom="0" bottomF="0.0" left="0" leftF="0.0" right="0" rightF="0.0" top="0" topF="5.6843418860808015E-14"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
@@ -158,10 +154,10 @@ SAU un pachet echivalent <y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></
         <node id="n4::n0">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="97.87798036465631" width="226.0" x="191.2607142857143" y="526.37646484375"/>
+              <y:Geometry height="97.87798036465631" width="226.0" x="219.5107142857143" y="478.46657704571356"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" borderDistance="20.0" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="53.00390625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="218.541015625" x="3.7294921875" xml:space="preserve" y="22.437037057328098">Senzor intern
+              <y:NodeLabel alignment="center" autoSizePolicy="content" borderDistance="20.0" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="53.00390625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="218.541015625" x="3.7294921875" xml:space="preserve" y="22.437037057328155">Senzor intern
 umiditate si temperatura<y:LabelModel><y:SmartNodeLabelModel distance="20.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:Shape type="octagon"/>
             </y:ShapeNode>
@@ -170,7 +166,7 @@ umiditate si temperatura<y:LabelModel><y:SmartNodeLabelModel distance="20.0"/></
         <node id="n4::n1">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="108.0" width="183.0" x="84.26071428571427" y="655.2544452084063"/>
+              <y:Geometry height="108.0" width="183.0" x="112.51071428571427" y="607.3445574103699"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="165.708984375" x="8.6455078125" xml:space="preserve" y="39.7490234375">GSM/GPRS+GPS<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -181,7 +177,7 @@ umiditate si temperatura<y:LabelModel><y:SmartNodeLabelModel distance="20.0"/></
         <node id="n4::n2">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="108.0" width="183.0" x="297.2607142857143" y="655.2544452084063"/>
+              <y:Geometry height="108.0" width="183.0" x="325.5107142857143" y="607.3445574103699"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="87.88671875" x="47.556640625" xml:space="preserve" y="39.7490234375">MC+RTC<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -192,11 +188,11 @@ umiditate si temperatura<y:LabelModel><y:SmartNodeLabelModel distance="20.0"/></
         <node id="n4::n3">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="108.0" width="226.0" x="68.76071428571427" y="794.2544452084063"/>
+              <y:Geometry height="108.0" width="226.0" x="97.01071428571427" y="746.3445574103699"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="53.00390625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="190.669921875" x="17.6650390625" xml:space="preserve" y="27.498046875">relay board or
-NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="53.00390625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="197.427734375" x="14.2861328125" xml:space="preserve" y="27.498046875">placa relee sau circuit
+MOSFET/IGBT<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:Shape type="rectangle"/>
             </y:ShapeNode>
           </data>
@@ -204,7 +200,7 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
         <node id="n4::n4">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="63.0" width="206.1142857142857" x="201.20357142857145" y="432.37646484375"/>
+              <y:Geometry height="63.0" width="206.1142857142857" x="229.45357142857145" y="384.4665770457136"/>
               <y:Fill color="#FFCC00" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="201.91015625" x="2.10206473214285" xml:space="preserve" y="17.2490234375">Coborator de tensiune<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -213,6 +209,17 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
           </data>
         </node>
       </graph>
+    </node>
+    <node id="n5">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="87.84011220196362" width="87.84011220196362" x="137.84065818473246" y="916.3445574103699"/>
+          <y:Fill color="#FFCC00" transparent="false"/>
+          <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="65.15234375" x="11.34388422598181" xml:space="preserve" y="29.66907953848181">Valva2<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
     </node>
     <edge id="n0::e0" source="n0::n0" target="n0::n3">
       <data key="d10">
@@ -227,11 +234,11 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
     <edge id="e0" source="n0::n1" target="n4::n3">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="-61.0" sy="54.0" tx="-56.5" ty="-54.0">
-            <y:Point x="243.2607142857143" y="379.5"/>
-            <y:Point x="68.76071428571429" y="379.5"/>
-            <y:Point x="68.76071428571429" y="778.7544452084063"/>
-            <y:Point x="125.26071428571427" y="778.7544452084063"/>
+          <y:Path sx="-47.81954184198224" sy="35.17005610098181" tx="-56.5" ty="-54.0">
+            <y:Point x="284.69117244373206" y="331.5901122019636"/>
+            <y:Point x="97.01071428571429" y="331.5901122019636"/>
+            <y:Point x="97.01071428571429" y="730.8445574103699"/>
+            <y:Point x="153.51071428571427" y="730.8445574103699"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
@@ -242,9 +249,9 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
     <edge id="e1" source="n0::n1" target="n4::n2">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="61.0" sy="54.0" tx="61.0" ty="-54.0">
-            <y:Point x="365.2607142857143" y="379.5"/>
-            <y:Point x="449.7607142857143" y="379.5"/>
+          <y:Path sx="47.81954184198224" sy="35.17005610098181" tx="61.0" ty="-54.0">
+            <y:Point x="380.33025612769654" y="331.5901122019636"/>
+            <y:Point x="478.0107142857143" y="331.5901122019636"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
@@ -255,7 +262,7 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
     <edge id="n0::e1" source="n0::n2" target="n0::n1">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="-158.5" sy="0.0" tx="91.5" ty="0.0"/>
+          <y:Path sx="-71.72931276297334" sy="0.0" tx="71.72931276297334" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
@@ -265,9 +272,9 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
     <edge id="n0::e2" source="n0::n3" target="n0::n1">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="31.5" tx="0.0" ty="-54.0">
-            <y:Point x="329.7607142857143" y="206.5"/>
-            <y:Point x="304.2607142857143" y="206.5"/>
+          <y:Path sx="0.0" sy="31.5" tx="0.0" ty="-35.17005610098181">
+            <y:Point x="377.7813492063492" y="206.5"/>
+            <y:Point x="332.5107142857143" y="206.5"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
@@ -279,8 +286,8 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="54.0" tx="56.5" ty="-54.0">
-            <y:Point x="388.7607142857143" y="778.7544452084063"/>
-            <y:Point x="238.26071428571427" y="778.7544452084063"/>
+            <y:Point x="417.0107142857143" y="730.8445574103699"/>
+            <y:Point x="266.51071428571424" y="730.8445574103699"/>
           </y:Path>
           <y:LineStyle color="#000000" type="dashed" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
@@ -298,48 +305,12 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e2" source="n4::n3" target="n1">
-      <data key="d10">
-        <y:PolyLineEdge>
-          <y:Path sx="-75.33333333333334" sy="54.0" tx="0.0" ty="-43.92005610098181">
-            <y:Point x="106.42738095238093" y="932.7544452084063"/>
-            <y:Point x="63.9202380952381" y="932.7544452084063"/>
-          </y:Path>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
-          <y:BendStyle smoothed="false"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
-    <edge id="e3" source="n4::n3" target="n2">
-      <data key="d10">
-        <y:PolyLineEdge>
-          <y:Path sx="75.33333333333334" sy="54.0" tx="0.0" ty="-43.92005610098181">
-            <y:Point x="257.0940476190476" y="932.7544452084063"/>
-            <y:Point x="299.6011904761905" y="932.7544452084063"/>
-          </y:Path>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
-          <y:BendStyle smoothed="false"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
-    <edge id="e4" source="n4::n3" target="n3">
-      <data key="d10">
-        <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="54.0" tx="0.0" ty="-43.92005610098181"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
-          <y:BendStyle smoothed="false"/>
-        </y:PolyLineEdge>
-      </data>
-    </edge>
     <edge id="n4::e2" source="n4::n0" target="n4::n2">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="48.938990182328155" tx="-61.0" ty="-54.0">
-            <y:Point x="304.2607142857143" y="639.7544452084063"/>
-            <y:Point x="327.7607142857143" y="639.7544452084063"/>
+            <y:Point x="332.5107142857143" y="591.8445574103699"/>
+            <y:Point x="356.0107142857143" y="591.8445574103699"/>
           </y:Path>
           <y:LineStyle color="#000000" type="dashed" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
@@ -347,11 +318,10 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e5" source="n0::n1" target="n4::n4">
-      <data key="d9"/>
+    <edge id="e2" source="n0::n1" target="n4::n4">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="54.0" tx="0.0" ty="-31.5"/>
+          <y:Path sx="0.0" sy="35.17005610098181" tx="0.0" ty="-31.5"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:BendStyle smoothed="false"/>
@@ -359,12 +329,11 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
       </data>
     </edge>
     <edge id="n4::e3" source="n4::n4" target="n4::n1">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="-68.70476190476191" sy="31.5" tx="0.0" ty="-54.0">
-            <y:Point x="235.5559523809524" y="510.87646484375"/>
-            <y:Point x="175.76071428571427" y="510.87646484375"/>
+          <y:Path sx="-68.70476190476194" sy="31.5" tx="0.0" ty="-54.0">
+            <y:Point x="263.80595238095236" y="462.9665770457136"/>
+            <y:Point x="204.01071428571427" y="462.9665770457136"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
@@ -373,7 +342,6 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
       </data>
     </edge>
     <edge id="n4::e4" source="n4::n4" target="n4::n0">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="31.5" tx="0.0" ty="-48.938990182328155"/>
@@ -384,15 +352,67 @@ NMOS/IGBT circuitry<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:Labe
       </data>
     </edge>
     <edge id="n4::e5" source="n4::n4" target="n4::n2">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="68.70476190476194" sy="31.5" tx="0.0" ty="-54.0">
-            <y:Point x="372.96547619047624" y="510.87646484375"/>
-            <y:Point x="432.7607142857143" y="510.87646484375"/>
-            <y:Point x="432.7607142857143" y="639.7544452084063"/>
-            <y:Point x="388.7607142857143" y="639.7544452084063"/>
+            <y:Point x="401.21547619047624" y="462.9665770457136"/>
+            <y:Point x="461.0107142857143" y="462.9665770457136"/>
+            <y:Point x="461.0107142857143" y="591.8445574103699"/>
+            <y:Point x="417.0107142857143" y="591.8445574103699"/>
           </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e3" source="n4::n3" target="n1">
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-84.75" sy="54.0" tx="0.0" ty="-43.92005610098181">
+            <y:Point x="125.26071428571427" y="884.8445574103699"/>
+            <y:Point x="63.9202380952381" y="884.8445574103699"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e4" source="n4::n3" target="n2">
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="84.75" sy="54.0" tx="0.0" ty="-43.92005610098181">
+            <y:Point x="294.76071428571424" y="884.8445574103699"/>
+            <y:Point x="417.44166666666666" y="884.8445574103699"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e5" source="n4::n3" target="n3">
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="28.25" sy="54.0" tx="0.0" ty="-43.92005610098181">
+            <y:Point x="238.26071428571427" y="900.8445574103699"/>
+            <y:Point x="299.6011904761905" y="900.8445574103699"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e6" source="n4::n3" target="n5">
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="-28.25" sy="54.0" tx="0.0" ty="-43.92005610098181"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:BendStyle smoothed="false"/>
