@@ -32,6 +32,7 @@ int address = 1024;
 int value = 10;
 int aux = 0;
 int i;
+char xx[]="qwerrrr";
 
 
 void setup()
@@ -49,16 +50,17 @@ void loop()
   // you could over-write important configuration
   // --> Available addresses: from 1024 to 4095
   // in o celula se paote scrie maxim pana la 255 ca nr
-/*
-  Utils.writeEEPROM(address, 44);
 
-
+  Utils.writeEEPROM(address, 'V');
+  Utils.writeEEPROM(address+1, 'L');
+  Utils.writeEEPROM(address+2, 'n');
+  
   for ( i = address + 13; i < 2095; i++)
   {
     // Writing in the EEPROM
     Utils.writeEEPROM(i, i);
   }
-*/
+
   for ( i = address ; i < 4095; i++)
   {
     // Reading the EEPROM
