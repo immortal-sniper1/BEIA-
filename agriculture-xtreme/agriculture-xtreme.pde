@@ -17,6 +17,17 @@
 // Soil oxygen level sensor probe (Apogee SO-411 & SO-421)
 // https://development.libelium.com/smart-agriculture-xtreme-sensor-guide/sensors-probes#soil-oxygen-level-sensor-probe-apogee-so-411-and-so-421
 
+
+// Solar radiation sensor probe for Smart Agriculture Xtreme (Apogee SQ-110)
+//https://development.libelium.com/ag-xtr-05-sq-110-sensor-reading/https://development.libelium.com/smart-agriculture-xtreme-sensor-guide/sensors-probes#solar-radiation-sensor-probe-for-smart-agriculture-xtreme-apogee-sq-110
+
+
+// Weather station sensor probe MaxiMet GMX-240 (W-PO) sensor probe
+// https://development.libelium.com/smart-agriculture-xtreme-sensor-guide/sensors-probes#maximet-gmx-240-w-po-sensor-probe
+
+
+
+
 #include <WaspSensorXtr.h>
 #include <WaspFrame.h>
 #include <Wasp4G.h>
@@ -93,9 +104,10 @@ ATMOS_14 mySensor2(XTR_SOCKET_A);
 leafWetness mySensor3();  // asta vine doar in socket B
 // 1. Declare an object for the sensor
 Apogee_SO411 mySensor4(XTR_SOCKET_A)
-
-
-
+// 1. Declare an object for the sensor
+Apogee_SQ110 mySensor5 = Apogee_SQ110(XTR_SOCKET_A);
+//   [Sensor Class] [Sensor Name]
+weatherStation mySensor6;  // asta vine doar in socket E
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1159,6 +1171,155 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+void cititor_meteo()
+{
+  uint8_t q = 0;
+  // 2. Read the sensor
+eve:
+  q++;
+  response = mySensor6.read();
+  if ( (response == 1) && (q <= 5) )
+  {
+    // 4. Print information
+    USB.println(F("---------------------------"));
+    USB.println(F("GMX"));
+    USB.print(F("Wind direction: "));
+    USB.print(mySensor6.gmx.windDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Avg. wind dir: "));
+    USB.print(mySensor6.gmx.avgWindDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Cor. wind dir: "));
+    USB.print(mySensor6.gmx.correctedWindDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Avg. cor. wind dir:"));
+    USB.print(mySensor6.gmx.avgCorrectedWindDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Avg. wind gust dir: "));
+    USB.print(mySensor6.gmx.avgWindGustDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Wind speed: "));
+    USB.printFloat(mySensor6.gmx.windSpeed, 2);
+    USB.println(F(" m/s"));
+    USB.print(F("Avg. wind speed: "));
+    USB.printFloat(mySensor6.gmx.avgWindSpeed, 2);
+    USB.println(F(" m/s"));
+    USB.print(F("Avg. wind gust speed:"));
+    USB.printFloat(mySensor6.gmx.avgWindGustSpeed, 2);
+    USB.println(F(" m/s"));
+    USB.print(F("Wind sensor status: "));
+    USB.println(mySensor6.gmx.windSensorStatus);
+    USB.print(F("Precip. total: "));
+    USB.printFloat(mySensor6.gmx.precipTotal, 3);
+    USB.println(F(" mm"));
+    USB.print(F("Precip. int: "));
+    USB.printFloat(mySensor6.gmx.precipIntensity, 3);
+    USB.println(F(" mm"));
+    USB.print(F("Precip. status: "));
+    USB.println(mySensor6.gmx.precipStatus, DEC);
+
+    USB.print(F("Solar radiation: "));
+    USB.print(mySensor6.gmx.solarRadiation);
+    USB.println(F(" W/m^2"));
+    USB.print(F("Sunshine hours: "));
+    USB.printFloat(mySensor6.gmx.sunshineHours, 2);
+    USB.println(F(" hours"));
+    USB.print(F("Sunrise: "));
+    USB.print(mySensor6.gmx.sunriseTime);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Solar noon: "));
+    USB.print(mySensor6.gmx.solarNoonTime);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Sunset: "));
+    USB.print(mySensor6.gmx.sunsetTime);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Sun position: "));
+    USB.print(mySensor6.gmx.sunPosition);
+    USB.println(F(" (degrees:degrees)"));
+    USB.print(F("Twilight civil: "));
+    USB.print(mySensor6.gmx.twilightCivil);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Twilight nautical: "));
+    USB.print(mySensor6.gmx.twilightNautical);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Twilight astronomical: "));
+    USB.print(mySensor6.gmx.twilightAstronom);
+    USB.println(F(" (h:min)"));
+
+    USB.print(F("Barometric pressure: "));
+    USB.printFloat(mySensor6.gmx.pressure, 1);
+    USB.println(F(" hPa"));
+    USB.print(F("Pressure at sea level: "));
+    USB.printFloat(mySensor6.gmx.pressureSeaLevel, 1);
+    USB.println(F(" hPa"));
+    USB.print(F("Pressure at station: "));
+    USB.printFloat(mySensor6.gmx.pressureStation, 1);
+    USB.println(F(" hPa"));
+    USB.print(F("Relative humidity: "));
+    USB.print(mySensor6.gmx.relativeHumidity);
+    USB.println(F(" %"));
+    USB.print(F("Air temperature: "));
+    USB.printFloat(mySensor6.gmx.temperature, 1);
+    USB.println(F(" Celsius degrees"));
+    USB.print(F("Dew point: "));
+    USB.printFloat(mySensor6.gmx.dewpoint, 1);
+    USB.println(F(" degrees"));
+    USB.print(F("Absolute humidity: "));
+    USB.printFloat(mySensor6.gmx.absoluteHumidity, 2);
+    USB.println(F(" g/m^3"));
+    USB.print(F("Air density: "));
+    USB.printFloat(mySensor6.gmx.airDensity, 1);
+    USB.println(F(" Kg/m^3"));
+    USB.print(F("Wet bulb temperature: "));
+    USB.printFloat(mySensor6.gmx.wetBulbTemperature, 1);
+    USB.println(F(" Celsius degrees"));
+    USB.print(F("Wind chill: "));
+    USB.printFloat(mySensor6.gmx.windChill, 1);
+    USB.println(F(" Celsius degrees"));
+
+    USB.print(F("Heat index: "));
+    USB.print(mySensor6.gmx.heatIndex);
+    USB.println(F(" Celsius degrees"));
+
+    USB.print(F("Compass: "));
+    USB.print(mySensor6.gmx.compass);
+    USB.println(F(" degrees"));
+    USB.print(F("X tilt: "));
+    USB.printFloat(mySensor6.gmx.xTilt, 0);
+    USB.println(F(" degrees"));
+    USB.print(F("Y tilt: "));
+    USB.printFloat(mySensor6.gmx.yTilt, 0);
+    USB.println(F(" degrees"));
+    USB.print(F("Z orient: "));
+    USB.printFloat(mySensor6.gmx.zOrient, 0);
+    USB.println();
+    USB.print(F("Timestamp: "));
+    USB.println(mySensor6.gmx.timestamp);
+    USB.print(F("Voltage: "));
+    USB.printFloat(mySensor6.gmx.supplyVoltage, 1);
+    USB.println(F(" V"));
+    USB.print(F("Status: "));
+    USB.println(mySensor6.gmx.status);
+
+    USB.println(F("---------------------------\n"));
+  }
+  else
+  {
+    USB.println(F("Sensor not connected or invalid data"));
+    USB.print(F("This was atempt: "));
+    USB.print(q);
+    USB.println(F("/5"));
+    USB.println(F("We will reatempt to do a reading in 10s"));
+    delay(10000);
+    goto eve;
+  }
+
+   if ( q>=6)
+   {
+        USB.println(F("All atempts failed, aborting process for this loop and continueing main programm"));
+   }
+}
+
 
 void masurator agroo()
 {
@@ -1281,6 +1442,46 @@ void masurator agroo()
   USB.println(F(" mV"));
   USB.println(F("---------------------------\n"));
 
+
+
+  // 1. Turn ON the sensor
+  mySensor5.ON();
+  // 2. Read the sensor
+  /*
+    Note: read() function does not directly return sensor values.
+    They are stored in the class vector variables defined for that purpose.
+    Values are available as a float value
+  */
+  mySensor5.read();
+  // 3. Turn off the sensor
+  mySensor5.OFF();
+  // 4. Print information
+  USB.println(F("---------------------------"));
+  USB.println(F("SQ-110"));
+  USB.print(F("PA Radiation: "));
+  USB.printFloat(mySensor5.radiation, 2);
+  USB.println(F(" umol*m-2*s-1"));
+  USB.print(F("Sensor voltage: "));
+  USB.printFloat(mySensor5.radiationVoltage, 4);
+  USB.println(F(" V"));
+  USB.println(F("---------------------------\n"));
+
+
+  cititor_meteo();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   frame.createFrame(ASCII, node_ID);
   frame.setFrameType(ffffffff);
 
@@ -1296,7 +1497,7 @@ void masurator agroo()
   if ( PWR.getBatteryLevel() < 20)
   {
     USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
-    ssent=0;
+    ssent = 0;
     goto RIUK;
   }
 
