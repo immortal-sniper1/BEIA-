@@ -91,8 +91,10 @@ char ftp_pass[] = "1fENXK~0qMgw";
 
 
 
-
-///senzori
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///senzori declarari
 
 //[Sensor Class] [Sensor Name] [Selected socket]
 
@@ -117,6 +119,23 @@ weatherStation mySensor6;  // asta vine doar in socket E
 
 
 // subprograme
+
+void linie_de_X(uint8_t x = 1)
+{
+  for (uint8_t i = 0; i < x ; i++)
+  {
+    USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  }
+}
+
+
+void linie_de_minus(uint8_t x = 1) // astia de la libelium o folosesc mult de tot
+{
+  for (uint8_t i = 0; i < x ; i++)
+  {
+    linie_de_minus(1);
+  }
+}
 
 
 void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
@@ -345,7 +364,7 @@ void INFO_4G_MDD()
 {
   int temperature;
   USB.ON();
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  linie_de_X(1);
   USB.println(F("Start INFO_4G_MDD"));
   delay(5000);
   /////////////////////////////////////////////////
@@ -484,7 +503,7 @@ void INFO_4G_MDD()
     // Problem with the communication with the 4G module
     USB.println(F("4G module not started"));
   }
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  linie_de_X(1);
   USB.OFF();
 
 }
@@ -496,7 +515,7 @@ void INFO_4G_MDD()
 void INFO_4G_NET()
 {
   USB.ON();
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  linie_de_X(1);
   USB.println(F("Starting INFO_4G_NET"));
 
   //////////////////////////////////////////////////
@@ -610,7 +629,7 @@ void INFO_4G_NET()
   //////////////////////////////////////////////////
   _4G.OFF();
   USB.println(F("2. Switch OFF 4G module"));
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  linie_de_X(1);
   USB.OFF();
 
 }
@@ -627,7 +646,7 @@ void HTTP_GET_4G()
   char resource[] = "/test-get-post.php?varA=1&varB=2&varC=3&varD=4&varE=5&varF=6&varG=7&varH=8&varI=9&varJ=10&varK=11&varL=12&varM=13&varN=14&varO=15";
   ///////////////////////////////////////
 
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  linie_de_X(1);
   USB.println(F("STARTING HTTP_GET_4G"));
   //////////////////////////////////////////////////
   // 1. Switch ON
@@ -676,7 +695,7 @@ void HTTP_GET_4G()
   ////////////////////////////////////////////////
   USB.println(F("3. Switch OFF 4G module"));
   _4G.OFF();
-  USB.println(F("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"));
+  linie_de_X(1);
 }
 
 
@@ -1119,7 +1138,9 @@ void FTP_4G_SEND(char SD_FILE[] , char SERVER_FILE[])
 
 
 
-void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza fara succes pana se va renunta
+void OTA_setup_check( int att = 1)
+// asta reprogrameaza in practica , variabila att numara de cate ori va incerca re se reprogrameza
+// fara succes pana se va renunta
 {
   int q = 1;
   bool w = false;
@@ -1131,14 +1152,14 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
     USB.println(att);
     // show program ID
     Utils.getProgramID(programID);
-    USB.println(F("-----------------------------"));
+    linie_de_minus(1);
     USB.print(F("Program id: "));
     USB.println(programID);
 
     // show program version number
     USB.print(F("Program version: "));
     USB.println(Utils.getProgramVersion(), DEC);
-    USB.println(F("-----------------------------"));
+    linie_de_minus(1);
 
     status = Utils.checkNewProgram();
 
@@ -1169,7 +1190,7 @@ void OTA_setup_check( int att = 1)   // asta reprogrameaza in practica , variabi
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+//citire senzori
 
 void cititor_meteo()
 {
@@ -1181,7 +1202,7 @@ eve:
   if ( (response == 1) && (q <= 5) )
   {
     // 4. Print information
-    USB.println(F("---------------------------"));
+    linie_de_minus(1);
     USB.println(F("GMX"));
     USB.print(F("Wind direction: "));
     USB.print(mySensor6.gmx.windDirection);
@@ -1217,7 +1238,7 @@ eve:
     USB.println(F(" mm"));
     USB.print(F("Precip. status: "));
     USB.println(mySensor6.gmx.precipStatus, DEC);
-
+    linie_de_minus(1);
     USB.print(F("Solar radiation: "));
     USB.print(mySensor6.gmx.solarRadiation);
     USB.println(F(" W/m^2"));
@@ -1245,7 +1266,7 @@ eve:
     USB.print(F("Twilight astronomical: "));
     USB.print(mySensor6.gmx.twilightAstronom);
     USB.println(F(" (h:min)"));
-
+    linie_de_minus(1);
     USB.print(F("Barometric pressure: "));
     USB.printFloat(mySensor6.gmx.pressure, 1);
     USB.println(F(" hPa"));
@@ -1280,7 +1301,7 @@ eve:
     USB.print(F("Heat index: "));
     USB.print(mySensor6.gmx.heatIndex);
     USB.println(F(" Celsius degrees"));
-
+    linie_de_minus(1);
     USB.print(F("Compass: "));
     USB.print(mySensor6.gmx.compass);
     USB.println(F(" degrees"));
@@ -1301,7 +1322,7 @@ eve:
     USB.print(F("Status: "));
     USB.println(mySensor6.gmx.status);
 
-    USB.println(F("---------------------------\n"));
+    linie_de_minus(1);
   }
   else
   {
@@ -1314,10 +1335,10 @@ eve:
     goto eve;
   }
 
-   if ( q>=6)
-   {
-        USB.println(F("All atempts failed, aborting process for this loop and continueing main programm"));
-   }
+  if ( q >= 6)
+  {
+    USB.println(F("All atempts failed, aborting process for this loop and continueing main programm"));
+  }
 }
 
 
@@ -1341,7 +1362,10 @@ void masurator agroo()
                + (2.92 * pow(10, -2) * mySensor1.sensor5TE.dielectricPermittivity)
                - (5.3 * pow(10, -2))) * 100 ;
 
-  // 5. Print information  USB.println(F("---------------------------"));  USB.println(F("5TE"));  USB.print(F("Dielectric Permittivity: "));
+  // 5. Print information
+  linie_de_minus(1);
+  USB.println(F("5TE"));
+  USB.print(F("Dielectric Permittivity: "));
   USB.printFloat(mySensor1.sensor5TE.dielectricPermittivity, 2);
   USB.println();
   USB.print(F("Volumetric Water Content: "));
@@ -1353,7 +1377,7 @@ void masurator agroo()
   USB.print(F("Soil temperature: "));
   USB.printFloat(mySensor1.sensor5TE.temperature, 1);
   USB.println(F(" degrees Celsius"));
-  USB.println(F("---------------------------\n"));
+  linie_de_minus(1);
 
 
 
@@ -1368,7 +1392,7 @@ void masurator agroo()
   mySensor2.OFF();
 
   // 4. Print information
-  USB.println(F("---------------------------"));
+  linie_de_minus(1);
   USB.println(F("ATMOS 14"));
   USB.print(F("Vapor Pressure:"));
   USB.printFloat(mySensor2.sensorATMOS14.vaporPressure, 3);
@@ -1382,7 +1406,7 @@ void masurator agroo()
   USB.print(F("Atmospheric Pressure:"));
   USB.printFloat(mySensor2.sensorATMOS14.atmosphericPressure, 2);
   USB.println(F(" kPa"));
-  USB.println(F("---------------------------\n"));
+  linie_de_minus(1);
 
 
 
@@ -1400,12 +1424,12 @@ void masurator agroo()
   mySensor3.OFF();
 
   // 4. Print information
-  USB.println(F("---------------------------"));
+  linie_de_minus(1);
   USB.println(F("Pythos31"));
   USB.print(F("Leaf wetness:"));
   USB.printFloat(mySensor.wetness, 4);
   USB.println(F(" V"));
-  USB.println(F("---------------------------\n"));
+  linie_de_minus(1);
 
 
 
@@ -1429,7 +1453,7 @@ void masurator agroo()
   mySensor4.OFF();
 
   // 4. Print information
-  USB.println(F("---------------------------"));
+  linie_de_minus(1);
   USB.println(F("SO-411"));
   USB.print(F("Calibrated Oxigen: "));
   USB.printFloat(mySensor.sensorSO411.calibratedOxygen, 3);
@@ -1440,7 +1464,7 @@ void masurator agroo()
   USB.print(F("Sensor millivolts: "));
   USB.printFloat(mySensor.sensorSO411.milliVolts, 4);
   USB.println(F(" mV"));
-  USB.println(F("---------------------------\n"));
+  linie_de_minus(1);
 
 
 
@@ -1456,7 +1480,7 @@ void masurator agroo()
   // 3. Turn off the sensor
   mySensor5.OFF();
   // 4. Print information
-  USB.println(F("---------------------------"));
+  linie_de_minus(1);
   USB.println(F("SQ-110"));
   USB.print(F("PA Radiation: "));
   USB.printFloat(mySensor5.radiation, 2);
@@ -1464,7 +1488,7 @@ void masurator agroo()
   USB.print(F("Sensor voltage: "));
   USB.printFloat(mySensor5.radiationVoltage, 4);
   USB.println(F(" V"));
-  USB.println(F("---------------------------\n"));
+  linie_de_minus(1);
 
 
   cititor_meteo();
@@ -1526,29 +1550,10 @@ RIUK:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// main loops
 
 
 void setup()
@@ -1574,59 +1579,6 @@ void loop()
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
