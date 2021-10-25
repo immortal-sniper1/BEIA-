@@ -1,5 +1,6 @@
-
-
+#include <WaspSensorXtr.h>
+#include <WaspFrame.h>
+#include <Wasp4G.h>
 
 //sensors
 // Conductivity, water content and soil temperature 5TE sensor probe (Decagon 5TE)
@@ -19,8 +20,7 @@
 
 
 // Solar radiation sensor probe for Smart Agriculture Xtreme (Apogee SQ-110)
-//https://development.libelium.com/ag-xtr-05-sq-110-sensor-reading/https://development.libelium.com/smart-agriculture-xtreme-sensor-guide/sensors-probes#solar-radiation-sensor-probe-for-smart-agriculture-xtreme-apogee-sq-110
-
+// https://development.libelium.com/smart-agriculture-xtreme-sensor-guide/sensors-probes#solar-radiation-sensor-probe-for-smart-agriculture-xtreme-apogee-sq-110
 
 // Weather station sensor probe MaxiMet GMX-240 (W-PO) sensor probe
 // https://development.libelium.com/smart-agriculture-xtreme-sensor-guide/sensors-probes#maximet-gmx-240-w-po-sensor-probe
@@ -28,9 +28,7 @@
 
 
 
-#include <WaspSensorXtr.h>
-#include <WaspFrame.h>
-#include <Wasp4G.h>
+
 
 
 
@@ -99,19 +97,20 @@ char ftp_pass[] = "1fENXK~0qMgw";
 //[Sensor Class] [Sensor Name] [Selected socket]
 
 // 1. Declare an object for the sensor
-Decagon_5TE mySensor1(XTR_SOCKET_A);
+Decagon_5TE mySensor1(XTR_SOCKET_A);                      // A B C D
 // 1. Declare an object for the sensor
-ATMOS_14 mySensor2(XTR_SOCKET_A);
+Decagon_VP4 mySensor2(XTR_SOCKET_C);                        // A B C D
 // 1. Declare an object for the sensor
-leafWetness mySensor3();  // asta vine doar in socket B
+leafWetness mySensor3();                                 // asta vine doar in socket B
 // 1. Declare an object for the sensor
-Apogee_SO411 mySensor4(XTR_SOCKET_A)
+Apogee_SO411 mySensor4(XTR_SOCKET_D);                    // A B C D
 // 1. Declare an object for the sensor
-Apogee_SQ110 mySensor5 = Apogee_SQ110(XTR_SOCKET_A);
+Apogee_SQ110 mySensor5 = Apogee_SQ110(XTR_SOCKET_F);     // B C E F
 //   [Sensor Class] [Sensor Name]
-weatherStation mySensor6;  // asta vine doar in socket E
+weatherStation mySensor6;                                // asta vine doar in socket E
 
 
+uint8_t response = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -574,24 +573,24 @@ void INFO_4G_NET()
         USB.print(F("1.3. Network type: "));
         switch (_4G._networkType)
         {
-        case Wasp4G::NETWORK_GPRS:
-          USB.println(F("GPRS"));
-          break;
-        case Wasp4G::NETWORK_EGPRS:
-          USB.println(F("EGPRS"));
-          break;
-        case Wasp4G::NETWORK_WCDMA:
-          USB.println(F("WCDMA"));
-          break;
-        case Wasp4G::NETWORK_HSDPA:
-          USB.println(F("HSDPA"));
-          break;
-        case Wasp4G::NETWORK_LTE:
-          USB.println(F("LTE"));
-          break;
-        case Wasp4G::NETWORK_UNKNOWN:
-          USB.println(F("Unknown or not registered"));
-          break;
+          case Wasp4G::NETWORK_GPRS:
+            USB.println(F("GPRS"));
+            break;
+          case Wasp4G::NETWORK_EGPRS:
+            USB.println(F("EGPRS"));
+            break;
+          case Wasp4G::NETWORK_WCDMA:
+            USB.println(F("WCDMA"));
+            break;
+          case Wasp4G::NETWORK_HSDPA:
+            USB.println(F("HSDPA"));
+            break;
+          case Wasp4G::NETWORK_LTE:
+            USB.println(F("LTE"));
+            break;
+          case Wasp4G::NETWORK_UNKNOWN:
+            USB.println(F("Unknown or not registered"));
+            break;
         }
       }
       else
@@ -955,55 +954,55 @@ void printErrorxx(uint8_t err)
 {
   switch (err)
   {
-  case 1:  USB.println(F("SD not present"));
-    break;
-  case 2:  USB.println(F("error downloading UPGRADE.TXT"));
-    break;
-  case 3:  USB.println(F("error opening FTP session"));
-    break;
-  case 4:  USB.println(F("filename is different to 7 bytes"));
-    break;
-  case 5:  USB.println(F("no 'FILE' pattern found"));
-    break;
-  case 6:  USB.println(F("'NO_FILE' is the filename"));
-    break;
-  case 7:  USB.println(F("no 'PATH' pattern found"));
-    break;
-  case 8:  USB.println(F("no 'SIZE' pattern found"));
-    break;
-  case 9:  USB.println(F("no 'VERSION' pattern found"));
-    break;
-  case 10: USB.println(F("invalid program version number"));
-    break;
-  case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
-    break;
-  case 12: USB.println(F("error downloading binary file: server file size is zero"));
-    break;
-  case 13: USB.println(F("error downloading binary file: reading the file size"));
-    break;
-  case 14: USB.println(F("error downloading binary file: SD not present"));
-    break;
-  case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
-    break;
-  case 16: USB.println(F("error downloading binary file: error opening the file"));
-    break;
-  case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
-    break;
-  case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
-    break;
-  case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
-    break;
-  case 20: USB.println(F("error downloading binary file: error  getting packet size"));
-    break;
-  case 21: USB.println(F("error downloading binary file: packet size mismatch"));
-    break;
-  case 22: USB.println(F("error downloading binary file: error writing SD"));
-    break;
-  case 23: USB.println(F("error downloading binary file: no more retries getting data"));
-    break;
-  case 24: USB.println(F("error downloading binary file: size mismatch"));
-    break;
-  default : USB.println(F("unknown"));
+    case 1:  USB.println(F("SD not present"));
+      break;
+    case 2:  USB.println(F("error downloading UPGRADE.TXT"));
+      break;
+    case 3:  USB.println(F("error opening FTP session"));
+      break;
+    case 4:  USB.println(F("filename is different to 7 bytes"));
+      break;
+    case 5:  USB.println(F("no 'FILE' pattern found"));
+      break;
+    case 6:  USB.println(F("'NO_FILE' is the filename"));
+      break;
+    case 7:  USB.println(F("no 'PATH' pattern found"));
+      break;
+    case 8:  USB.println(F("no 'SIZE' pattern found"));
+      break;
+    case 9:  USB.println(F("no 'VERSION' pattern found"));
+      break;
+    case 10: USB.println(F("invalid program version number"));
+      break;
+    case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
+      break;
+    case 12: USB.println(F("error downloading binary file: server file size is zero"));
+      break;
+    case 13: USB.println(F("error downloading binary file: reading the file size"));
+      break;
+    case 14: USB.println(F("error downloading binary file: SD not present"));
+      break;
+    case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
+      break;
+    case 16: USB.println(F("error downloading binary file: error opening the file"));
+      break;
+    case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
+      break;
+    case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
+      break;
+    case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
+      break;
+    case 20: USB.println(F("error downloading binary file: error  getting packet size"));
+      break;
+    case 21: USB.println(F("error downloading binary file: packet size mismatch"));
+      break;
+    case 22: USB.println(F("error downloading binary file: error writing SD"));
+      break;
+    case 23: USB.println(F("error downloading binary file: no more retries getting data"));
+      break;
+    case 24: USB.println(F("error downloading binary file: size mismatch"));
+      break;
+    default : USB.println(F("unknown"));
 
   }
 }
@@ -1165,22 +1164,22 @@ void OTA_setup_check( int att = 1)
 
     switch (status)
     {
-    case 0:
-      USB.println(F("REPROGRAMMING ERROR"));
-      Utils.blinkRedLED(300, 3);
-      q++;
-      break;
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-    case 1:
-      USB.println(F("REPROGRAMMING OK"));
-      Utils.blinkGreenLED(300, 3);
-      w = true;
-      break;
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-    default:
-      USB.println(F("RESTARTING"));
-      Utils.blinkGreenLED(500, 1);
-      q++;
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
   }
 
@@ -1342,8 +1341,12 @@ eve:
 }
 
 
-void masurator agroo()
+
+
+
+void masurator_agroo()
 {
+  uint8_t joyy;
 
 
   // 2. Turn ON the sensor
@@ -1395,43 +1398,43 @@ void masurator agroo()
   linie_de_minus(1);
   USB.println(F("ATMOS 14"));
   USB.print(F("Vapor Pressure:"));
-  USB.printFloat(mySensor2.sensorATMOS14.vaporPressure, 3);
+  USB.printFloat(mySensor2.sensorVP4.vaporPressure, 3);
   USB.println(F(" kPa"));
   USB.print(F("Temperature:"));
-  USB.printFloat(mySensor2.sensorATMOS14.temperature, 1);
+  USB.printFloat(mySensor2.sensorVP4.temperature, 1);
   USB.println(F(" degrees Celsius"));
   USB.print(F("Relative Humidity:"));
-  USB.printFloat(mySensor2.sensorATMOS14.relativeHumidity, 1);
+  USB.printFloat(mySensor2.sensorVP4.relativeHumidity, 1);
   USB.println(F(" %RH"));
   USB.print(F("Atmospheric Pressure:"));
-  USB.printFloat(mySensor2.sensorATMOS14.atmosphericPressure, 2);
+  USB.printFloat(mySensor2.sensorVP4.atmosphericPressure, 2);
   USB.println(F(" kPa"));
   linie_de_minus(1);
 
 
 
 
+  /*
 
+    // 2. Turn ON the sensor
+    mySensor3.ON();
 
-  // 2. Turn ON the sensor
-  mySensor3.ON();
+    // 3. Read the sensor. Values stored in class variables
+    // Check complete code example for details
+    mySensor3.read();
 
-  // 3. Read the sensor. Values stored in class variables
-  // Check complete code example for details
-  mySensor3.read();
+    // 4. Turn off the sensor
+    mySensor3.OFF();
 
-  // 4. Turn off the sensor
-  mySensor3.OFF();
+    // 4. Print information
+    linie_de_minus(1);
+    USB.println(F("Pythos31"));
+    USB.print(F("Leaf wetness:"));
+    USB.printFloat(mySensor3.wetness, 4);
+    USB.println(F(" V"));
+    linie_de_minus(1);
 
-  // 4. Print information
-  linie_de_minus(1);
-  USB.println(F("Pythos31"));
-  USB.print(F("Leaf wetness:"));
-  USB.printFloat(mySensor.wetness, 4);
-  USB.println(F(" V"));
-  linie_de_minus(1);
-
-
+  */
 
 
 
@@ -1456,13 +1459,13 @@ void masurator agroo()
   linie_de_minus(1);
   USB.println(F("SO-411"));
   USB.print(F("Calibrated Oxigen: "));
-  USB.printFloat(mySensor.sensorSO411.calibratedOxygen, 3);
+  USB.printFloat(mySensor4.sensorSO411.calibratedOxygen, 3);
   USB.println(F(" %"));
   USB.print(F("Body temperature: "));
-  USB.printFloat(mySensor.sensorSO411.bodyTemperature, 1);
+  USB.printFloat(mySensor4.sensorSO411.bodyTemperature, 1);
   USB.println(F(" degrees Celsius"));
   USB.print(F("Sensor millivolts: "));
-  USB.printFloat(mySensor.sensorSO411.milliVolts, 4);
+  USB.printFloat(mySensor4.sensorSO411.milliVolts, 4);
   USB.println(F(" mV"));
   linie_de_minus(1);
 
@@ -1507,7 +1510,7 @@ void masurator agroo()
 
 
   frame.createFrame(ASCII, node_ID);
-  frame.setFrameType(ffffffff);
+  //  frame.setFrameType(ffffffff);
 
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
   frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
