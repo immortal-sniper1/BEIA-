@@ -1536,10 +1536,10 @@ void masurator_agroo()
   frame.addSensor(AGRX_LW, umezeala_frunza);
 
   // add Socket C sensor values
-  frame.addSensor(AGRX_TC_C, mySensor2.sensorVP4.temperature);
-  frame.addSensor(AGRX_HUM_C, mySensor2.sensorVP4.relativeHumidity);
+  frame.addSensor(AGRX_VP4_TC5_C, mySensor2.sensorVP4.temperature);
+  frame.addSensor(AGRX_VP4_RH_C, mySensor2.sensorVP4.relativeHumidity);
   frame.addSensor(AGRX_VP4_AP_C, mySensor2.sensorVP4.atmosphericPressure);
-  frame.addSensor(AGRX_PRES_C, mySensor2.sensorVP4.vaporPressure);
+  frame.addSensor(AGRX_VP4_VP_C, mySensor2.sensorVP4.vaporPressure);
 
   // add Socket D sensor values
   frame.addSensor(AGRX_SO411_TC2_D, mySensor4.sensorSO411.bodyTemperature);
