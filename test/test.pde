@@ -52,6 +52,41 @@
 //   [Sensor Class] [Sensor Name]
 leafWetness mySensor3;
 
+
+
+
+int frunzarie()
+{
+  int wett=-5;
+
+  // 2. Turn ON the sensor
+  mySensor3.ON();
+
+  // 3. Read the sensor. Values stored in class variables
+  // Check complete code example for details
+  mySensor3.read();
+
+  // 4. Turn off the sensor
+  mySensor3.OFF();
+
+  // 4. Print information
+
+  USB.println(F("Pythos31"));
+  USB.print(F("Leaf wetness:"));
+  wett = mySensor3.wetness;
+  USB.printFloat(wett , 4);
+  USB.println(F(" V"));
+  
+  return wett;
+}
+
+
+
+
+
+
+
+
 void setup()
 {
   USB.println(F("Pythos31 example"));
@@ -59,27 +94,9 @@ void setup()
 
 void loop()
 {
-  // 1. Turn ON the sensor
-  mySensor3.ON();
+int rr;
 
-  // 2. Read the sensor
-  /*
-    Note: read() function does not directly return sensor values.
-    They are stored in the class vector variables defined for that purpose.
-    Values are available as a float value
-  */
-  mySensor3.read();
-
-  // 3. Turn off the sensor
-  mySensor3.OFF();
-
-  // 4. Print information
-  USB.println(F("---------------------------"));
-  USB.println(F("Pythos31"));
-  USB.print(F("Leaf wetness:"));
-  USB.printFloat(mySensor3.wetness, 4);
-  USB.println(F(" V"));
-  USB.println(F("---------------------------\n"));
+rr=frunzarie();
 
   delay(5000);
 

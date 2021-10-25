@@ -101,7 +101,7 @@ Decagon_5TE mySensor1(XTR_SOCKET_A);                      // A B C D
 // 1. Declare an object for the sensor
 Decagon_VP4 mySensor2(XTR_SOCKET_C);                        // A B C D
 // 1. Declare an object for the sensor
-leafWetness mySensor3();                                 // asta vine doar in socket B
+//leafWetness mySensor3();                                 // asta vine doar in socket B    WTF de de nu merge cu declarare aici?!
 // 1. Declare an object for the sensor
 Apogee_SO411 mySensor4(XTR_SOCKET_D);                    // A B C D
 // 1. Declare an object for the sensor
@@ -1348,22 +1348,23 @@ eve:
 int frunzarie()
 {
   int wett=-5;
+  leafWetness mySensor3;
 
   // 2. Turn ON the sensor
-  //mySensor3.ON();
+  mySensor3.ON();
 
   // 3. Read the sensor. Values stored in class variables
   // Check complete code example for details
-  //mySensor3.read();
+  mySensor3.read();
 
   // 4. Turn off the sensor
-  //mySensor3.OFF();
+  mySensor3.OFF();
 
   // 4. Print information
   linie_de_minus(1);
   USB.println(F("Pythos31"));
   USB.print(F("Leaf wetness:"));
-  //wett = mySensor3.wetness;
+  wett = mySensor3.wetness;
   USB.printFloat(wett , 4);
   USB.println(F(" V"));
   linie_de_minus(1);
