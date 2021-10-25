@@ -1344,9 +1344,41 @@ eve:
 
 
 
+
+int frunzarie()
+{
+  int wett=-5;
+
+  // 2. Turn ON the sensor
+  //mySensor3.ON();
+
+  // 3. Read the sensor. Values stored in class variables
+  // Check complete code example for details
+  //mySensor3.read();
+
+  // 4. Turn off the sensor
+  //mySensor3.OFF();
+
+  // 4. Print information
+  linie_de_minus(1);
+  USB.println(F("Pythos31"));
+  USB.print(F("Leaf wetness:"));
+  //wett = mySensor3.wetness;
+  USB.printFloat(wett , 4);
+  USB.println(F(" V"));
+  linie_de_minus(1);
+  return wett;
+}
+
+
+
+
+
+
 void masurator_agroo()
 {
   uint8_t joyy;
+  int umezeala;
 
 
   // 2. Turn ON the sensor
@@ -1414,32 +1446,6 @@ void masurator_agroo()
 
 
 
-  /*
-
-    // 2. Turn ON the sensor
-    mySensor3.ON();
-
-    // 3. Read the sensor. Values stored in class variables
-    // Check complete code example for details
-    mySensor3.read();
-
-    // 4. Turn off the sensor
-    mySensor3.OFF();
-
-    // 4. Print information
-    linie_de_minus(1);
-    USB.println(F("Pythos31"));
-    USB.print(F("Leaf wetness:"));
-    USB.printFloat(mySensor3.wetness, 4);
-    USB.println(F(" V"));
-    linie_de_minus(1);
-
-  */
-
-
-
-
-
 
 
   // 2. Turn ON the sensor
@@ -1495,7 +1501,7 @@ void masurator_agroo()
 
 
   cititor_meteo();
-
+  umezeala = frunzarie();
 
 
 
