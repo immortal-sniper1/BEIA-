@@ -67,7 +67,7 @@ uint8_t program_verrr;
 
 //EDITEAZA AICI!
 int  cycle_time2 = 1150; // in seconds
-char node_ID[] = "agro xtreme";
+char node_ID[] = "agro_xtreme";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 // APN settings
 ///////////////////////////////////////    pt orange RO
@@ -1530,7 +1530,7 @@ void masurator_agroo()
   frame.addSensor(AGRX_5TE_DP2_A, mySensor1.sensor5TE.dielectricPermittivity);
   frame.addSensor(AGRX_5TE_EC2_A, mySensor1.sensor5TE.electricalConductivity);
   frame.addSensor(AGRX_5TE_TC4_A, mySensor1.sensor5TE.temperature);
- // frame.addSensor(AGRX_5TE_VWC_A, VWC);
+// frame.addSensor(AGRX_5TE_VWC_A, VWC);
 
   // add Socket B sensor values
   frame.addSensor(AGRX_LW, umezeala_frunza);
@@ -1551,7 +1551,7 @@ void masurator_agroo()
   frame.addSensor(AGRX_GMX_AWD, mySensor6.gmx.avgWindDirection);
   frame.addSensor(AGRX_GMX_AWS, mySensor6.gmx.avgWindSpeed);
   frame.addSensor(AGRX_GMX_PI, mySensor6.gmx.precipIntensity);
-  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);    // se mai pot adauga multi aici 
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);    // se mai pot adauga multi aici
 
 
   // add Socket F sensor values
@@ -1605,27 +1605,176 @@ RIUK:
 
 void setup()
 {
-  // put your setup code here, to run once:
+  USB.ON();
+  RTC.ON();
+  //  x=setProgramVersion(1);
+
+  INFO_4G_MDD();
+  INFO_4G_NET();
+  //HTTP_GET_4G();
+  //HTTP_POST_4G();
+  //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  OTA_setup_check(5);
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 1. sets operator parameters
+
+  _4G.set_APN(apn, login, password);
+  _4G.show_APN();
+
+  SET_RTC_4G(RTC_ATEMPTS);
+  USB.println(RTC.getTime());
+  USB.println(F("Agro Xtreme 4G"));
+
+
+  // Set SD ON
+  SD.ON();
+
+  if (sentence == 1)
+  {
+    // Delete file
+    sd_answer = SD.del(filename);
+
+    if (sd_answer == 1)
+    {
+      USB.println(F("file deleted"));
+    }
+    else
+    {
+      USB.println(F("file NOT deleted"));
+    }
+  }
+  // Create file IF id doent exist
+  sd_answer = SD.create(filename);
+
+  if (sd_answer == 1)
+  {
+    USB.println(F("file created"));
+  }
+  else
+  {
+    USB.println(F("file NOT created"));
+  }
+
+  USB.print(F("loop cycle time[s]:= "));
+  USB.println(cycle_time2);
+  sd_answer = SD.appendln(filename, "--------------------------------------------------------------------------------------------------------------");
+  if (sd_answer == 1)
+  {
+    USB.println(F("writeing is OK"));
+  }
+  else
+  {
+    USB.println(F("writeing is haveing errors"));
+  }
+
+  USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
+  USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+  USB.println(F("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"));
+
+
+  // pm
+  USB.ON();
+  loop_count = 0;
 
 }
 
 
+
+
+
+// main program
 void loop()
 {
-  // put your main code here, to run repeatedly:
+  // get actual time before loop
+  prev = millis();
+  loop_count++;
+  if (loop_count > 2000000000)
+    // 2147483647
+  {
+    loop_count = 0;
+  }
+  USB.print(F("loop_count: "));
+  USB.println( loop_count);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  program_verrr = Utils.getProgramVersion();    //versiune program
+  masurator_agroo();
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+  OTAP_4G();
+
+  linie_de_X(1);
+  /// NU UMBLA AICI!
+  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
+  IN_LOOP_RTC_CHECK( RTC_SUCCES);
+
+  linie_de_X(1);
 
 
+  cycle_time = cycle_time2 - b - 5;
+  if (cycle_time < 10) {
+    cycle_time = 15;
+  }
+  USB.print(F("cycle time= "));
+  USB.println(cycle_time);
 
+  x = cycle_time % 60; // sec
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[9] = y[0];
+  rtc_str[10] = y[1];
 
+  x = cycle_time / 60 % 60; // min
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[6] = y[0];
+  rtc_str[7] = y[1];
 
+  x = cycle_time / 3600 % 3600; // h
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  rtc_str[3] = y[0];
+  rtc_str[4] = y[1];
 
+  ///-------------
 
+  // Go to deepsleep
 
+  ////////////////////////////////////////////////
+  // 5. Sleep
+  ////////////////////////////////////////////////
+  USB.println(F("5. Enter deep sleep..."));
+  USB.print(F("X"));
+  USB.print(rtc_str);
+  USB.println(F("X"));
+
+  //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+  USB.println(RTC.getTimestamp());
+  USB.OFF();
+  //delay(30000);
+  PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  USB.ON();
+  linie_de_X(1);
+  USB.println(F("6. Wake up!!\n\n"));
 
 
 }
+
 
 
 

@@ -1360,7 +1360,8 @@ RIUK:
       if (sd_answer == 1)
       {
         USB.println(F("file deleted"));
-      } else
+      } 
+      else
       {
         USB.println(F("file NOT deleted"));
       }
@@ -1371,7 +1372,8 @@ RIUK:
     if (sd_answer == 1)
     {
       USB.println(F("file created"));
-    } else
+    } 
+    else
     {
       USB.println(F("file NOT created"));
     }
@@ -1382,7 +1384,8 @@ RIUK:
     if (sd_answer == 1)
     {
       USB.println(F("writeing is OK"));
-    } else
+    } 
+    else
     {
       USB.println(F("writeing is haveing errors"));
     }
