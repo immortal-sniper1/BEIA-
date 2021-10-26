@@ -30,7 +30,7 @@
 
 
 
-
+// VARIABILE GLOBALE STANDARD
 
 
 //NU UNBLA AICI!!
@@ -1552,6 +1552,118 @@ void masurator_agroo()
   frame.addSensor(AGRX_GMX_AWS, mySensor6.gmx.avgWindSpeed);
   frame.addSensor(AGRX_GMX_PI, mySensor6.gmx.precipIntensity);
   frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);    // se mai pot adauga multi aici
+
+  frame.addSensor(AGRX_GMX_SUNSHINE, mySensor6.gmx.sunshineHours);
+  frame.addSensor(AGRX_GMX_SUNRISE, mySensor6.gmx.sunriseTime);
+  frame.addSensor(AGRX_GMX_SUNSET, mySensor6.gmx.sunsetTime);
+  frame.addSensor(AGRX_GMX_SOLAR_NOON, mySensor6.gmx.solarNoonTime);
+  frame.addSensor(AGRX_GMX_DEWP, mySensor6.gmx.dewpoint);
+  frame.addSensor(AGRX_GMX_AD, mySensor6.gmx.airDensity);
+  frame.addSensor(AGRX_GMX_WC, mySensor6.gmx.windChill);
+  frame.addSensor(AGRX_GMX_HI, mySensor6.gmx.heatIndex);
+  frame.addSensor(AGRX_GMX_WBT, mySensor6.gmx.wetBulbTemperature);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+
+/*  SENZORI CARE MAI TREBUIE ADAUGATI IN FRAME
+
+
+    USB.println(F(" degrees"));
+    USB.print(F("Cor. wind dir: "));
+    USB.print(mySensor6.gmx.correctedWindDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Avg. cor. wind dir:"));
+    USB.print(mySensor6.gmx.avgCorrectedWindDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Avg. wind gust dir: "));
+    USB.print(mySensor6.gmx.avgWindGustDirection);
+    USB.println(F(" degrees"));
+    USB.print(F("Wind speed: "));
+
+    USB.println(F(" m/s"));
+    USB.print(F("Avg. wind gust speed:"));
+    USB.printFloat(mySensor6.gmx.avgWindGustSpeed, 2);
+    USB.println(F(" m/s"));
+    USB.print(F("Wind sensor status: "));
+    USB.println(mySensor6.gmx.windSensorStatus);
+    USB.print(F("Precip. total: "));
+
+    USB.println(F(" mm"));
+    USB.print(F("Precip. status: "));
+    USB.println(mySensor6.gmx.precipStatus, DEC);
+    linie_de_minus(1);
+    USB.print(F("Solar radiation: "));
+    USB.print(mySensor6.gmx.solarRadiation);
+
+ 
+    USB.println(F(" (h:min)"));
+    USB.print(F("Sun position: "));
+    USB.print(mySensor6.gmx.sunPosition);
+    USB.println(F(" (degrees:degrees)"));
+    USB.print(F("Twilight civil: "));
+    USB.print(mySensor6.gmx.twilightCivil);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Twilight nautical: "));
+    USB.print(mySensor6.gmx.twilightNautical);
+    USB.println(F(" (h:min)"));
+    USB.print(F("Twilight astronomical: "));
+    USB.print(mySensor6.gmx.twilightAstronom);
+    USB.println(F(" (h:min)"));
+    linie_de_minus(1);
+    USB.print(F("Barometric pressure: "));
+    USB.printFloat(mySensor6.gmx.pressure, 1);
+    USB.println(F(" hPa"));
+    USB.print(F("Pressure at sea level: "));
+    USB.printFloat(mySensor6.gmx.pressureSeaLevel, 1);
+    USB.println(F(" hPa"));
+    USB.print(F("Pressure at station: "));
+    USB.printFloat(mySensor6.gmx.pressureStation, 1);
+    USB.println(F(" hPa"));
+    USB.print(F("Relative humidity: "));
+    USB.print(mySensor6.gmx.relativeHumidity);
+    USB.println(F(" %"));
+    USB.print(F("Air temperature: "));
+    USB.printFloat(mySensor6.gmx.temperature, 1);
+    USB.println(F(" Celsius degrees"));
+    USB.print(F("Dew point: "));
+ 
+    USB.println(F(" degrees"));
+    USB.print(F("Absolute humidity: "));
+    USB.printFloat(mySensor6.gmx.absoluteHumidity, 2);
+    USB.println(F(" g/m^3"));
+    USB.print(F("Air density: "));
+     
+
+
+    USB.println(F(" Celsius degrees"));
+    linie_de_minus(1);
+    USB.print(F("Compass: "));
+    USB.print(mySensor6.gmx.compass);
+    USB.println(F(" degrees"));
+    USB.print(F("X tilt: "));
+    USB.printFloat(mySensor6.gmx.xTilt, 0);
+    USB.println(F(" degrees"));
+    USB.print(F("Y tilt: "));
+    USB.printFloat(mySensor6.gmx.yTilt, 0);
+    USB.println(F(" degrees"));
+    USB.print(F("Z orient: "));
+    USB.printFloat(mySensor6.gmx.zOrient, 0);
+    USB.println();
+    USB.print(F("Timestamp: "));
+    USB.println(mySensor6.gmx.timestamp);
+    USB.print(F("Voltage: "));
+    USB.printFloat(mySensor6.gmx.supplyVoltage, 1);
+    USB.println(F(" V"));
+    USB.print(F("Status: "));
+    USB.println(mySensor6.gmx.status);
+
+    */
+
+
+
 
 
   // add Socket F sensor values
