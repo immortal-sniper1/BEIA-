@@ -1187,6 +1187,45 @@ void OTA_setup_check( int att = 1)
 }
 
 
+
+// asta e folosita in void loop la inceput de tott
+void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable , active true
+{
+  int tt;
+
+  if ( y)
+  {
+    tt =  x * 3 % 60;
+    if (tt > 1000)  // 59 minutes max timer time pe site  desi in schetchul lor scria 1000 min
+    {
+      tt = 1000;
+    }
+    if (tt < 1)
+    {
+      tt = 1;   // 1 minute is min timer time
+    }
+    RTC.setWatchdog(tt);
+    USB.print(F("RTC timer reset succesful"));
+    USB.print(F("        next forced restart: "));
+    USB.println(  RTC.getWatchdog()  );
+  }
+}
+
+void cardru_mic_de_inceput()
+{
+  linie_de_X(2);
+  USB.print(F("This frame was sent only to signal a station turn on or a watchdog reset"));
+  frame.createFrame(ASCII, node_ID);
+  // It is mandatory to specify the Smart Agriculture Xtreme type
+  frame.setFrameType(INFORMATION_FRAME_AGR_XTR);
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  frame.addSensor(AGRX_CURRENT_SOCKET_F, 1000); // dummy data
+  frame.showFrame();
+
+  HTTP_4G_TRIMITATOR_FRAME();
+  linie_de_X(2);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1562,105 +1601,108 @@ void masurator_agroo()
   frame.addSensor(AGRX_GMX_WC, mySensor6.gmx.windChill);
   frame.addSensor(AGRX_GMX_HI, mySensor6.gmx.heatIndex);
   frame.addSensor(AGRX_GMX_WBT, mySensor6.gmx.wetBulbTemperature);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipStatus);
   frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
   frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
   frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
   frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
-  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
-
-/*  SENZORI CARE MAI TREBUIE ADAUGATI IN FRAME
 
 
-    USB.println(F(" degrees"));
-    USB.print(F("Cor. wind dir: "));
-    USB.print(mySensor6.gmx.correctedWindDirection);
-    USB.println(F(" degrees"));
-    USB.print(F("Avg. cor. wind dir:"));
-    USB.print(mySensor6.gmx.avgCorrectedWindDirection);
-    USB.println(F(" degrees"));
-    USB.print(F("Avg. wind gust dir: "));
-    USB.print(mySensor6.gmx.avgWindGustDirection);
-    USB.println(F(" degrees"));
-    USB.print(F("Wind speed: "));
-
-    USB.println(F(" m/s"));
-    USB.print(F("Avg. wind gust speed:"));
-    USB.printFloat(mySensor6.gmx.avgWindGustSpeed, 2);
-    USB.println(F(" m/s"));
-    USB.print(F("Wind sensor status: "));
-    USB.println(mySensor6.gmx.windSensorStatus);
-    USB.print(F("Precip. total: "));
-
-    USB.println(F(" mm"));
-    USB.print(F("Precip. status: "));
-    USB.println(mySensor6.gmx.precipStatus, DEC);
-    linie_de_minus(1);
-    USB.print(F("Solar radiation: "));
-    USB.print(mySensor6.gmx.solarRadiation);
-
- 
-    USB.println(F(" (h:min)"));
-    USB.print(F("Sun position: "));
-    USB.print(mySensor6.gmx.sunPosition);
-    USB.println(F(" (degrees:degrees)"));
-    USB.print(F("Twilight civil: "));
-    USB.print(mySensor6.gmx.twilightCivil);
-    USB.println(F(" (h:min)"));
-    USB.print(F("Twilight nautical: "));
-    USB.print(mySensor6.gmx.twilightNautical);
-    USB.println(F(" (h:min)"));
-    USB.print(F("Twilight astronomical: "));
-    USB.print(mySensor6.gmx.twilightAstronom);
-    USB.println(F(" (h:min)"));
-    linie_de_minus(1);
-    USB.print(F("Barometric pressure: "));
-    USB.printFloat(mySensor6.gmx.pressure, 1);
-    USB.println(F(" hPa"));
-    USB.print(F("Pressure at sea level: "));
-    USB.printFloat(mySensor6.gmx.pressureSeaLevel, 1);
-    USB.println(F(" hPa"));
-    USB.print(F("Pressure at station: "));
-    USB.printFloat(mySensor6.gmx.pressureStation, 1);
-    USB.println(F(" hPa"));
-    USB.print(F("Relative humidity: "));
-    USB.print(mySensor6.gmx.relativeHumidity);
-    USB.println(F(" %"));
-    USB.print(F("Air temperature: "));
-    USB.printFloat(mySensor6.gmx.temperature, 1);
-    USB.println(F(" Celsius degrees"));
-    USB.print(F("Dew point: "));
- 
-    USB.println(F(" degrees"));
-    USB.print(F("Absolute humidity: "));
-    USB.printFloat(mySensor6.gmx.absoluteHumidity, 2);
-    USB.println(F(" g/m^3"));
-    USB.print(F("Air density: "));
-     
 
 
-    USB.println(F(" Celsius degrees"));
-    linie_de_minus(1);
-    USB.print(F("Compass: "));
-    USB.print(mySensor6.gmx.compass);
-    USB.println(F(" degrees"));
-    USB.print(F("X tilt: "));
-    USB.printFloat(mySensor6.gmx.xTilt, 0);
-    USB.println(F(" degrees"));
-    USB.print(F("Y tilt: "));
-    USB.printFloat(mySensor6.gmx.yTilt, 0);
-    USB.println(F(" degrees"));
-    USB.print(F("Z orient: "));
-    USB.printFloat(mySensor6.gmx.zOrient, 0);
-    USB.println();
-    USB.print(F("Timestamp: "));
-    USB.println(mySensor6.gmx.timestamp);
-    USB.print(F("Voltage: "));
-    USB.printFloat(mySensor6.gmx.supplyVoltage, 1);
-    USB.println(F(" V"));
-    USB.print(F("Status: "));
-    USB.println(mySensor6.gmx.status);
+  /*  SENZORI CARE MAI TREBUIE ADAUGATI IN FRAME
 
-    */
+
+      USB.println(F(" degrees"));
+      USB.print(F("Cor. wind dir: "));
+      USB.print(mySensor6.gmx.correctedWindDirection);
+      USB.println(F(" degrees"));
+      USB.print(F("Avg. cor. wind dir:"));
+      USB.print(mySensor6.gmx.avgCorrectedWindDirection);
+      USB.println(F(" degrees"));
+      USB.print(F("Avg. wind gust dir: "));
+      USB.print(mySensor6.gmx.avgWindGustDirection);
+      USB.println(F(" degrees"));
+      USB.print(F("Wind speed: "));
+
+      USB.println(F(" m/s"));
+      USB.print(F("Avg. wind gust speed:"));
+      USB.printFloat(mySensor6.gmx.avgWindGustSpeed, 2);
+      USB.println(F(" m/s"));
+      USB.print(F("Wind sensor status: "));
+      USB.println(mySensor6.gmx.windSensorStatus);
+      USB.print(F("Precip. total: "));
+
+      USB.println(F(" mm"));
+      USB.print(F("Precip. status: "));
+      USB.println(mySensor6.gmx.precipStatus, DEC);
+      linie_de_minus(1);
+      USB.print(F("Solar radiation: "));
+      USB.print(mySensor6.gmx.solarRadiation);
+
+
+      USB.println(F(" (h:min)"));
+      USB.print(F("Sun position: "));
+      USB.print(mySensor6.gmx.sunPosition);
+      USB.println(F(" (degrees:degrees)"));
+      USB.print(F("Twilight civil: "));
+      USB.print(mySensor6.gmx.twilightCivil);
+      USB.println(F(" (h:min)"));
+      USB.print(F("Twilight nautical: "));
+      USB.print(mySensor6.gmx.twilightNautical);
+      USB.println(F(" (h:min)"));
+      USB.print(F("Twilight astronomical: "));
+      USB.print(mySensor6.gmx.twilightAstronom);
+      USB.println(F(" (h:min)"));
+      linie_de_minus(1);
+      USB.print(F("Barometric pressure: "));
+      USB.printFloat(mySensor6.gmx.pressure, 1);
+      USB.println(F(" hPa"));
+      USB.print(F("Pressure at sea level: "));
+      USB.printFloat(mySensor6.gmx.pressureSeaLevel, 1);
+      USB.println(F(" hPa"));
+      USB.print(F("Pressure at station: "));
+      USB.printFloat(mySensor6.gmx.pressureStation, 1);
+      USB.println(F(" hPa"));
+      USB.print(F("Relative humidity: "));
+      USB.print(mySensor6.gmx.relativeHumidity);
+      USB.println(F(" %"));
+      USB.print(F("Air temperature: "));
+      USB.printFloat(mySensor6.gmx.temperature, 1);
+      USB.println(F(" Celsius degrees"));
+      USB.print(F("Dew point: "));
+
+      USB.println(F(" degrees"));
+      USB.print(F("Absolute humidity: "));
+      USB.printFloat(mySensor6.gmx.absoluteHumidity, 2);
+      USB.println(F(" g/m^3"));
+      USB.print(F("Air density: "));
+
+
+
+      USB.println(F(" Celsius degrees"));
+      linie_de_minus(1);
+      USB.print(F("Compass: "));
+      USB.print(mySensor6.gmx.compass);
+      USB.println(F(" degrees"));
+      USB.print(F("X tilt: "));
+      USB.printFloat(mySensor6.gmx.xTilt, 0);
+      USB.println(F(" degrees"));
+      USB.print(F("Y tilt: "));
+      USB.printFloat(mySensor6.gmx.yTilt, 0);
+      USB.println(F(" degrees"));
+      USB.print(F("Z orient: "));
+      USB.printFloat(mySensor6.gmx.zOrient, 0);
+      USB.println();
+      USB.print(F("Timestamp: "));
+      USB.println(mySensor6.gmx.timestamp);
+      USB.print(F("Voltage: "));
+      USB.printFloat(mySensor6.gmx.supplyVoltage, 1);
+      USB.println(F(" V"));
+      USB.print(F("Status: "));
+      USB.println(mySensor6.gmx.status);
+
+      */
 
 
 
@@ -1700,10 +1742,6 @@ RIUK:
 
 
   scriitor_SD(filename, ssent);
-
-
-
-
 }
 
 
@@ -1719,7 +1757,9 @@ void setup()
 {
   USB.ON();
   RTC.ON();
+  Watchdog_setup_and_reset( 15 , true ); // set to 15 since it will be 45 in practice , enough to compleate 1 measurement set and send the data
   //  x=setProgramVersion(1);
+
 
   INFO_4G_MDD();
   INFO_4G_NET();
@@ -1782,6 +1822,8 @@ void setup()
     USB.println(F("writeing is haveing errors"));
   }
 
+  cardru_mic_de_inceput();
+
   USB.println(F("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"));
   USB.println(F("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
   USB.println(F("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"));
@@ -1815,6 +1857,8 @@ void loop()
 
   program_verrr = Utils.getProgramVersion();    //versiune program
   masurator_agroo();
+
+  Watchdog_setup_and_reset( cycle_time2 , true );
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1875,13 +1919,13 @@ void loop()
   USB.print(rtc_str);
   USB.println(F("X"));
 
-  //USB.println(F("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+  linie_de_X(2);
   USB.println(RTC.getTimestamp());
   USB.OFF();
   //delay(30000);
   PWR.deepSleep(rtc_str, RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
   USB.ON();
-  linie_de_X(1);
+  linie_de_X(2);
   USB.println(F("6. Wake up!!\n\n"));
 
 

@@ -845,14 +845,14 @@ void IONII()
 
 
 // asta e folosita in void loop la inceput de tott
-void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable
+void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable , active true
 {
   int tt;
 
   if ( y)
   {
     tt =  x * 3 % 60;
-    if (tt > 59)  // 59 minutes max timer time
+    if (tt > 59)  // 59 minutes max timer time pe site  desi in schetchul lor scria 1000 min 
     {
       tt = 59;
     }
