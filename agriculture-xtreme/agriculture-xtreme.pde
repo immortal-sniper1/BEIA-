@@ -67,7 +67,7 @@ uint8_t program_verrr;
 
 //EDITEAZA AICI!
 int  cycle_time2 = 1150; // in seconds
-char node_ID[] = "agro_xtreme";
+char node_ID[] = "SAX1";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 // APN settings
 ///////////////////////////////////////    pt orange RO
@@ -112,6 +112,7 @@ Apogee_SQ110 mySensor5 = Apogee_SQ110(XTR_SOCKET_F);     // B C E F
 
 
 uint8_t response = 0;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -574,24 +575,24 @@ void INFO_4G_NET()
         USB.print(F("1.3. Network type: "));
         switch (_4G._networkType)
         {
-        case Wasp4G::NETWORK_GPRS:
-          USB.println(F("GPRS"));
-          break;
-        case Wasp4G::NETWORK_EGPRS:
-          USB.println(F("EGPRS"));
-          break;
-        case Wasp4G::NETWORK_WCDMA:
-          USB.println(F("WCDMA"));
-          break;
-        case Wasp4G::NETWORK_HSDPA:
-          USB.println(F("HSDPA"));
-          break;
-        case Wasp4G::NETWORK_LTE:
-          USB.println(F("LTE"));
-          break;
-        case Wasp4G::NETWORK_UNKNOWN:
-          USB.println(F("Unknown or not registered"));
-          break;
+          case Wasp4G::NETWORK_GPRS:
+            USB.println(F("GPRS"));
+            break;
+          case Wasp4G::NETWORK_EGPRS:
+            USB.println(F("EGPRS"));
+            break;
+          case Wasp4G::NETWORK_WCDMA:
+            USB.println(F("WCDMA"));
+            break;
+          case Wasp4G::NETWORK_HSDPA:
+            USB.println(F("HSDPA"));
+            break;
+          case Wasp4G::NETWORK_LTE:
+            USB.println(F("LTE"));
+            break;
+          case Wasp4G::NETWORK_UNKNOWN:
+            USB.println(F("Unknown or not registered"));
+            break;
         }
       }
       else
@@ -955,55 +956,55 @@ void printErrorxx(uint8_t err)
 {
   switch (err)
   {
-  case 1:  USB.println(F("SD not present"));
-    break;
-  case 2:  USB.println(F("error downloading UPGRADE.TXT"));
-    break;
-  case 3:  USB.println(F("error opening FTP session"));
-    break;
-  case 4:  USB.println(F("filename is different to 7 bytes"));
-    break;
-  case 5:  USB.println(F("no 'FILE' pattern found"));
-    break;
-  case 6:  USB.println(F("'NO_FILE' is the filename"));
-    break;
-  case 7:  USB.println(F("no 'PATH' pattern found"));
-    break;
-  case 8:  USB.println(F("no 'SIZE' pattern found"));
-    break;
-  case 9:  USB.println(F("no 'VERSION' pattern found"));
-    break;
-  case 10: USB.println(F("invalid program version number"));
-    break;
-  case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
-    break;
-  case 12: USB.println(F("error downloading binary file: server file size is zero"));
-    break;
-  case 13: USB.println(F("error downloading binary file: reading the file size"));
-    break;
-  case 14: USB.println(F("error downloading binary file: SD not present"));
-    break;
-  case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
-    break;
-  case 16: USB.println(F("error downloading binary file: error opening the file"));
-    break;
-  case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
-    break;
-  case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
-    break;
-  case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
-    break;
-  case 20: USB.println(F("error downloading binary file: error  getting packet size"));
-    break;
-  case 21: USB.println(F("error downloading binary file: packet size mismatch"));
-    break;
-  case 22: USB.println(F("error downloading binary file: error writing SD"));
-    break;
-  case 23: USB.println(F("error downloading binary file: no more retries getting data"));
-    break;
-  case 24: USB.println(F("error downloading binary file: size mismatch"));
-    break;
-  default : USB.println(F("unknown"));
+    case 1:  USB.println(F("SD not present"));
+      break;
+    case 2:  USB.println(F("error downloading UPGRADE.TXT"));
+      break;
+    case 3:  USB.println(F("error opening FTP session"));
+      break;
+    case 4:  USB.println(F("filename is different to 7 bytes"));
+      break;
+    case 5:  USB.println(F("no 'FILE' pattern found"));
+      break;
+    case 6:  USB.println(F("'NO_FILE' is the filename"));
+      break;
+    case 7:  USB.println(F("no 'PATH' pattern found"));
+      break;
+    case 8:  USB.println(F("no 'SIZE' pattern found"));
+      break;
+    case 9:  USB.println(F("no 'VERSION' pattern found"));
+      break;
+    case 10: USB.println(F("invalid program version number"));
+      break;
+    case 11: USB.println(F("file size does not match in UPGRADE.TXT and server"));
+      break;
+    case 12: USB.println(F("error downloading binary file: server file size is zero"));
+      break;
+    case 13: USB.println(F("error downloading binary file: reading the file size"));
+      break;
+    case 14: USB.println(F("error downloading binary file: SD not present"));
+      break;
+    case 15: USB.println(F("error downloading binary file: error creating the file in SD"));
+      break;
+    case 16: USB.println(F("error downloading binary file: error opening the file"));
+      break;
+    case 17: USB.println(F("error downloading binary file: error setting the pointer of the file"));
+      break;
+    case 18: USB.println(F("error downloading binary file: error opening the GET connection"));
+      break;
+    case 19: USB.println(F("error downloading binary file: error module returns error code after requesting data"));
+      break;
+    case 20: USB.println(F("error downloading binary file: error  getting packet size"));
+      break;
+    case 21: USB.println(F("error downloading binary file: packet size mismatch"));
+      break;
+    case 22: USB.println(F("error downloading binary file: error writing SD"));
+      break;
+    case 23: USB.println(F("error downloading binary file: no more retries getting data"));
+      break;
+    case 24: USB.println(F("error downloading binary file: size mismatch"));
+      break;
+    default : USB.println(F("unknown"));
 
   }
 }
@@ -1165,22 +1166,22 @@ void OTA_setup_check( int att = 1)
 
     switch (status)
     {
-    case 0:
-      USB.println(F("REPROGRAMMING ERROR"));
-      Utils.blinkRedLED(300, 3);
-      q++;
-      break;
+      case 0:
+        USB.println(F("REPROGRAMMING ERROR"));
+        Utils.blinkRedLED(300, 3);
+        q++;
+        break;
 
-    case 1:
-      USB.println(F("REPROGRAMMING OK"));
-      Utils.blinkGreenLED(300, 3);
-      w = true;
-      break;
+      case 1:
+        USB.println(F("REPROGRAMMING OK"));
+        Utils.blinkGreenLED(300, 3);
+        w = true;
+        break;
 
-    default:
-      USB.println(F("RESTARTING"));
-      Utils.blinkGreenLED(500, 1);
-      q++;
+      default:
+        USB.println(F("RESTARTING"));
+        Utils.blinkGreenLED(500, 1);
+        q++;
     }
   }
 
@@ -1569,7 +1570,7 @@ void masurator_agroo()
   frame.addSensor(AGRX_5TE_DP2_A, mySensor1.sensor5TE.dielectricPermittivity);
   frame.addSensor(AGRX_5TE_EC2_A, mySensor1.sensor5TE.electricalConductivity);
   frame.addSensor(AGRX_5TE_TC4_A, mySensor1.sensor5TE.temperature);
-// frame.addSensor(AGRX_5TE_VWC_A, VWC);
+  // frame.addSensor(AGRX_5TE_VWC_A, VWC);
 
   // add Socket B sensor values
   frame.addSensor(AGRX_LW, umezeala_frunza);
@@ -1702,7 +1703,7 @@ void masurator_agroo()
       USB.print(F("Status: "));
       USB.println(mySensor6.gmx.status);
 
-      */
+  */
 
 
 
@@ -1755,10 +1756,17 @@ RIUK:
 
 void setup()
 {
+  int bbat;
   USB.ON();
   RTC.ON();
   Watchdog_setup_and_reset( 15 , true ); // set to 15 since it will be 45 in practice , enough to compleate 1 measurement set and send the data
   //  x=setProgramVersion(1);
+  bbat = PWR.getBatteryLevel();
+  USB.print(F("Batt amount: "));
+  USB.println(  bbat );
+  USB.print(F("Batt amount: "));
+  USB.println(   PWR.getBatteryLevel() );
+
 
 
   INFO_4G_MDD();
