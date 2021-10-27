@@ -70,8 +70,9 @@ int  cycle_time2 = 1150; // in seconds
 char node_ID[] = "SAX1";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 // APN settings
-///////////////////////////////////////    pt orange RO
-char apn[] = "net";
+///////////////////////////////////////
+//char apn[] = "net";    //    pt orange RO
+char apn[] = "broadband";    //    pt telekom RO
 char login[] = "";
 char password[] = "";
 ///////////////////////////////////////
@@ -1419,19 +1420,22 @@ int frunzarie()
 
 void masurator_agroo()
 {
+  USB.print(F("inceput masurator agro"));
   uint8_t joyy;
   int umezeala_frunza;
 
 
   // 2. Turn ON the sensor
   mySensor1.ON();
+    USB.print(F("rrrrrrrrrrrrrrrrrrrrrrrr"));
 
   // 3. Read the sensor. Values stored in class variables
   // Check complete code example for details
   mySensor1.read();
-
+    USB.print(F("kkkkkkkkkkkkkkkkkkk"));
   // 4. Turn off the sensor
   mySensor1.OFF();
+      USB.print(F("bbbbbbbbbbbbbbbbbbbbb"));
   // 4. Conversion of dielectric permittivity into Volumetric Water Content (VWC)
   // for mineral soil using Topp equation
   float VWC = ((4.3 * pow(10, -6) * pow(mySensor1.sensor5TE.dielectricPermittivity, 3))
@@ -1759,7 +1763,7 @@ void setup()
   int bbat;
   USB.ON();
   RTC.ON();
-  Watchdog_setup_and_reset( 15 , true ); // set to 15 since it will be 45 in practice , enough to compleate 1 measurement set and send the data
+  //Watchdog_setup_and_reset( 15 , true ); // set to 15 since it will be 45 in practice , enough to compleate 1 measurement set and send the data
   //  x=setProgramVersion(1);
   bbat = PWR.getBatteryLevel();
   USB.print(F("Batt amount: "));
@@ -1775,7 +1779,7 @@ void setup()
   //HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
-  OTA_setup_check(5);
+  // OTA_setup_check(5);
 
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1863,20 +1867,20 @@ void loop()
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  program_verrr = Utils.getProgramVersion();    //versiune program
+  // program_verrr = Utils.getProgramVersion();    //versiune program
   masurator_agroo();
-
-  Watchdog_setup_and_reset( cycle_time2 , true );
+  USB.print(F("gata cu parte a RF si agro"));
+  // Watchdog_setup_and_reset( cycle_time2 , true );
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  OTAP_4G();
+  // OTAP_4G();
 
   linie_de_X(1);
   /// NU UMBLA AICI!
-  RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
-  IN_LOOP_RTC_CHECK( RTC_SUCCES);
+ // RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
+ // IN_LOOP_RTC_CHECK( RTC_SUCCES);
 
   linie_de_X(1);
 
