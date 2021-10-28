@@ -135,7 +135,7 @@ void linie_de_minus(uint8_t x = 1) // astia de la libelium o folosesc mult de to
 {
   for (uint8_t i = 0; i < x ; i++)
   {
-    linie_de_minus(1);
+    USB.println(F("--------------------------"));
   }
 }
 
@@ -1235,12 +1235,14 @@ void cardru_mic_de_inceput()
 
 void cititor_meteo()
 {
-  uint8_t q = 0;
+  int qt = 0;
+  USB.print(F("qt= "));
+  USB.println(qt);
   // 2. Read the sensor
 eve:
-  q++;
+  qt++;
   response = mySensor6.read();
-  if ( (response == 1) && (q <= 5) )
+  if (response == 1)
   {
     // 4. Print information
     linie_de_minus(1);
@@ -1367,19 +1369,24 @@ eve:
   }
   else
   {
-    USB.println(F("Sensor not connected or invalid data"));
-    USB.print(F("This was atempt: "));
-    USB.print(q);
-    USB.println(F("/5"));
-    USB.println(F("We will reatempt to do a reading in 10s"));
-    delay(10000);
-    goto eve;
+    if (qt <= 5)
+    {
+      USB.println(F("Sensor not connected or invalid data"));
+      USB.print(F("This was atempt: "));
+      USB.print(qt);
+      USB.println(F("/5"));
+      USB.println(F("We will reatempt to do a reading in 10s"));
+      delay(10000);
+      goto eve;
+    }
+    else
+    {
+      USB.println(F("All atempts failed, aborting process for this loop and continueing main programm"));
+    }
+
   }
 
-  if ( q >= 6)
-  {
-    USB.println(F("All atempts failed, aborting process for this loop and continueing main programm"));
-  }
+
 }
 
 
@@ -1427,22 +1434,25 @@ void masurator_agroo()
 
   // 2. Turn ON the sensor
   mySensor1.ON();
-    USB.print(F("rrrrrrrrrrrrrrrrrrrrrrrr"));
+  //USB.print(F("rrrrrrrrrrrrrrrrrrrrrrrr"));
 
   // 3. Read the sensor. Values stored in class variables
   // Check complete code example for details
   mySensor1.read();
-    USB.print(F("kkkkkkkkkkkkkkkkkkk"));
+  //USB.print(F("kkkkkkkkkkkkkkkkkkk"));
   // 4. Turn off the sensor
   mySensor1.OFF();
-      USB.print(F("bbbbbbbbbbbbbbbbbbbbb"));
+  //USB.print(F("bbbbbbbbbbbbbbbbbbbbb"));
   // 4. Conversion of dielectric permittivity into Volumetric Water Content (VWC)
   // for mineral soil using Topp equation
+
   float VWC = ((4.3 * pow(10, -6) * pow(mySensor1.sensor5TE.dielectricPermittivity, 3))
                - (5.5 * pow(10, -4) * pow(mySensor1.sensor5TE.dielectricPermittivity, 2))
                + (2.92 * pow(10, -2) * mySensor1.sensor5TE.dielectricPermittivity)
                - (5.3 * pow(10, -2))) * 100 ;
 
+  // int VWC = 0;
+ // USB.print(F("oooooooooooooo"));
   // 5. Print information
   linie_de_minus(1);
   USB.println(F("5TE"));
@@ -1711,8 +1721,6 @@ void masurator_agroo()
 
 
 
-
-
   // add Socket F sensor values
   frame.addSensor(AGRX_SR_F, mySensor5.radiation);
 
@@ -1721,16 +1729,12 @@ void masurator_agroo()
   frame.showFrame();
 
 
-
-
-
   if ( PWR.getBatteryLevel() < 20)
   {
     USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
     ssent = 0;
     goto RIUK;
   }
-
 
   joyy = 0;
 gooo:
@@ -1742,9 +1746,6 @@ gooo:
     goto gooo;
   }
 RIUK:
-
-
-
 
   scriitor_SD(filename, ssent);
 }
@@ -1879,8 +1880,8 @@ void loop()
 
   linie_de_X(1);
   /// NU UMBLA AICI!
- // RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
- // IN_LOOP_RTC_CHECK( RTC_SUCCES);
+  // RTC.setAlarm2("01:10:00", RTC_ABSOLUTE, RTC_ALM2_MODE1); // activare in fiecare duminica la 1000 dimineata
+  // IN_LOOP_RTC_CHECK( RTC_SUCCES);
 
   linie_de_X(1);
 
