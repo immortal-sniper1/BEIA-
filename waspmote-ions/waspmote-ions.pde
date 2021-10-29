@@ -59,14 +59,14 @@ uint8_t time_zone = 4;///for ROMANIA
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "IONS1";
+char node_ID[] = "SWI";
 int count_trials = 0;
 int N_trials = 2;
 char ESSID[] = "LANCOMBEIA";
 char PASSW[] = "beialancom";
 uint8_t max_atemptss = 10; // nr de max de trame de retrimit deodata
 uint8_t resend_f = 2; // frame resend atempts
-int cycle_time2 = 1200; // in seconds
+int cycle_time2 = 120; // in seconds
 
 // Create an instance of the class
 pt1000Class     tempSensor;
@@ -666,34 +666,34 @@ void all_in_1_frame_process()
   uint8_t ssent = 0;
   bool rr = true;
   uint8_t lvl;
-
-  if ( PWR.getBatteryLevel() >= 50)
-  {
-    goto SS;
-  }
-  else
-  {
-    if ( (PWR.getBatteryLevel() >= 30)  && (loop_count % 2 == 0) )
+  /*
+    if ( PWR.getBatteryLevel() >= 50)
     {
       goto SS;
     }
     else
     {
-      lvl = 1;
-      goto NSS;
-    }
-    if ( (PWR.getBatteryLevel() >= 20) && (PWR.getBatteryLevel() < 30) && (loop_count % 4 == 0) )
-    {
-      goto SS;
-    }
-    else
-    {
-      lvl = 2;
-      goto NSS;
-    }
+      if ( (PWR.getBatteryLevel() >= 30)  && (loop_count % 2 == 0) )
+      {
+        goto SS;
+      }
+      else
+      {
+        lvl = 1;
+        goto NSS;
+      }
+      if ( (PWR.getBatteryLevel() >= 20) && (PWR.getBatteryLevel() < 30) && (loop_count % 4 == 0) )
+      {
+        goto SS;
+      }
+      else
+      {
+        lvl = 2;
+        goto NSS;
+      }
 
-  }
-
+    }
+  */
 
 SS:
   ssent = trimitator_WIFI();
@@ -794,7 +794,7 @@ void IONII()
   ///////////////////////////////////////////
 
   // Create new frame (BINARY)
-  frame.createFrame(BINARY);
+  frame.createFrame(BINARY, node_ID);
 
   // Add temperature
   frame.addSensor(SENSOR_IONS_WT, tempValue);
@@ -811,7 +811,7 @@ void IONII()
 
 
 
-   ssent = trimitator_WIFI();
+  all_in_1_frame_process();
 
 
 
@@ -820,7 +820,7 @@ void IONII()
   ///////////////////////////////////////////
 
   // Create new frame (ASCII)
-  frame.createFrame(ASCII);
+  frame.createFrame(ASCII , node_ID);
 
   // Add temperature
   frame.addSensor(SENSOR_IONS_WT, tempValue);
@@ -839,7 +839,7 @@ void IONII()
   frame.showFrame();
 
   scriitor_SD(filename, ssent);
-
+  trimitator_WIFI();
 
 }
 
@@ -852,7 +852,7 @@ void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  i
   if ( y)
   {
     tt =  x * 3 % 60;
-    if (tt > 59)  // 59 minutes max timer time pe site  desi in schetchul lor scria 1000 min 
+    if (tt > 59)  // 59 minutes max timer time pe site  desi in schetchul lor scria 1000 min
     {
       tt = 59;
     }
@@ -908,10 +908,10 @@ void setup()
   AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrationsNH4, NUM_POINTS);
 
 
-//  x1 = 0;
-//  x2 = 0;
-//  x3 = 0;
-//  x4 = 0;
+  //  x1 = 0;
+  //  x2 = 0;
+  //  x3 = 0;
+  //  x4 = 0;
 }
 
 
@@ -937,7 +937,7 @@ void loop()
   IONII();
 
 
- Watchdog_setup_and_reset( cycle_time2 , true );
+  //Watchdog_setup_and_reset( cycle_time2 , true );
 
   //OTA_check_loop();
 
