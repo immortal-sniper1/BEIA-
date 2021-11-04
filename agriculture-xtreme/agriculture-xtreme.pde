@@ -1569,7 +1569,7 @@ void masurator_agroo()
 
 
 
-
+// monocadru
 
   frame.createFrame(ASCII, node_ID);
   // It is mandatory to specify the Smart Agriculture Xtreme type
@@ -1624,7 +1624,7 @@ void masurator_agroo()
 
 
 
-
+////////////////////////////////////////////////////////////////////
   /*  SENZORI CARE MAI TREBUIE ADAUGATI IN FRAME
 
 
@@ -1718,7 +1718,7 @@ void masurator_agroo()
       USB.println(mySensor6.gmx.status);
 
   */
-
+//////////////////////////////////////////////////////////////////////////////
 
 
   // add Socket F sensor values
@@ -1748,6 +1748,127 @@ gooo:
 RIUK:
 
   scriitor_SD(filename, ssent);
+
+  
+
+  // --------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// bicadru
+
+  frame.createFrame(ASCII, node_ID);
+  // It is mandatory to specify the Smart Agriculture Xtreme type
+  frame.setFrameType(INFORMATION_FRAME_AGR_XTR);
+
+
+
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  frame.addSensor(SENSOR_TIME, RTC.getTimestamp());
+
+
+
+  // add Socket A sensor values
+  frame.addSensor(AGRX_5TE_DP2_A, mySensor1.sensor5TE.dielectricPermittivity);
+  frame.addSensor(AGRX_5TE_EC2_A, mySensor1.sensor5TE.electricalConductivity);
+  frame.addSensor(AGRX_5TE_TC4_A, mySensor1.sensor5TE.temperature);
+  // frame.addSensor(AGRX_5TE_VWC_A, VWC);
+
+  // add Socket B sensor values
+  frame.addSensor(AGRX_LW, umezeala_frunza);
+
+  // add Socket C sensor values
+  frame.addSensor(AGRX_VP4_TC5_C, mySensor2.sensorVP4.temperature);
+  frame.addSensor(AGRX_VP4_RH_C, mySensor2.sensorVP4.relativeHumidity);
+  frame.addSensor(AGRX_VP4_AP_C, mySensor2.sensorVP4.atmosphericPressure);
+  frame.addSensor(AGRX_VP4_VP_C, mySensor2.sensorVP4.vaporPressure);
+
+  // add Socket D sensor values
+  frame.addSensor(AGRX_SO411_TC2_D, mySensor4.sensorSO411.bodyTemperature);
+  frame.addSensor(AGRX_SO411_CO_D, mySensor4.sensorSO411.calibratedOxygen);
+  frame.addSensor(AGRX_SO411_MV2_D, mySensor4.sensorSO411.milliVolts);
+
+
+  
+  frame.showFrame();
+
+
+  if ( PWR.getBatteryLevel() < 20)
+  {
+    USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
+    ssent = 0;
+    goto RIUK3;
+  }
+
+  joyy = 0;
+gooo3:
+  ssent = HTTP_4G_TRIMITATOR_FRAME();
+  if ( ssent != 1 && joyy <= resend_f)
+  {
+    joyy++;
+    delay(1000);
+    goto gooo3;
+  }
+RIUK3:
+
+  scriitor_SD(filename, ssent);
+
+// partea nr2
+
+  frame.createFrame(ASCII, node_ID);
+  // It is mandatory to specify the Smart Agriculture Xtreme type
+  frame.setFrameType(INFORMATION_FRAME_AGR_XTR);
+
+  // add Socket E sensor values
+  frame.addSensor(AGRX_GMX_AWD, mySensor6.gmx.avgWindDirection);
+  frame.addSensor(AGRX_GMX_AWS, mySensor6.gmx.avgWindSpeed);
+  frame.addSensor(AGRX_GMX_PI, mySensor6.gmx.precipIntensity);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);    // se mai pot adauga multi aici
+
+  frame.addSensor(AGRX_GMX_SUNSHINE, mySensor6.gmx.sunshineHours);
+  frame.addSensor(AGRX_GMX_SUNRISE, mySensor6.gmx.sunriseTime);
+  frame.addSensor(AGRX_GMX_SUNSET, mySensor6.gmx.sunsetTime);
+  frame.addSensor(AGRX_GMX_SOLAR_NOON, mySensor6.gmx.solarNoonTime);
+  frame.addSensor(AGRX_GMX_DEWP, mySensor6.gmx.dewpoint);
+  frame.addSensor(AGRX_GMX_AD, mySensor6.gmx.airDensity);
+  frame.addSensor(AGRX_GMX_WC, mySensor6.gmx.windChill);
+  frame.addSensor(AGRX_GMX_HI, mySensor6.gmx.heatIndex);
+  frame.addSensor(AGRX_GMX_WBT, mySensor6.gmx.wetBulbTemperature);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipStatus);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+  frame.addSensor(AGRX_GMX_PT, mySensor6.gmx.precipTotal);
+
+
+  // add Socket F sensor values
+  frame.addSensor(AGRX_SR_F, mySensor5.radiation);
+
+
+  
+  frame.showFrame();
+
+
+  if ( PWR.getBatteryLevel() < 20)
+  {
+    USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
+    ssent = 0;
+    goto RIUK2;
+  }
+
+  joyy = 0;
+gooo2:
+  ssent = HTTP_4G_TRIMITATOR_FRAME();
+  if ( ssent != 1 && joyy <= resend_f)
+  {
+    joyy++;
+    delay(1000);
+    goto gooo2;
+  }
+RIUK2:
+
+  scriitor_SD(filename, ssent);
+  
 }
 
 
