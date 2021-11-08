@@ -131,7 +131,7 @@ const float concentrationsNH4[] = { 4.0,    20.0,  40.0 };
 
 
 // calibrare
-//float x1 , x2, x3, x4, difff;
+float x1 , x2, x3, x4, difff;
 
 
 
@@ -719,6 +719,7 @@ void IONII()
 {
   uint8_t ssent = 0;
 
+  
   ///////////////////////////////////////////
   // 1. Turn on the board
   ///////////////////////////////////////////
@@ -732,23 +733,23 @@ void IONII()
 
   // Read the Calcium sensor
   float CaVolts = calciumSensor.read();
-  //  USB.print(F("calciumSensor: "));
-  //  USB.println( CaVolts );
-  //  difff = x1 - CaVolts;
-  //  x1 = CaVolts;
-  //  USB.print(F("difff = "));
-  //  USB.println( difff );
+    USB.print(F("calciumSensor: "));
+    USB.println( CaVolts );
+    difff = x1 - CaVolts;
+    x1 = CaVolts;
+    USB.print(F("difff = "));
+    USB.println( difff );
   float calciumValue = calciumSensor.calculateConcentration(CaVolts);
   delay(200);
 
   // Read the NO3 sensor
   float NO3Volts = NO3Sensor.read();
-  //  USB.print(F("NO3Sensor: "));
-  //  USB.println( NO3Volts );
-  //  difff = x2 - NO3Volts;
-  //  x2 = NO3Volts;
-  //  USB.print(F("difff = "));
-  //  USB.println( difff );
+    USB.print(F("NO3Sensor: "));
+    USB.println( NO3Volts );
+    difff = x2 - NO3Volts;
+    x2 = NO3Volts;
+    USB.print(F("difff = "));
+    USB.println( difff );
   float NO3Value = NO3Sensor.calculateConcentration(NO3Volts);
   delay(200);
 
@@ -758,23 +759,23 @@ void IONII()
 
   // Read the NH4 sensor
   float AmmoniumSensorV =   AmmoniumSensor.read();
-  //  USB.print(F(" AmmoniumSensor: "));
-  //  USB.println( AmmoniumSensorV );
-  //  difff =x3 - AmmoniumSensorV;
-  //  x3 = AmmoniumSensorV;
-  //  USB.print(F("difff = "));
-  //  USB.println( difff );
+    USB.print(F(" AmmoniumSensor: "));
+    USB.println( AmmoniumSensorV );
+    difff =x3 - AmmoniumSensorV;
+    x3 = AmmoniumSensorV;
+    USB.print(F("difff = "));
+    USB.println( difff );
   float AmmoniumSensorD = AmmoniumSensor.calculateConcentration( AmmoniumSensorV  );
   delay(200);
 
   // Read the MG sensor
   float MagnesiumSensorV = MagnesiumSensor.read();
-  //  USB.print(F(" MagnesiumSensor: "));
-  //  USB.println( MagnesiumSensorV );
-  //  difff = x4 - MagnesiumSensorV;
-  //  x4 = MagnesiumSensorV;
-  //  USB.print(F("difff = "));
-  //  USB.println( difff );
+    USB.print(F(" MagnesiumSensor: "));
+    USB.println( MagnesiumSensorV );
+    difff = x4 - MagnesiumSensorV;
+    x4 = MagnesiumSensorV;
+    USB.print(F("difff = "));
+    USB.println( difff );
   float MagnesiumSensorD = MagnesiumSensor.calculateConcentration( MagnesiumSensorV  );
   delay(200);
 
@@ -908,10 +909,10 @@ void setup()
   AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrationsNH4, NUM_POINTS);
 
 
-  //  x1 = 0;
-  //  x2 = 0;
-  //  x3 = 0;
-  //  x4 = 0;
+    x1 = 0;
+    x2 = 0;
+    x3 = 0;
+    x4 = 0;
 }
 
 
