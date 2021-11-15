@@ -88,27 +88,31 @@ ionSensorClass  MagnesiumSensor(SOCKET_D);
 //======================================================================
 // Calibration voltage values for Calcium sensor
 //======================================================================
-#define point1_volt_Ca 2.950
-#define point2_volt_Ca 3.024
-#define point3_volt_Ca 3.150
+#define point0_volt_Ca 2.7841875553
+#define point1_volt_Ca 2.8603124618
+#define point2_volt_Ca 2.9419033050
+#define point3_volt_Ca 2.9673700332
 //======================================================================
 // Calibration voltage values for NO3 sensor
 //======================================================================
-#define point1_volt_NO3 3.567
-#define point2_volt_NO3 3.426
-#define point3_volt_NO3 3.409
+#define point0_volt_NO3 3.3747367858
+#define point1_volt_NO3 3.4093074798
+#define point2_volt_NO3 3.3091824054
+#define point3_volt_NO3 3.3055853843
 //======================================================================
 // Calibration voltage values for Magnesium sensor
 //======================================================================
-#define point1_volt_MG 2.615
-#define point2_volt_MG 2.727
-#define point3_volt_MG 2.853
+#define point0_volt_MG 2.5455000400
+#define point1_volt_MG 2.6197500228
+#define point2_volt_MG 2.7062499523
+#define point3_volt_MG 2.7370288372
 //======================================================================
 // Calibration voltage values for NH4 sensor
 //======================================================================
-#define point1_volt_NH4 2.901
-#define point2_volt_NH4 3.027
-#define point3_volt_NH4 3.170
+#define point0_volt_NH4 2.0157787799
+#define point1_volt_NH4 2.4735245704
+#define point2_volt_NH4 2.6662840843
+#define point3_volt_NH4 2.7841875553
 //======================================================================
 // Define the number of calibration points
 //======================================================================
@@ -120,6 +124,11 @@ const float voltages_Ca[]    = { point1_volt_Ca,  point2_volt_Ca,  point3_volt_C
 const float voltages_NO3[]   = { point1_volt_NO3, point2_volt_NO3, point3_volt_NO3 };
 const float voltages_MG[]    = { point1_volt_MG,  point2_volt_MG,  point3_volt_MG };
 const float voltages_NH4[]   = { point1_volt_NH4, point2_volt_NH4, point3_volt_NH4 };
+
+//const float voltages_Ca[]    = {point0_volt_Ca ,point1_volt_Ca,  point2_volt_Ca};
+//const float voltages_NO3[]   = { point0_volt_NO3, point1_volt_NO3, point2_volt_NO3 };
+//const float voltages_MG[]    = { point0_volt_MG , point1_volt_MG,  point2_volt_MG};
+//const float voltages_NH4[]   = { point0_volt_NH4, point1_volt_NH4, point2_volt_NH4 };
 //======================================================================
 
 
@@ -128,7 +137,10 @@ const float concentrationsMg[]  = { 11.0,   55.0,  110.0 };
 const float concentrationsNO3[] = { 132.0,  660.0, 1320.0 };
 const float concentrationsNH4[] = { 4.0,    20.0,  40.0 };
 
-
+//const float concentrationsCa[]  = {9.2, 36.0,   180.0};
+//const float concentrationsMg[]  = {2.4,  11.0,   55.0 };
+//const float concentrationsNO3[] = {4.29, 132.0,  660.0 };
+//const float concentrationsNH4[] = {0.01, 4.0,    20.0 };
 
 // calibrare
 float x1 , x2, x3, x4, difff;
@@ -719,7 +731,7 @@ void IONII()
 {
   uint8_t ssent = 0;
 
-  
+
   ///////////////////////////////////////////
   // 1. Turn on the board
   ///////////////////////////////////////////
@@ -733,23 +745,23 @@ void IONII()
 
   // Read the Calcium sensor
   float CaVolts = calciumSensor.read();
-    USB.print(F("calciumSensor: "));
-    USB.println( CaVolts );
-    difff = x1 - CaVolts;
-    x1 = CaVolts;
-    USB.print(F("difff = "));
-    USB.println( difff );
+  USB.print(F("calciumSensor: "));
+  USB.println( CaVolts );
+  difff = x1 - CaVolts;
+  x1 = CaVolts;
+  USB.print(F("difff = "));
+  USB.println( difff );
   float calciumValue = calciumSensor.calculateConcentration(CaVolts);
   delay(200);
 
   // Read the NO3 sensor
   float NO3Volts = NO3Sensor.read();
-    USB.print(F("NO3Sensor: "));
-    USB.println( NO3Volts );
-    difff = x2 - NO3Volts;
-    x2 = NO3Volts;
-    USB.print(F("difff = "));
-    USB.println( difff );
+  USB.print(F("NO3Sensor: "));
+  USB.println( NO3Volts );
+  difff = x2 - NO3Volts;
+  x2 = NO3Volts;
+  USB.print(F("difff = "));
+  USB.println( difff );
   float NO3Value = NO3Sensor.calculateConcentration(NO3Volts);
   delay(200);
 
@@ -759,23 +771,23 @@ void IONII()
 
   // Read the NH4 sensor
   float AmmoniumSensorV =   AmmoniumSensor.read();
-    USB.print(F(" AmmoniumSensor: "));
-    USB.println( AmmoniumSensorV );
-    difff =x3 - AmmoniumSensorV;
-    x3 = AmmoniumSensorV;
-    USB.print(F("difff = "));
-    USB.println( difff );
+  USB.print(F(" AmmoniumSensor: "));
+  USB.println( AmmoniumSensorV );
+  difff = x3 - AmmoniumSensorV;
+  x3 = AmmoniumSensorV;
+  USB.print(F("difff = "));
+  USB.println( difff );
   float AmmoniumSensorD = AmmoniumSensor.calculateConcentration( AmmoniumSensorV  );
   delay(200);
 
   // Read the MG sensor
   float MagnesiumSensorV = MagnesiumSensor.read();
-    USB.print(F(" MagnesiumSensor: "));
-    USB.println( MagnesiumSensorV );
-    difff = x4 - MagnesiumSensorV;
-    x4 = MagnesiumSensorV;
-    USB.print(F("difff = "));
-    USB.println( difff );
+  USB.print(F(" MagnesiumSensor: "));
+  USB.println( MagnesiumSensorV );
+  difff = x4 - MagnesiumSensorV;
+  x4 = MagnesiumSensorV;
+  USB.print(F("difff = "));
+  USB.println( difff );
   float MagnesiumSensorD = MagnesiumSensor.calculateConcentration( MagnesiumSensorV  );
   delay(200);
 
@@ -909,10 +921,10 @@ void setup()
   AmmoniumSensor.setCalibrationPoints(voltages_NH4, concentrationsNH4, NUM_POINTS);
 
 
-    x1 = 0;
-    x2 = 0;
-    x3 = 0;
-    x4 = 0;
+  x1 = 0;
+  x2 = 0;
+  x3 = 0;
+  x4 = 0;
 }
 
 
