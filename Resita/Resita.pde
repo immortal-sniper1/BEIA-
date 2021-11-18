@@ -6,7 +6,7 @@
 
 
 
-int cycle_time2 = 20; // in seconds
+int cycle_time2 = 2; // in seconds
 unsigned long prev, b ;
 
 
@@ -48,12 +48,15 @@ void setup()
   USB.ON();
   RTC.ON();
   USB.println(F("USB port started..."));
-  pinMode(DIGITAL4, OUTPUT);
-  pinMode(DIGITAL5, OUTPUT);
-  pinMode(ANALOG4, OUTPUT);
-  digitalWrite(DIGITAL4, LOW);
-  digitalWrite(DIGITAL5, LOW);
-  digitalWrite(ANALOG4, LOW);
+  // pinMode(DIGITAL4, OUTPUT);
+  // pinMode(DIGITAL5, OUTPUT);
+  //  pinMode(ANALOG4, OUTPUT);
+  pinMode(DIGITAL19, OUTPUT);
+  pinMode(ANALOG7, OUTPUT);
+  //  digitalWrite(DIGITAL4, LOW);
+  //  digitalWrite(DIGITAL5, LOW);
+  //  digitalWrite(ANALOG4, LOW);
+
 
 
   O2Sensor.setCalibrationPoints(voltages, concentrations);
@@ -62,8 +65,9 @@ void setup()
   O2Sensor.ON();
   // Switch ON the sensor socket
 
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
   PWR.setSensorPower(SENS_5V, SENS_ON);
+
 
 
 }
@@ -78,10 +82,12 @@ void setup()
 
 void loop()
 {
-  digitalWrite(DIGITAL4, LOW);
-  digitalWrite(DIGITAL5, LOW);
-  digitalWrite(ANALOG4, LOW);
+  //digitalWrite(ANALOG20, HIGH);
+  digitalWrite(DIGITAL19, HIGH);
+  digitalWrite(ANALOG7, HIGH);
+
   prev = millis();
+
 
   O2Vol = O2Sensor.readVoltage();
   USB.print(F("O2 concentration Estimated: "));
@@ -97,9 +103,6 @@ void loop()
   USB.println(F(" %"));
 
 
-  digitalWrite(ANALOG7, HIGH);
-  digitalWrite(ANALOG6, HIGH);
-
 
   if ( O2Val > prag1 )
   {
@@ -107,13 +110,12 @@ void loop()
     {
       // buzz+ red led
 
-      digitalWrite(ANALOG7, HIGH);
-      analogWrite(DIGITAL4, 127); // buzzerul pt ca trebe PWM pe el
+      digitalWrite(DIGITAL19, HIGH);
     }
     else
     {
       // yellow led
-      digitalWrite(DIGITAL5, HIGH);
+      digitalWrite(ANALOG7, HIGH);
     }
   }
 
