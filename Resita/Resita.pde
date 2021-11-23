@@ -9,14 +9,15 @@
 int cycle_time2 = 2; // in seconds
 unsigned long prev, b ;
 
+#define RED_LED DIGITAL8
+#define YELLOW_LED DIGITAL7
 
 
 
-
-float concentration;	// Stores the concentration level in ppm
-float temperature;	// Stores the temperature in C
-float humidity;		// Stores the realitve humidity in %RH
-float pressure;		// Stores the pressure in Pa
+float concentration;  // Stores the concentration level in ppm
+float temperature;  // Stores the temperature in C
+float humidity;   // Stores the realitve humidity in %RH
+float pressure;   // Stores the pressure in Pa
 
 
 
@@ -40,7 +41,6 @@ int prag2 = 23.5;
 
 
 
-//  https://www.electronicwings.com/users/sanketmallawat91/projects/215/frequency-changing-of-pwm-pins-of-arduino-uno
 
 void setup()
 {
@@ -48,14 +48,9 @@ void setup()
   USB.ON();
   RTC.ON();
   USB.println(F("USB port started..."));
-  // pinMode(DIGITAL4, OUTPUT);
-  // pinMode(DIGITAL5, OUTPUT);
-  //  pinMode(ANALOG4, OUTPUT);
-  pinMode(DIGITAL19, OUTPUT);
-  pinMode(ANALOG7, OUTPUT);
-  //  digitalWrite(DIGITAL4, LOW);
-  //  digitalWrite(DIGITAL5, LOW);
-  //  digitalWrite(ANALOG4, LOW);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(YELLOW_LED, OUTPUT);
+
 
 
 
@@ -66,26 +61,14 @@ void setup()
   // Switch ON the sensor socket
 
   //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
-  PWR.setSensorPower(SENS_5V, SENS_ON);
-
-
 
 }
 
 
 
 
-
-
-
-
-
 void loop()
 {
-  //digitalWrite(ANALOG20, HIGH);
-  digitalWrite(DIGITAL19, HIGH);
-  digitalWrite(ANALOG7, HIGH);
-
   prev = millis();
 
 
@@ -103,19 +86,18 @@ void loop()
   USB.println(F(" %"));
 
 
-
   if ( O2Val > prag1 )
   {
     if ( O2Val > prag2 )
     {
       // buzz+ red led
 
-      digitalWrite(DIGITAL19, HIGH);
+      digitalWrite(RED_LED, HIGH);
     }
     else
     {
-      // yellow led
-      digitalWrite(ANALOG7, HIGH);
+      // buzz+  yellow led
+      digitalWrite(YELLOW_LED, HIGH);
     }
   }
 
