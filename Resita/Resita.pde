@@ -6,7 +6,7 @@
 
 
 
-int cycle_time2 = 2; // in seconds
+int cycle_time2 = 120; // in seconds
 unsigned long prev, b ;
 
 #define RED_LED DIGITAL8
@@ -40,6 +40,33 @@ int prag1 = 22.5;
 int prag2 = 23.5;
 
 
+// asta e folosita in void loop la inceput de tott
+void Watchdog_setup_and_reset(int x, bool y = false) // x e timpul in secunde  iar y e enable
+{
+  int tt;
+
+  if ( y)
+  {
+    tt = 3 * x % 60;
+    if (tt > 59)  // 59 minutes max timer time
+    {
+      tt = 59;
+    }
+    if (tt < 1)
+    {
+      tt = 1;   // 1 minute is min timer time
+    }
+    RTC.setWatchdog(tt);
+    USB.print(F("RTC timer reset succesful"));
+    USB.print(F("        next forced restart: "));
+    USB.println(  RTC.getWatchdog()  );
+  }
+
+}
+
+
+
+
 
 
 void setup()
@@ -60,7 +87,10 @@ void setup()
   O2Sensor.ON();
   // Switch ON the sensor socket
 
-  //PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  // asta vine in void setup
+USB.println(F("Watchdog settings: 3 cycle time"));
+Watchdog_setup_and_reset( cycle_time2, true);
 
 }
 
@@ -70,6 +100,7 @@ void setup()
 void loop()
 {
   prev = millis();
+  Watchdog_setup_and_reset( cycle_time2, true);
 
 
   O2Vol = O2Sensor.readVoltage();

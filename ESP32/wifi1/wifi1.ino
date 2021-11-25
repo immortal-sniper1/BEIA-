@@ -34,8 +34,8 @@ int port = 1883;
 
 
 
-int pinn2 = D0;
-int pinn = D7;
+#define pinn2  D0
+#define pinn  D7
 
 
 void setup()
@@ -64,7 +64,7 @@ void setup()
 
   Serial.print("Connecting MQTT: ");
   //Adafruit_MQTT.Adafruit_MQTT( server,  port, user, pass );
-  Adafruit_MQTT.Adafruit_MQTT( server,  port );
+//  Adafruit_MQTT.Adafruit_MQTT( server,  port );
   
   int cc = Adafruit_MQTT.connect();
   Serial.print("Succes= ", cc);
