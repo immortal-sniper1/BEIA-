@@ -1,19 +1,3 @@
-#include <Adafruit_MQTT.h>
-#include <Adafruit_MQTT_Client.h>
-#include <Adafruit_MQTT_FONA.h>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #include <ESP8266WiFi.h>
 //#include <ESP8266WiFiMulti.h>
@@ -62,12 +46,6 @@ void setup()
   Serial.println(WiFi.localIP());
   digitalWrite(pinn2, HIGH);
 
-  Serial.print("Connecting MQTT: ");
-  //Adafruit_MQTT.Adafruit_MQTT( server,  port, user, pass );
-//  Adafruit_MQTT.Adafruit_MQTT( server,  port );
-  
-  int cc = Adafruit_MQTT.connect();
-  Serial.print("Succes= ", cc);
 
 
 

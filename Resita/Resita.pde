@@ -113,7 +113,7 @@ void loop()
   O2Val = O2Sensor.readConcentration();
 
   USB.print(F(" O2 concentration Estimated: "));
-  USB.print(O2Val * 0.6);
+  USB.print(O2Val * 0.6 / 10000);
   USB.println(F(" %"));
 
 
