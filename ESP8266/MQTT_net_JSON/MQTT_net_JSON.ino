@@ -9,8 +9,7 @@
 // WiFi
 const char *ssid = "LANCOMBEIA"; // Enter your WiFi name
 const char *password = "beialancom";  // Enter WiFi password
-//const char *ssid = "AndroidAP41F72"; // Enter your WiFi name
-//const char *password = "hsia8997";  // Enter WiFi password
+
 
 // MQTT Broker
 const char *mqtt_broker = "mqtt.beia-telemetrie.ro";
@@ -178,7 +177,7 @@ void loop()
 
 
   digitalWrite(pinn, LOW);
-  delay(10000);
+  delay(500000);
   Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
 }

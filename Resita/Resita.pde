@@ -6,11 +6,14 @@
 
 
 
-int cycle_time2 = 120; // in seconds
+int cycle_time2 = 20; // in seconds
 unsigned long prev, b ;
 
-#define RED_LED DIGITAL8
-#define YELLOW_LED DIGITAL7
+
+// 7 si 8 pt socket F
+//3 4 pt socket C
+#define RED_LED DIGITAL3
+#define YELLOW_LED DIGITAL4
 
 
 
@@ -22,7 +25,7 @@ float pressure;   // Stores the pressure in Pa
 
 
 // O2 Sensor must be connected in SOCKET_1
-O2SensorClass O2Sensor(SOCKET_1);
+O2SensorClass O2Sensor(SOCKET_B);
 
 // Percentage values of Oxygen
 #define POINT1_PERCENTAGE 0.0
@@ -87,7 +90,7 @@ void setup()
   O2Sensor.ON();
   // Switch ON the sensor socket
 
-  PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+ // PWR.deepSleep("00:00:02:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
   // asta vine in void setup
 USB.println(F("Watchdog settings: 3 cycle time"));
 Watchdog_setup_and_reset( cycle_time2, true);
@@ -113,7 +116,7 @@ void loop()
   O2Val = O2Sensor.readConcentration();
 
   USB.print(F(" O2 concentration Estimated: "));
-  USB.print(O2Val * 0.6 / 10000);
+  USB.print(O2Val * 0.6 );
   USB.println(F(" %"));
 
 
