@@ -2,9 +2,15 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <NTPClient.h>
+
 
 #define pinn  D7
 #define ADCC  A0
+
+
+
+
 
 // WiFi
 const char *ssid = "LANCOMBEIA"; // Enter your WiFi name
@@ -19,6 +25,13 @@ const char *topic3 = "training/robi/esp8266test2";
 const char *mqtt_username = "";
 const char *mqtt_password = "";
 const int mqtt_port = 1883;
+
+// time
+const long utcOffsetInSeconds = 3600;
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+
+
 
 int yy = 0;
 int rr;
@@ -47,7 +60,7 @@ char eee[] = "{\"ttt\":44}";
 
 
 
-
+NTPClient timeClient(espClient, "pool.ntp.org", utcOffsetInSeconds);
 
 
 
@@ -56,6 +69,10 @@ void setup()
 {
   // Set software serial baud to 115200;
   Serial.begin(115200);
+  Serial.setTimeout(2000);
+  // Wait for serial to initialize.
+  while (!Serial) { }
+
   pinMode(pinn , OUTPUT);
   pinMode(ADCC , INPUT);
 
@@ -92,40 +109,8 @@ void setup()
   // publish and subscribe
   client.publish(topic, "THE EMPEROR PROTECTS");
   client.subscribe(topic);
-}
 
 
-
-
-
-
-
-
-
-
-
-
-
-void callback(char *topic, byte *payload, unsigned int length)
-{
-  Serial.print("Message arrived in topic: ");
-  Serial.println(topic);
-  Serial.print("Message:");
-  for (int i = 0; i < length; i++)
-  {
-    Serial.print((char) payload[i]);
-  }
-  Serial.println();
-  Serial.println("-----------------------");
-}
-
-
-
-
-
-
-void loop()
-{
   Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
   yy++;
   char sus_var[512] ;
@@ -164,7 +149,8 @@ void loop()
     data.add(2.302038);
 
   */
-  doc["40K"] = tt[rr];
+  // doc["40K"] = tt[rr];
+  doc["40K"] = "string var goes here as a long test to see stuff";
   doc["count"] = yy;
   serializeJson(doc, sus_var);
   Serial.println("JSON: ");
@@ -176,6 +162,25 @@ void loop()
   delay(500);
 
   digitalWrite(pinn, LOW);
+
+
+
+  timeClient.begin();
+  timeClient.update();
+
+  Serial.print(daysOfTheWeek[timeClient.getDay()]);
+  Serial.print(", ");
+  Serial.print(timeClient.getHours());
+  Serial.print(":");
+  Serial.print(timeClient.getMinutes());
+  Serial.print(":");
+  Serial.println(timeClient.getSeconds());
+  //Serial.println(timeClient.getFormattedTime());
+
+
+
+
+
   Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
   //delay(500000);
   Serial.println("I'm awake, but I'm going into deep sleep mode for 300 seconds");
@@ -183,7 +188,47 @@ void loop()
 
 
 
-  
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void callback(char *topic, byte *payload, unsigned int length)
+{
+  Serial.print("Message arrived in topic: ");
+  Serial.println(topic);
+  Serial.print("Message:");
+  for (int i = 0; i < length; i++)
+  {
+    Serial.print((char) payload[i]);
+  }
+  Serial.println();
+  Serial.println("-----------------------");
+}
+
+
+
+
+
+
+void loop()
+{
+
+
+  delay(100);
+
+
 
 
 }

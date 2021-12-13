@@ -17,6 +17,14 @@
     - SOCKET_C
     - SOCKET_F
 */
+/*
+                    | A | B | C | D | E | F |
+                    |-----------------------|
+  TeHuPr              |   |   |   |   | X |   |
+  O2                  |   | X |   |   |   |   |
+  Alarm               |   |   | X |   |   |   |
+                    |-----------------------|
+*/
 
 // 7 si 8 pt socket F
 //3 4 pt socket C
@@ -35,12 +43,12 @@ float pressure;   // Stores the pressure in Pa
 
 
 
-int prag1 = 22.5;
-int prag2 = 23.5;
+int prag1 = 22.5; //First threshold for yellow alarm
+int prag2 = 23.5; //Second threshold for red alarm
 int cycle_time2 = 120; // in seconds
 unsigned long prev, b;
 float O2Vol, O2Val;
-
+int bat_V;
 
 
 
@@ -88,6 +96,8 @@ void setup()
   USB.println(F("USB port started..."));
   pinMode(RED_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
+  digitalWrite(YELLOW_LED, LOW);
+  digitalWrite(RED_LED, LOW);
 
   USB.println(F("Electrochemical gas sensor example"));
 
@@ -101,16 +111,19 @@ void setup()
 
   // First sleep time
   // After 2 minutes, Waspmote wakes up thanks to the RTC Alarm
- // PWR.deepSleep("00:00:02:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
-  PWR.deepSleep("00:00:03:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
- // Watchdog_setup_and_reset( 4*60, true);
+  // PWR.deepSleep("00:00:02:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  PWR.deepSleep("00:00:03:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
+  // Watchdog_setup_and_reset( cycle_time2 * 2, true);
 }
 
 void loop()
 {
 
   prev = millis();
- // Watchdog_setup_and_reset( cycle_time2, true);
+  USB.println(F("starting main loop:"));
+  digitalWrite(YELLOW_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+
   ///////////////////////////////////////////
   // 2. Read sensors
   ///////////////////////////////////////////
@@ -125,6 +138,11 @@ void loop()
 
   // And print the values via USB
   USB.println(F("***************************************"));
+  USB.print(F("Battery: "));
+  bat_V = PWR.getBatteryLevel();
+  USB.println( bat_V );
+
+
   USB.print(F("Gas concentration: "));
   USB.print(concentration);
   USB.println(F(" ppm"));
@@ -180,7 +198,6 @@ void loop()
 
 
 
-
   ///////////////////////////////////////////
   // 5. Sleep
   ///////////////////////////////////////////
@@ -193,11 +210,17 @@ void loop()
 
 
 
+  // Watchdog_setup_and_reset( cycle_time2 * 2 , true);
+  PWR.deepSleep("00:00:00:30", RTC_OFFSET, RTC_ALM1_MODE1, ALL_ON);
 
-  b = cycle_time2 * 1000 - ( millis() - prev );
-  if ( b < 1)
-  {
-    b = 0;
-  }
-  delay(b);
-}
+  /*
+    b = cycle_time2 * 1000 - ( millis() - prev );
+    if ( b < 1)
+    {
+    b = 500;
+    }
+    delay(b);
+
+
+   */
+    }
