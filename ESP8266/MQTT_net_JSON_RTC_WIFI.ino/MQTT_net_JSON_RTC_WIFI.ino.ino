@@ -1,20 +1,24 @@
 #include <ArduinoJson.h>
-
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <NTPClient.h>
-
+#include <WiFiUdp.h>
 
 #define pinn  D7
 #define ADCC  A0
 
 
 
-
-
 // WiFi
 const char *ssid = "LANCOMBEIA"; // Enter your WiFi name
 const char *password = "beialancom";  // Enter WiFi password
+
+const long utcOffsetInSeconds = 3600;
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+// Define NTP Client to get time
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+
 
 
 // MQTT Broker
@@ -25,14 +29,13 @@ const char *topic3 = "training/robi/esp8266test2";
 const char *mqtt_username = "";
 const char *mqtt_password = "";
 const int mqtt_port = 1883;
-
-// time
-const long utcOffsetInSeconds = 3600;
-char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-
+WiFiClient espClient;
+PubSubClient client(espClient);
+StaticJsonDocument<512> doc;
 
 
 
+char eee[] = "{\"ttt\":44}";
 int yy = 0;
 int rr;
 float qqw;
@@ -51,154 +54,6 @@ char tt[][200] =
   "Life is the Emperor's currency, spend it well. - Warhammer 40k, Imperium" ,
   "Show me a fortress and I'll show you a ruin. - Captain Edain Bourne, Warhammer 40k Seige, p. 105"
 };
-
-WiFiClient espClient;
-PubSubClient client(espClient);
-StaticJsonDocument<512> doc;
-
-char eee[] = "{\"ttt\":44}";
-
-
-
-NTPClient timeClient(espClient, "pool.ntp.org", utcOffsetInSeconds);
-
-
-
-
-void setup()
-{
-  // Set software serial baud to 115200;
-  Serial.begin(115200);
-  Serial.setTimeout(2000);
-  // Wait for serial to initialize.
-  while (!Serial) { }
-
-  pinMode(pinn , OUTPUT);
-  pinMode(ADCC , INPUT);
-
-
-
-
-  // connecting to a WiFi network
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(15000);
-    Serial.println("Connecting to WiFi..");
-  }
-  Serial.println("Connected to the WiFi network");
-  //connecting to a mqtt broker
-  client.setServer(mqtt_broker, mqtt_port);
-  client.setCallback(callback);
-  while (!client.connected())
-  {
-    String client_id = "esp8266-client-";
-    client_id += String(WiFi.macAddress());
-    Serial.printf("The client %s connects to the public mqtt broker\n", client_id.c_str());
-    if (client.connect(client_id.c_str(), mqtt_username, mqtt_password))
-    {
-      Serial.println("Public emqx mqtt broker connected");
-    }
-    else
-    {
-      Serial.print("failed with state ");
-      Serial.print(client.state());
-      delay(2000);
-    }
-  }
-  // publish and subscribe
-  client.publish(topic, "THE EMPEROR PROTECTS");
-  client.subscribe(topic);
-
-
-  Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-  yy++;
-  char sus_var[512] ;
-  // itoa(yy, sus_var, 10);
-  digitalWrite(pinn, HIGH);
-  client.loop();
-  Serial.println(yy);
-  rr = random(0, 12);
-  Serial.print("random: ");
-  Serial.println(   rr  );
-
-  qqw = analogRead(ADCC);
-  Serial.print("TENSIUNE RAW: ");
-  Serial.println(   qqw  );
-  qqw = qqw * 3.33 / 1023;
-  Serial.print("TENSIUNE [V]: ");
-  Serial.println(   qqw  );
-  Serial.println(tt[rr]);
-
-
-
-  Serial.println(tt[rr]);
-  client.publish(topic, tt[rr] );
-  client.publish(topic3, eee );
-
-
-
-
-  doc["sensor1"] = "fierbinte";
-  doc["sensor2"] = 1351824120;
-  doc["tensiune"] = qqw;
-
-  /*
-    JsonArray data = doc.createNestedArray("data");
-    data.add(48.75608);
-    data.add(2.302038);
-
-  */
-  // doc["40K"] = tt[rr];
-  doc["40K"] = "string var goes here as a long test to see stuff";
-  doc["count"] = yy;
-  serializeJson(doc, sus_var);
-  Serial.println("JSON: ");
-  Serial.println(sus_var);
-
-
-
-  client.publish(topic2, sus_var );
-  delay(500);
-
-  digitalWrite(pinn, LOW);
-
-
-
-  timeClient.begin();
-  timeClient.update();
-
-  Serial.print(daysOfTheWeek[timeClient.getDay()]);
-  Serial.print(", ");
-  Serial.print(timeClient.getHours());
-  Serial.print(":");
-  Serial.print(timeClient.getMinutes());
-  Serial.print(":");
-  Serial.println(timeClient.getSeconds());
-  //Serial.println(timeClient.getFormattedTime());
-
-
-
-
-
-  Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-  //delay(500000);
-  Serial.println("I'm awake, but I'm going into deep sleep mode for 300 seconds");
-  ESP.deepSleep(30e7);
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
 
 
 
@@ -222,11 +77,140 @@ void callback(char *topic, byte *payload, unsigned int length)
 
 
 
+
+void setup()
+{
+  // Set software serial baud to 115200;
+  Serial.begin(115200);
+  pinMode(pinn , OUTPUT);
+  pinMode(ADCC , INPUT);
+
+  WiFi.begin(ssid, password);
+
+  while ( WiFi.status() != WL_CONNECTED ) {
+    delay ( 500 );
+    Serial.print ( "." );
+  }
+
+
+
+
+
+
+
+
+
+
+
+  // connecting to a WiFi network
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(15000);
+    Serial.println("Connecting to WiFi..");
+  }
+  Serial.println("Connected to the WiFi network");
+  //connecting to a mqtt broker
+  client.setServer(mqtt_broker, mqtt_port);
+  client.setCallback(callback);
+  while (!client.connected())
+  {
+    String client_id = "ROBERT: ";
+    client_id += String(WiFi.macAddress());
+    Serial.printf("The client %s connects to the public mqtt broker\n", client_id.c_str());
+    if (client.connect(client_id.c_str(), mqtt_username, mqtt_password))
+    {
+      Serial.println("Public emqx mqtt broker connected");
+    }
+    else
+    {
+      Serial.print("failed with state ");
+      Serial.print(client.state());
+      delay(2000);
+    }
+  }
+  // publish and subscribe
+  client.publish(topic, "THE EMPEROR PROTECTS");
+  client.subscribe(topic);
+  timeClient.begin();
+}
+
+
+
+
+
+
+
+
+
 void loop()
 {
+  timeClient.update();
+  Serial.print(daysOfTheWeek[timeClient.getDay()]);
+  Serial.print(", ");
+  Serial.print(timeClient.getHours());
+  Serial.print(":");
+  Serial.print(timeClient.getMinutes());
+  Serial.print(":");
+  Serial.println(timeClient.getSeconds());
+  //Serial.println(timeClient.getFormattedTime());
+
+  delay(1000);
 
 
-  delay(100);
+
+  char sus_var[512] ;
+  // itoa(yy, sus_var, 10);
+  digitalWrite(pinn, HIGH);
+  client.loop();
+  Serial.println(yy);
+  rr = random(0, 12);
+  Serial.print("random: ");
+  Serial.println(   rr  );
+
+
+
+  qqw = analogRead(ADCC);
+  Serial.print("TENSIUNE RAW: ");
+  Serial.println(   qqw  );
+  qqw = qqw * 3.33 / 1023;
+  Serial.print("TENSIUNE [V]: ");
+  Serial.println(   qqw  );
+
+
+  
+  Serial.println(tt[rr]);
+  client.publish(topic, tt[rr] );
+  client.publish(topic3, eee );
+  doc["sensor1"] = "fierbinte";
+  doc["sensor2"] = 1351824120;
+  doc["tensiune"] = qqw;
+  doc["40K"] = tt[rr];
+  doc["Hours"] = timeClient.getHours();
+  doc["Minutes"] = timeClient.getMinutes();
+  doc["Seconds"] = timeClient.getSeconds();
+  serializeJson(doc, sus_var);
+  Serial.println("JSON: ");
+  Serial.println(sus_var);
+  client.publish(topic2, sus_var );
+  delay(500);
+  digitalWrite(pinn, LOW);
+
+
+
+
+  Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+  //delay(500000);
+  Serial.println("I'm awake, but I'm going into deep sleep mode for 300 seconds");
+  ESP.deepSleep(30e7);
+
+
+
+
+
+
+
+
 
 
 

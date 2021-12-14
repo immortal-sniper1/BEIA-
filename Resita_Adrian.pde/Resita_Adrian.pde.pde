@@ -10,17 +10,25 @@
                     |-----------------------|
 */
 
-
-
 //====================================================================
 // INSTANCE DEFINITION
 //====================================================================
+
+#define PRAG1 225000
+#define PRAG2 235000
+
+#define PRAGEROARE 500000
+
+// 7 si 8 pt socket F
+// 3 4 pt socket C
+#define RED_LED DIGITAL3
+#define YELLOW_LED DIGITAL4
+
 bmeGasesSensor bme;
 Gas O2(SOCKET_F);
 
-
 // Default device name
-char *MOTE_ID = "H5";
+char *MOTE_ID = "H1";
 
 //====================================================================
 // PARAMETERS FOR SD CARD
@@ -39,16 +47,12 @@ uint8_t connection_status;
 // Define measurement variables
 ////////////////////////////////////////////////
 
-float temperature;      // Stores the temperature in ºC
-float humidity;         // Stores the realitve humidity in %RH
-float pressure;         // Stores the pressure in Pa
+float temperature; // Stores the temperature in ºC
+float humidity;    // Stores the realitve humidity in %RH
+float pressure;    // Stores the pressure in Pa
 float concO2;
 
-
 int status;
-
-
-
 
 /*
  * Writes the frame to the SD card usind the following format:
@@ -82,25 +86,14 @@ bool writeSD(void) {
   // Add newline
   ok &= file.write("\n") > 0;
 
-//  if (NTP_IS_SYNC == true) {
-//    USB.println(F("NTP is set - I will write the real time on the SD card."));
-//    ok &= file.write("+\t") > 0;
-//  } else {
-//    USB.println(F("No NTP was synced. No time available :("));
-//    ok &= file.write("-\t") > 0;
-//  }
+  ok &= file.write("+\t") > 0;
 
   ltoa(millis(), millis_str, 10);
   ok &= file.write(millis_str) > 0;
   ok &= file.write("\t") > 0;
 
-  // Write epoch time (or *)
-//  if (NTP_IS_SYNC) {
-//    ltoa(RTC.getEpochTime(), epoch_time_str, 10);
-//    ok &= file.write(epoch_time_str) > 0;
-//  } else {
-//    ok &= file.write("*") > 0;
-//  }
+  ltoa(RTC.getEpochTime(), epoch_time_str, 10);
+  ok &= file.write(epoch_time_str) > 0;
 
   // Write \t before frame
   ok &= file.write("\t") > 0;
@@ -126,13 +119,13 @@ bool writeSD(void) {
 //====================================================================
 void readSensors() {
   delay(100);
-  
+
   USB.println(F("****************************************"));
   USB.println(F("Powering on Oxygen sensor  to warm up"));
 
   O2.ON();
 
-  USB.println(F("... Enter deep sleep mode 2 minutes to warm up sensors"));
+  USB.println(F("... Enter deep sleep mode 3 minutes to warm up sensors"));
   PWR.deepSleep("00:00:03:00", RTC_OFFSET, RTC_ALM1_MODE1, SENSOR_ON);
 
   USB.println(F("Woke up from deep sleep. Reading BME first"));
@@ -143,19 +136,19 @@ void readSensors() {
   temperature = bme.getTemperature();
   humidity = bme.getHumidity();
   pressure = bme.getPressure();
-  
+
   USB.println(F("...done reading... BME OFF."));
   bme.OFF();
 
   USB.println(F("Reading oxygen concentration..."));
   concO2 = O2.getConc(temperature);
-    
+
   USB.println(F("... done reading... O2"));
 
   USB.print(F("... O2 concentration: "));
   USB.print(concO2);
   USB.println(F(" ppm"));
-  
+
   USB.println(F("... *************************************"));
 }
 
@@ -165,20 +158,19 @@ void readSensors() {
 void CreateDataFrame(uint8_t frame_type) {
   USB.println(F("..CREATING FRAME PROCESS "));
 
-    frame.createFrame(ASCII);
-    //Add BAT level
-    frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-    // Add temperature
-    frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
-    // Add humidity
-    frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
-    // Add pressure value
-    frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
-    // Add O2 value
-    frame.addSensor(SENSOR_GASES_PRO_O2, concO2, 3);
-    // Show the frame
-    frame.showFrame();
-
+  frame.createFrame(frame_type, MOTE_ID);
+  // Add BAT level
+  frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
+  // Add temperature
+  frame.addSensor(SENSOR_GASES_PRO_TC, temperature, 2);
+  // Add humidity
+  frame.addSensor(SENSOR_GASES_PRO_HUM, humidity, 2);
+  // Add pressure value
+  frame.addSensor(SENSOR_GASES_PRO_PRES, pressure, 2);
+  // Add O2 value
+  frame.addSensor(SENSOR_GASES_PRO_O2, concO2, 3);
+  // Show the frame
+  frame.showFrame();
 }
 
 void setup() {
@@ -191,6 +183,13 @@ void setup() {
   USB.print(F("BEIA "));
   USB.println(MOTE_ID);
   USB.println(F("*****************************************************"));
+
+
+  // Setup LEDs/Buzzers
+  pinMode(RED_LED, OUTPUT);
+  pinMode(YELLOW_LED, OUTPUT);
+  digitalWrite(YELLOW_LED, LOW);
+  digitalWrite(RED_LED, LOW);
 
   // Init RTC
   RTC.ON();
@@ -225,10 +224,30 @@ void loop() {
 
   // Step 3: Save on SD card
   writeSD();
+  
+  // Step 4: Update buzzers
+  int yellow_led, red_led;
+  if (concO2 < PRAGEROARE) {
+    yellow_led = (concO2 > PRAG1) && (concO2 < PRAG2) ? HIGH : LOW;
+    red_led = (concO2 > PRAG2) ? HIGH : LOW;
+  } else {
+    yellow_led = LOW;
+    red_led = LOW;
+  }
+
+  // Alert both on low battery
+  if(PWR.getBatteryLevel() < 25) {
+    yellow_led = HIGH;
+    red_led = HIGH;
+  }
+
+  digitalWrite(YELLOW_LED, yellow_led);
+  digitalWrite(RED_LED, red_led);
 
   USB.println(F("---------------------------------"));
-  USB.println(F("...Enter deep sleep mode 12 min"));
+  USB.println(F("...Enter deep sleep mode 45 sec"));
   PWR.deepSleep("00:00:00:45", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+
   USB.ON();
   USB.print(F("...wake up!! Date: "));
   USB.println(RTC.getTime());
