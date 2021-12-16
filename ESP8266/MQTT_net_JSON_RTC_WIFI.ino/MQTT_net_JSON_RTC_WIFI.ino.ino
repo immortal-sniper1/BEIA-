@@ -13,10 +13,10 @@
 const char *ssid = "LANCOMBEIA"; // Enter your WiFi name
 const char *password = "beialancom";  // Enter WiFi password
 
-const long utcOffsetInSeconds = 3600;
+const long utcOffsetInSeconds = 7200;   // time zone offset relative to UTC , in seconds
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 // Define NTP Client to get time
-WiFiUDP ntpUDP;
+WiFiUDP ntpUDP;     // UDP instance that is used for some functions
 NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 
 
@@ -178,7 +178,7 @@ void loop()
   Serial.println(   qqw  );
 
 
-  
+
   Serial.println(tt[rr]);
   client.publish(topic, tt[rr] );
   client.publish(topic3, eee );
@@ -189,6 +189,7 @@ void loop()
   doc["Hours"] = timeClient.getHours();
   doc["Minutes"] = timeClient.getMinutes();
   doc["Seconds"] = timeClient.getSeconds();
+  doc["time"] = timeClient.getFormattedTime();
   serializeJson(doc, sus_var);
   Serial.println("JSON: ");
   Serial.println(sus_var);

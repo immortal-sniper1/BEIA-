@@ -31,7 +31,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="61.0" width="132.0" x="587.0" y="157.0"/>
-          <y:Fill color="#FFCC00" transparent="false"/>
+          <y:Fill color="#00FFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="119.388671875" x="6.3056640625" xml:space="preserve" y="13.798828125">Measurement station,
 grid parameters<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -131,7 +131,7 @@ possible maintanance urgences and other data <y:LabelModel><y:SmartNodeLabelMode
           <y:Geometry height="56.231998443603516" width="35.095298767089844" x="897.4523506164551" y="297.112003326416"/>
           <y:Fill color="#CCCCFF" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="48.103515625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="176.095703125" x="-70.50020217895508" xml:space="preserve" y="60.231998443603516">Edge clown server
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="48.103515625" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="176.095703125" x="-70.50020217895508" xml:space="preserve" y="60.231998443603516">Edge cloud server
 responsable for decision making
  and centraliseing data<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="-0.5" nodeRatioX="0.0" nodeRatioY="0.5" offsetX="0.0" offsetY="4.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:SVGNodeProperties usingVisualBounds="true"/>
@@ -300,7 +300,7 @@ responsable for decision making
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="120.0" width="120.0" x="-0.4999999999998437" y="34.00000000000006"/>
-          <y:Fill color="#FFCC00" transparent="false"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="72.0390625" x="23.98046875" xml:space="preserve" y="43.298828125">Power grid 
 controll point<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -351,7 +351,7 @@ can open or close the conection<y:LabelModel><y:SmartNodeLabelModel distance="4.
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="138.9999999999999" sy="-3.9958444378261504" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:LineStyle color="#FFCC00" type="line" width="7.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
@@ -403,7 +403,7 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="4.0"/>
+          <y:LineStyle color="#000000" type="line" width="5.0"/>
           <y:Arrows source="delta" target="delta"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
@@ -413,7 +413,7 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:LineStyle color="#000000" type="line" width="5.0"/>
           <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
@@ -433,8 +433,8 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
+          <y:LineStyle color="#FFCC00" type="line" width="1.0"/>
+          <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
@@ -443,8 +443,8 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
+          <y:LineStyle color="#FFCC00" type="line" width="1.0"/>
+          <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
@@ -453,8 +453,8 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
+          <y:LineStyle color="#FFCC00" type="line" width="1.0"/>
+          <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
@@ -463,8 +463,8 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
+          <y:LineStyle color="#FFCC00" type="line" width="1.0"/>
+          <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
@@ -505,8 +505,8 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="-26.57570676391657" ty="4.01978056217385"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
-          <y:Arrows source="none" target="standard"/>
+          <y:LineStyle color="#FFCC00" type="line" width="7.0"/>
+          <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
@@ -515,7 +515,7 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:LineStyle color="#FFCC00" type="line" width="7.0"/>
           <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
@@ -534,7 +534,9 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
     <edge id="e18" source="n20" target="n21">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+            <y:Point x="161.98039215686273" y="181.84313725490193"/>
+          </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
@@ -545,7 +547,7 @@ using GPRS/3/4/5G network<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnable
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
-          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:LineStyle color="#FFCC00" type="line" width="7.0"/>
           <y:Arrows source="standard" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
