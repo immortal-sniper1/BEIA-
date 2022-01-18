@@ -17,7 +17,7 @@
 #define PRAG1 225000
 #define PRAG2 235000
 
-#define PRAGEROARE 500000
+#define PRAGEROARE 650000
 
 // 7 si 8 pt socket F
 // 3 4 pt socket C
@@ -55,14 +55,14 @@ float concO2;
 int status;
 
 /*
- * Writes the frame to the SD card usind the following format:
- * When RTC is okay (set)
- * +\t<milis>\t<epoch_time>\t<frame>
- * When RTC is not set
- * -\t<milis>\t*\t<frame>
- * Uses NTP_IS_SYNC to see if the RTC is set.
- * Returns true if the write is succesful.
- */
+   Writes the frame to the SD card usind the following format:
+   When RTC is okay (set)
+   +\t<milis>\t<epoch_time>\t<frame>
+   When RTC is not set
+   -\t<milis>\t*\t<frame>
+   Uses NTP_IS_SYNC to see if the RTC is set.
+   Returns true if the write is succesful.
+*/
 bool writeSD(void) {
   bool ok = true;
   USB.println(F("--------------- Start of writeSD ------------------------"));
@@ -224,7 +224,7 @@ void loop() {
 
   // Step 3: Save on SD card
   writeSD();
-  
+
   // Step 4: Update buzzers
   int yellow_led, red_led;
   if (concO2 < PRAGEROARE) {
@@ -235,8 +235,12 @@ void loop() {
     red_led = LOW;
   }
 
+//  delay(60000);
+//  yellow_led = LOW;
+//  red_led = LOW;
+
   // Alert both on low battery
-  if(PWR.getBatteryLevel() < 25) {
+  if (PWR.getBatteryLevel() < 25) {
     yellow_led = HIGH;
     red_led = HIGH;
   }
@@ -246,7 +250,7 @@ void loop() {
 
   USB.println(F("---------------------------------"));
   USB.println(F("...Enter deep sleep mode 45 sec"));
-  PWR.deepSleep("00:00:00:45", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
+  PWR.deepSleep("00:00:05:00", RTC_OFFSET, RTC_ALM1_MODE1, ALL_OFF);
 
   USB.ON();
   USB.print(F("...wake up!! Date: "));
