@@ -790,6 +790,9 @@ int HTTP_4G_TRIMITATOR_FRAME()
 
   int ssent = 0;
   int ssent2;
+
+
+  /*
   // nu se trimite daca bateria e prea descarcata
   if ( PWR.getBatteryLevel() >= 50 )
   {
@@ -812,9 +815,9 @@ int HTTP_4G_TRIMITATOR_FRAME()
       }
     }
   }
-
-  USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
-  goto not_sendeder;
+*/
+ // USB.println(F("Not sending data due to low battery levels BUT DATA IS STORED ON THE SD CARD"));
+  //goto not_sendeder;
 gato:
 
 
@@ -1369,7 +1372,7 @@ eve:
   }
   else
   {
-    if (qt <= 5)
+    if (qt <= 2)
     {
       USB.println(F("Sensor not connected or invalid data"));
       USB.print(F("This was atempt: "));
@@ -1556,7 +1559,7 @@ void masurator_agroo()
   linie_de_minus(1);
 
 
-  cititor_meteo();
+ // cititor_meteo();
   umezeala_frunza = frunzarie();
 
 
@@ -1848,8 +1851,10 @@ RIUK3:
   
   frame.showFrame();
 
+int ddg;
+ddg=PWR.getBatteryLevel();
 
-  if ( PWR.getBatteryLevel() < 20)
+  if ( ddg < 20)
   {
     USB.print(F("LOW BATTERY ABANDONING TRANSMISION ATEMPT IN ORDER TO KEEP THE STATION ALIVE AND RECORDING DATA ON THE SD"));
     ssent = 0;
@@ -1897,7 +1902,7 @@ void setup()
 
   INFO_4G_MDD();
   INFO_4G_NET();
-  //HTTP_GET_4G();
+ // HTTP_GET_4G();
   //HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
