@@ -1,10 +1,11 @@
 #include <Wire.h>
 
-
+const int slaveAddress = 0x70;
 
 const int ledRed = LED_BUILTIN;      // LED connected to digital pin 2
 const int ledYell = 3;      // LED connected to digital pin 3
 const int buzz = 5;        // buzzer connected to digital pin 5
+int safety = 7;
 
 void setup()
 {
@@ -14,6 +15,7 @@ void setup()
   pinMode(ledRed, OUTPUT);
   pinMode(ledYell, OUTPUT);
   pinMode(buzz, OUTPUT);
+    pinMode(safety, OUTPUT);
 
 }
 
@@ -28,6 +30,11 @@ void loop()
   {
     int c = Wire.read(); // receive a byte as character
     Serial.println(c);         // print the character
+
+
+
+
+    
     if ( c == 13 )     // 13 si 46 sunt la intamplare
     {
       digitalWrite(ledRed, HIGH);
