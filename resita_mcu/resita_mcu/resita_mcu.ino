@@ -30,7 +30,7 @@ void loop()
 
 
   c = Wire.read(); // receive a byte as character
-  Serial.println(c);         // print the character
+  Serial.println(c , HEX);         // print the character
 
   
   
