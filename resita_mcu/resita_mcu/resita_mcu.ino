@@ -7,6 +7,7 @@ const int ledYell = 3;      // LED connected to digital pin 3
 const int buzz = 5;        // buzzer connected to digital pin 5
 int safety = 7;
 
+ int u;
 void setup()
 {
   Wire.begin();        // join i2c bus (address optional for master)
@@ -15,7 +16,7 @@ void setup()
   pinMode(ledRed, OUTPUT);
   pinMode(ledYell, OUTPUT);
   pinMode(buzz, OUTPUT);
-    pinMode(safety, OUTPUT);
+  pinMode(safety, OUTPUT);
 
 }
 
@@ -30,23 +31,29 @@ void loop()
   {
     int c = Wire.read(); // receive a byte as character
     Serial.println(c);         // print the character
+u=1;
 
 
 
 
-    
-    if ( c == 13 )     // 13 si 46 sunt la intamplare
+    if ( c == 2 )     // 13 si 46 sunt la intamplare
     {
       digitalWrite(ledRed, HIGH);
       digitalWrite(buzz, HIGH);
       Serial.println("primit 13");
+      u=0;
     }
-    if ( c == 46 )
+
+    
+    if ( c == 4 )
     {
       digitalWrite(ledYell, HIGH);
       digitalWrite( buzz, HIGH);
+      u=0;
     }
-    else
+
+    
+    if ( u != 0 )
     {
       Serial.println("invalid command!");
     }

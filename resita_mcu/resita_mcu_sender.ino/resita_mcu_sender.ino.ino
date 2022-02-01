@@ -16,16 +16,7 @@ void loop()
   Wire.beginTransmission(4); // transmit to device #4
   Serial.print("loop x:");
   Serial.println(x);
-  Wire.write("x is odd?");        // sends five bytes
-  if ( x % 2 == 1)
-  {
-    Wire.write(13);              // sends 2 byte
-  }
-  else
-  {
-    Wire.write(9);              // sends 1 byte
-  }
-
+  Wire.write(x);
   Wire.endTransmission();    // stop transmitting
   x++;
 
