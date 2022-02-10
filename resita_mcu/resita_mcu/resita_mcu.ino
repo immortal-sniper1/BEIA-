@@ -24,38 +24,38 @@ void setup()
 
 void loop()
 {
-  //Wire.requestFrom(  byte(0x77), 4);    // request 2 bytes from peripheral device #8
+  Wire.requestFrom(  slaveAddress , 1);    // request 2 bytes from peripheral device #8
   Serial.println("loop n");
- // while ( Wire.available() )   // peripheral may send less than requested
+  // while ( Wire.available() )   // peripheral may send less than requested
 
 
-  c = Wire.read(); // receive a byte as character
-  Serial.println(c , HEX);         // print the character
-
-  
-  
-    c = Wire.read(); // receive a byte as character
-    Serial.println(c);         // print the character
+  //  c = Wire.read(); // receive a byte as character
+  // Serial.println(c , HEX);         // print the character
 
 
 
-/*
+  // c = Wire.read(); // receive a byte as character
+  // Serial.println(c, HEX);         // print the character
+  Serial.println(  Wire.read() , HEX);
+  Serial.println(  Wire.read() , HEX);
 
-    if ( c == 13 )     // 13 si 46 sunt la intamplare
-    {
-      digitalWrite(ledRed, HIGH);
-      digitalWrite(buzz, HIGH);
-      Serial.println("primit 13");
-    }
-    if ( c == 46 )
-    {
-      digitalWrite(ledYell, HIGH);
-      digitalWrite( buzz, HIGH);
-    }
-    else
-    {
-      Serial.println("invalid command!");
-    }
+  /*
+
+      if ( c == 13 )     // 13 si 46 sunt la intamplare
+      {
+        digitalWrite(ledRed, HIGH);
+        digitalWrite(buzz, HIGH);
+        Serial.println("primit 13");
+      }
+      if ( c == 46 )
+      {
+        digitalWrite(ledYell, HIGH);
+        digitalWrite( buzz, HIGH);
+      }
+      else
+      {
+        Serial.println("invalid command!");
+      }
 
   */
 
