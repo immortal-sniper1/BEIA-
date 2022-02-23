@@ -28,6 +28,9 @@
     Design:            David Gascón
     Implementation:    Luis Miguel Martí
 */
+#include <test.h>
+
+
 
 // Variable to store function returns
 uint8_t data_read;
@@ -38,6 +41,7 @@ void setup()
   //////////////////////////
   // 1. Start the I2C bus
   //////////////////////////
+  USB.ON();
   I2C.begin();
 
   ////////////////////////////////////////////////////////
@@ -66,5 +70,10 @@ void loop()
   I2C.write(0x75, 0xD1, 0x04);
 
   delay(5000);
+
+  USB.println(   test.beia.Add(13, 15)  );
+
+
+
 }
 
