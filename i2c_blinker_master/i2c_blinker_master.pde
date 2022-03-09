@@ -72,7 +72,7 @@ void loop()
   delay(5000);
 
   USB.println(   test.beia.Add(13, 15)  );
-
+  //USB.println(   test.beia.Add(13, 15)  );
 
 
 }
