@@ -1344,8 +1344,8 @@ void setup()
 
   INFO_4G_MDD();
   INFO_4G_NET();
-  //HTTP_GET_4G();
-  //HTTP_POST_4G();
+  HTTP_GET_4G();
+  HTTP_POST_4G();
   //FTP_4G_SEND( SD_FILE , SERVER_FILE  );
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //OTA_setup_check(5);
