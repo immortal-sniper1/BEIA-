@@ -37,7 +37,7 @@ uint8_t program_verrr;
 
 
 //EDITEAZA AICI!
-int  cycle_time2 = 1150; // in seconds
+int  cycle_time2 = 180; // in seconds era 1150 pt 20 min
 char node_ID[] = "SWX2";
 uint8_t RTC_ATEMPTS = 10; // number of RTC sync atempts
 // APN settings
