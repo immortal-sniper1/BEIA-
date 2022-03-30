@@ -1,4 +1,4 @@
-#include "../../beia.h"
+#include "beia.h"
 
 int main()
 {
