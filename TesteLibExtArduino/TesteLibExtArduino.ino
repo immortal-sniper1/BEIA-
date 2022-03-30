@@ -2,7 +2,7 @@
 
 int r=1;
 
-beia robb();
+beia robb();   // instanta clasa beia
 
 void setup() {
   // put your setup code here, to run once:
