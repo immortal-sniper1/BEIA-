@@ -1,12 +1,17 @@
 #include "secretele.h"
 
+int x = 1;
 
+
+beia robb();
 void setup()
 {
   // put your setup code here, to run once:
   USB.ON();
   //USB.println(rr);
-  USB.println(   Add( 13, 17)  );
+//  x = beia.Addd( 13, 17) ;
+  USB.println( x );
+  robb.weeeee();
 
 }
 
@@ -14,5 +19,6 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
+  delay(500);
 
 }
