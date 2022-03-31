@@ -8,15 +8,15 @@ class beia
   private:
     int numar = 13;
   public:
-//    int beia::Addd(int  a=1, int b=1)
-//    {
-//      return a + b;
-//    }
-//
-//    void beia::weeeee()
-//    {
-//        USB.println(F("\n----------------------------\n"));
-//    }
+    int beia::Addd(int  a=1, int b=1)
+    {
+      return a + b;
+    }
+
+    void beia::weeeee()
+    {
+        USB.println(F("\n----------------------------\n"));
+    }
 
 };
 

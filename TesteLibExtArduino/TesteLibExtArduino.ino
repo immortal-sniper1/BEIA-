@@ -4,14 +4,15 @@ int r=1;
 
 beia robb();   // instanta clasa beia
 
-void setup() {
+void setup()
+ {
   // put your setup code here, to run once:
+  Serial.begin(9600);
+  Serial.println( beia::numar2  );
+ // robb::Addd(11 , 55);
 
 
-  robb::Addd(11 , 55);
-
-
-  r= robb.Addd(33 , 85);
+ // r= robb.Addd(33 , 85);
 
 }
 

@@ -10,7 +10,7 @@ void setup()
   USB.ON();
   //USB.println(rr);
 //  x = beia.Addd( 13, 17) ;
-  USB.println( beia::numar );
+  USB.println( numar );
  // robb.weeeee();
 
 }
