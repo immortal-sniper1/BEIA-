@@ -204,6 +204,7 @@ void setRTCM() {
   if ( error == 0 )
   {
     USB.print(F("SET RTC ok. "));
+    NTP_IS_SYNC = true;
   }
   else
   {
