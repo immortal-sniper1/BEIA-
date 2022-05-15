@@ -1,0 +1,21 @@
+Circuit: * E:\BEIA-work\BEIA-\simulations\toilet4me2-fan.asc
+
+Direct Newton iteration for .op point succeeded.
+
+Date: Thu May 12 09:54:15 2022
+Total elapsed time: 0.301 seconds.
+
+tnom = 27
+temp = 27
+method = modified trap
+totiter = 10389
+traniter = 10378
+tranpoints = 5105
+accept = 5082
+rejected = 23
+matrix size = 14
+fillins = 5
+solver = Normal
+Matrix Compiler1: 900 bytes object code size  0.2/0.2/[0.1]
+Matrix Compiler2: 1.27 KB object code size  0.1/0.2/[0.1]
+
