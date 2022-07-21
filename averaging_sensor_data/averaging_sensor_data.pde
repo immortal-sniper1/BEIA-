@@ -377,7 +377,7 @@ void loop()
   USB.println(PWR.getBatteryVolts());
   USB.print("battery percent: ");
   USB.println((int)(PWR.getBatteryLevel()));
-
+  fancy_particles();
 
 
 
