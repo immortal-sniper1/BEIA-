@@ -299,9 +299,10 @@ qwerty:
 
 
 
-void fancy_particles()
+void fancy_particles( uint8_t x = 16)
 {
-  uint8_t ii;
+  // x number of values to average out
+  uint8_t ii, OPC_status;
   float sum1 = 0, sum2 = 0, sum3 = 0;
   //Turn on the particle matter sensor
   OPC_status = PM.ON();
@@ -314,7 +315,7 @@ void fancy_particles()
     USB.println(F("Error starting the particle sensor"));
   }
 
-  for (ii = 0; ii < 16; ii++)
+  for (ii = 0; ii < x; ii++)
   {
     // Get measurement from the particle matter sensor
     // Power the fan and the laser and perform a measure of 5 seconds
@@ -324,10 +325,10 @@ void fancy_particles()
     sum2 = sum2 + PM._PM2_5;
     sum3 = sum3 + PM._PM10;
   }
-  partt1 = sum1 >> 4;
-  partt2 = sum2 >> 4;
-  partt3 = sum3 >> 4;
-
+  partt1 = sum1 / x;
+  partt2 = sum2 / x;
+  partt3 = sum3 / x;
+  USB.println(F("Averageing algorithm ended"));
 
 
   PM.OFF();
