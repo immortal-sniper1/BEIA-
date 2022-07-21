@@ -1,40 +1,13 @@
-/*
-    ------ [BS_01] Getting the value of temperature sensor --------
-
-    Explanation: This example shows how to get the vale of temperature
-    sensor. Temperature Sensor MCP9700A plugged to ANALOG6 pin
-
-    Copyright (C) 2016 Libelium Comunicaciones Distribuidas S.L.
-    http://www.libelium.com
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-    Version:           3.0
-    Design:            Marcos Yarza
-    Implementation:    Marcos Yarza
-*/
-
 // Library include
 #include <WaspSensorGas_v30.h>
 #include <WaspFrame.h>
 #include <WaspWIFI_PRO.h>
-
+#include <WaspPM.h>
 
 
 
 ///// EDITEAZA AICI DOAR
-char node_ID[] = "ceva13xx";
+char node_ID[] = "TestMedie";
 int count_trials = 0;
 int N_trials = 5;
 char ESSID[] = "LANCOMBEIA";
@@ -47,7 +20,7 @@ unsigned long prev, previous;
 int x, b, cycle_time;
 uint8_t status = false;
 
-
+int partt1, partt2, partt3;
 
 
 
@@ -88,7 +61,7 @@ O2SensorClass O2Sensor(SOCKET_1);
 #define POINT2_VOLTAGE 2.0
 
 float concentrations_o2[] = {POINT1_PERCENTAGE, POINT2_PERCENTAGE};
-float voltages[] =       {POINT1_VOLTAGE, POINT2_VOLTAGE};
+float voltages[] =          {POINT1_VOLTAGE,    POINT2_VOLTAGE};
 
 
 
@@ -326,7 +299,40 @@ qwerty:
 
 
 
+void fancy_particles()
+{
+  uint8_t ii;
+  float sum1 = 0, sum2 = 0, sum3 = 0;
+  //Turn on the particle matter sensor
+  OPC_status = PM.ON();
+  if (OPC_status == 1)
+  {
+    USB.println(F("Particle sensor started"));
+  }
+  else
+  {
+    USB.println(F("Error starting the particle sensor"));
+  }
 
+  for (ii = 0; ii < 16; ii++)
+  {
+    // Get measurement from the particle matter sensor
+    // Power the fan and the laser and perform a measure of 5 seconds
+    //OPC_measure = PM.getPM(5000, 5000);
+    PM.getPM(5000, 5000);
+    sum1 = sum1 + PM._PM1;
+    sum2 = sum2 + PM._PM2_5;
+    sum3 = sum3 + PM._PM10;
+  }
+  partt1 = sum1 >> 4;
+  partt2 = sum2 >> 4;
+  partt3 = sum3 >> 4;
+
+
+
+  PM.OFF();
+
+}
 
 
 
@@ -357,12 +363,6 @@ void setup()
   USB.println(F("------------------------------------"));
   USB.println(RTC.getTime());
   USB.println(F("------------------------------------\n"));
-  // Switch ON and configure the Gases Board
-
-  O2Sensor.setCalibrationPoints(voltages, concentrations_o2);
-  LPGSensor.setCalibrationPoints(voltages_lps, concentrations_lps, 3);
-  CO2Sensor.setCalibrationPoints(voltages_co2, concentrations_co2, 3);
-
 
 
 
@@ -371,20 +371,6 @@ void setup()
 
 void loop()
 {
-  Gases.ON();
-  // Switch ON the SOCKET_1
-  O2Sensor.ON();
-  // Switch ON the sensor socket
-
-  LPGSensor.ON();
-  CO2Sensor.ON();
-  delay(200000);
-  // read temperature sensor connected to ANALOG6 pin
-  temperature = Utils.readTemperature();
-  USB.print(F("Value of temperature: "));
-  USB.print(temperature * 0.088);
-  USB.println(F(" Celsius degrees"));
-
   USB.println(RTC.getTime());
   USB.print("battery (Volts): ");
   USB.println(PWR.getBatteryVolts());
@@ -393,64 +379,29 @@ void loop()
 
 
 
-  float O2Vol = O2Sensor.readVoltage();
-  USB.print(F("O2 concentration Estimated: "));
-  USB.print(O2Vol);
-  USB.print(F(" mV | "));
-  delay(100);
-
-  // Read the concentration value in %
-  float O2Val = O2Sensor.readConcentration();
-
-  USB.print(F(" O2 concentration Estimated: "));
-  USB.print(O2Val * 0.6);
-  USB.println(F(" %"));
 
 
 
-  float LPGVol = LPGSensor.readVoltage();         // Voltage value of the sensor
-  float LPGRes = LPGSensor.readResistance();      // Resistance of the sensor
-  float LPGPPM = LPGSensor.readConcentration();   // PPM value of LPG
-  float CO2PPM = CO2Sensor.readConcentration();
-  float CO2Vol = CO2Sensor.readVoltage();
-
-  // Print of the results
-  USB.print(F("LPG Sensor Voltage: "));
-  USB.print(LPGVol);
-  USB.println(F(" V |"));
-
-  // Print of the results
-  USB.print(F(" LPG Sensor Resistance: "));
-  USB.print(LPGRes);
-  USB.println(F(" Ohms |"));
-
-  USB.print(F(" LPG concentration Estimated: "));
-  USB.print(LPGPPM);
-  USB.println(F(" ppm"));
 
 
-
-  USB.print(F("CO2 Sensor Voltage: "));
-  USB.print(CO2Vol);
-  USB.println(F("volts |"));
-
-
-  Gases.OFF();
-  // Switch ON the SOCKET_1
-  O2Sensor.OFF();
-  // Switch ON the sensor socket
-
-  LPGSensor.OFF();
-  CO2Sensor.OFF();
-  delay(10000);
 
 
 
   frame.createFrame(ASCII, node_ID); // frame1 de  stocat
   frame.addSensor(SENSOR_BAT, PWR.getBatteryLevel());
-  frame.addSensor(SENSOR_GASES_LPG, LPGPPM  );     // CH4 analogic
-  frame.addSensor(SENSOR_GASES_CO2, CO2Vol  );     // CH4 analogic
+  // Add PM1
+  frame.addSensor(SENSOR_GASES_PRO_PM1, PM._PM1, 2);
+  // Add PM2.5
+  frame.addSensor(SENSOR_GASES_PRO_PM2_5, PM._PM2_5, 2);
+  // Add PM10
+  frame.addSensor(SENSOR_GASES_PRO_PM10, PM._PM10, 2);
   frame.addTimestamp();
+  // Add PM1 value
+  frame.addSensor(SENSOR_GASES_PRO_CO2, partt1, 2);
+  // Add PM2.5 value
+  frame.addSensor(SENSOR_GASES_PRO_NO2, partt2, 2);
+  // Add PM10 value
+  frame.addSensor(SENSOR_GASES_PRO_SO2, partt3, 2);
 
   frame.showFrame();
   trimitator_WIFI();
