@@ -84,3 +84,25 @@ void loop()
 
 
 }
+
+
+/*
+ * functii disponibile pe can bus 
+    uint16_t getEngineLoad();
+    uint16_t getEngineCoolantTemp();
+    uint16_t getFuelPressure();
+    uint16_t getIntakeMAPressure();
+    uint16_t getEngineRPM();
+    uint16_t getVehicleSpeed();
+    uint16_t getTimingAdvance();
+    uint16_t getIntankeAirTemp();
+    uint16_t getMAFairFlowRate();
+    uint8_t getThrottlePosition();
+    uint8_t getFuelLevel();
+    uint8_t getBarometricPressure();
+    uint16_t getEngineFuelRate();
+ 
+ */
+
+
+
