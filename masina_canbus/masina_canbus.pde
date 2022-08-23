@@ -75,11 +75,41 @@ void loop()
   USB.print(fuelPressure);
   USB.println("  KPa");
 
+  // USB.println(F("<============================================>"));
+
+  // USB.println();
+  //--------------------------------------------------------------------------------------------------------------------------
+
+  USB.print(F("\tVehicle FuelLevel =>  "));
+  USB.print(  CAN.getFuelLevel()  );
+  USB.println("  Km / h");
+
+  USB.print(F("\tEngine MAFairFlowRate =>  "));
+  USB.print(CAN.getMAFairFlowRate() );
+  USB.println("  RPM");
+
+  USB.print(F("\tEngine IntankeAirTemp =>  "));
+  USB.print(CAN.getIntankeAirTemp() );
+  USB.println("  L/h");
+
+  USB.print(F("\t IntakeMAPressure =>  "));
+  USB.print(CAN.getIntakeMAPressure() );
+  USB.println("  %");
+
+  USB.print(F("\t  EngineCoolantTemp =>  "));
+  USB.print( CAN.getEngineCoolantTemp() );
+  USB.println(" % ");
+
+  USB.print(F("\t  EngineLoad =>  "));
+  USB.print( CAN.getEngineLoad()  );
+  USB.println("  KPa");
+
   USB.println(F("<============================================>"));
 
   USB.println();
 
-  delay(1000);
+
+  delay(5000);
 
 
 
@@ -87,22 +117,22 @@ void loop()
 
 
 /*
- * functii disponibile pe can bus 
+   functii disponibile pe can bus
     uint16_t getEngineLoad();
-    uint16_t getEngineCoolantTemp();
-    uint16_t getFuelPressure();
-    uint16_t getIntakeMAPressure();
-    uint16_t getEngineRPM();
-    uint16_t getVehicleSpeed();
+  x uint16_t getEngineCoolantTemp();
+  x  uint16_t getIntakeMAPressure();
     uint16_t getTimingAdvance();
-    uint16_t getIntankeAirTemp();
-    uint16_t getMAFairFlowRate();
-    uint8_t getThrottlePosition();
-    uint8_t getFuelLevel();
-    uint8_t getBarometricPressure();
-    uint16_t getEngineFuelRate();
- 
- */
+  x  uint16_t getIntankeAirTemp();
+  x  uint16_t getMAFairFlowRate();
+  x  uint8_t getThrottlePosition();
+  x  uint8_t getFuelLevel();
+  x  uint8_t getBarometricPressure();
+  x  uint16_t getEngineFuelRate();
+    x  uint16_t getEngineRPM();
+  x  uint16_t getVehicleSpeed();
+    x  uint16_t getFuelPressure();
+
+*/
 
 
 
