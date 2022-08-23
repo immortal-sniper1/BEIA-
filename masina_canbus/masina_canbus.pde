@@ -82,27 +82,27 @@ void loop()
 
   USB.print(F("\tVehicle FuelLevel =>  "));
   USB.print(  CAN.getFuelLevel()  );
-  USB.println("  Km / h");
+  USB.println("  AAA");
 
   USB.print(F("\tEngine MAFairFlowRate =>  "));
   USB.print(CAN.getMAFairFlowRate() );
-  USB.println("  RPM");
+  USB.println("  AAA");
 
   USB.print(F("\tEngine IntankeAirTemp =>  "));
   USB.print(CAN.getIntankeAirTemp() );
-  USB.println("  L/h");
+  USB.println("  AAA");
 
   USB.print(F("\t IntakeMAPressure =>  "));
   USB.print(CAN.getIntakeMAPressure() );
-  USB.println("  %");
+  USB.println("  AAA");
 
   USB.print(F("\t  EngineCoolantTemp =>  "));
   USB.print( CAN.getEngineCoolantTemp() );
-  USB.println(" % ");
+  USB.println(" AAA ");
 
   USB.print(F("\t  EngineLoad =>  "));
   USB.print( CAN.getEngineLoad()  );
-  USB.println("  KPa");
+  USB.println("  AAA");
 
   USB.println(F("<============================================>"));
 
