@@ -54,7 +54,7 @@ char tt[][200] =
   "Life is the Emperor's currency, spend it well. - Warhammer 40k, Imperium" ,
   "Show me a fortress and I'll show you a ruin. - Captain Edain Bourne, Warhammer 40k Seige, p. 105"
 };
-  float uvIntensity ;
+float uvIntensity ;
 
 
 
@@ -188,12 +188,12 @@ void loop()
   Serial.println(   qqw  );
   uvIntensity = mapfloat(qqw, 0.99, 2.9, 0.0, 15.0);
   Serial.print(" UV Intensity (mW/cm^2): ");
-  Serial.print(uvIntensity);  
+  Serial.print(uvIntensity);
   Serial.println();
 
 
 
-  
+
 
 
   Serial.println(tt[rr]);
@@ -202,7 +202,7 @@ void loop()
   doc["sensor1"] = "fierbinte";
   doc["sensor2"] = 1351824120;
   doc["tensiune"] = qqw;
-  doc["UV Intensity (mW/cm^2):"]= uvIntensity ;
+  doc["UV Intensity (mW/cm^2):"] = uvIntensity ;
   doc["40K"] = tt[rr];
   doc["Hours"] = timeClient.getHours();
   doc["Minutes"] = timeClient.getMinutes();
