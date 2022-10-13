@@ -44,7 +44,7 @@ while 1:
             print(outputt[:1])
             print(outputt2[:1])
             #ss2='{"id":"ceva","value":' + int(outputt2) + '}'
-            myJSON_test=json.dumps({"id":"ceva","value":outputt2 })
+            myJSON_test=json.dumps({"id":"GalatiPonton1","value":outputt2 })
             json.dumps(["apple", 731])
             #print(ss2)
             print(  "grwtwtwtwetwet-----------------------------" )
