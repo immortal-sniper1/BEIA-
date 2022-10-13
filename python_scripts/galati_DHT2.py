@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 
 serialPort = serial.Serial(    port="COM6", baudrate=4800, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE)
 
-mqttBroker = 'beia.telemetrie.ro'
+mqttBroker = 'mqtt.beia-telemetrie.ro'
 port = 1883
 topic = "training/vital5g/DST-2/depth"
 client_id = "NUC-navrom"
@@ -13,6 +13,9 @@ client.connect(mqttBroker)
 
 serialString = ""  # Used to hold data coming over UART
 
+# while(1):
+#     client.publish(topic, "77")
+#     time.sleep(30)
 
 
 while 1:
@@ -27,6 +30,31 @@ while 1:
             print(serialString.decode("Ascii"))
 
             # mqtt de bagat cam pe aici
-            client.publish(topic, serialString)
+            lungg=len(serialString)
+            smgg=serialString[lungg-20:lungg-17]
+            smgg2=serialString[lungg-18:lungg-15]
+            #nn=int(smgg)
+            print( "smgg= ", end = ' ' )
+            print( smgg )
+            print( "smgg2= ", end = ' ' )
+            print(  smgg2 )
+            outputt= smgg.decode()
+            outputt2= smgg2.decode()
+            print(outputt[:1])
+            print(outputt2[:1])
+            print(  "grwtwtwtwetwet-----------------------------" )
+            #if outputt[:1]!="f" or  outputt[:1].isnumeric()    :
+            client.publish(topic, outputt   )
+            client.publish(topic,  '{"id":"ceva","value":' + int(outputt) + '}'  )
+            print(  "upssss" )
+            #if outputt2[:1]!="f" or outputt2[:1].isnumeric()   :
+            #if 1 :
+            client.publish(topic, outputt   )
+            client.publish(topic,  '{"id":"ceva","value":' + int(outputt2) + '}'  )
+            print(  "upssss2" )
+
+
+            time.sleep(5)
+
         except:
             pass
