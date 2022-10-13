@@ -1,6 +1,7 @@
 import serial
 import time
 import paho.mqtt.client as mqtt
+import json
 
 serialPort = serial.Serial(    port="COM6", baudrate=4800, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE)
 
@@ -42,15 +43,14 @@ while 1:
             outputt2= smgg2.decode()
             print(outputt[:1])
             print(outputt2[:1])
+            #ss2='{"id":"ceva","value":' + int(outputt2) + '}'
+            myJSON_test=json.dumps({"id":"ceva","value":outputt2 })
+            json.dumps(["apple", 731])
+            #print(ss2)
             print(  "grwtwtwtwetwet-----------------------------" )
             #if outputt[:1]!="f" or  outputt[:1].isnumeric()    :
-            client.publish(topic, outputt   )
-            client.publish(topic,  '{"id":"ceva","value":' + int(outputt) + '}'  )
-            print(  "upssss" )
-            #if outputt2[:1]!="f" or outputt2[:1].isnumeric()   :
-            #if 1 :
-            client.publish(topic, outputt   )
-            client.publish(topic,  '{"id":"ceva","value":' + int(outputt2) + '}'  )
+            #client.publish(topic, outputt2   )
+            client.publish(topic,  myJSON_test  )
             print(  "upssss2" )
 
 
