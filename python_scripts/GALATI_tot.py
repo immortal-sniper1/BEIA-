@@ -175,5 +175,7 @@ while True:
         print("\nUnknown message format for AIS")
             
     print("\n------------------End of loop------------------\n")
-    print("Waiting 10 seconds before new loop...")
+    print("Waiting ")
+    print(perio_cycle)
+    print(" seconds before new loop...")
     time.sleep(perio_cycle)
