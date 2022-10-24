@@ -3,11 +3,10 @@ import time
 import paho.mqtt.client as mqtt
 import json
 from pyais.stream import FileReaderStream
-from pyais import decode
 import datetime
 
 DEBUGG = True
-perio_cycle=100
+
 mqttBroker = 'mqtt.beia-telemetrie.ro'
 port = 1883
 topicDEP  = "training/vital5g/DST-2/depth"
@@ -48,7 +47,8 @@ def GetAISData():
                 
             # Read data out of the buffer until a carraige return / new line is found
             serialStringAIS = serialPortAIS.readline()
-            AISmessage = serialStringAIS.decode("Ascii")
+            AISmessage = serialStringAIS.d
+            ecode("Ascii")
             
             if DEBUGG:
                 print("   message: " + AISmessage)
@@ -165,15 +165,10 @@ while True:
     DepthDict = {"id":"GalatiPonton1", "value":DepthData }
     payloadDEP = json.dumps(DepthDict)
     client.publish(topicDEP, payloadDEP)
-    
-    try:
-        print("\n")
-        decodat_AIS=decode(str(AISData))
-        print(decodat_AIS)
-        #client.publish(topic3,  decodat_AIS  )
-    except:
-        print("\nUnknown message format for AIS")
+    #decodat_AIS=decode(AISData)
+    #print(decodat_AIS)
+    #client.publish(topic3,  decodat_AIS  )
             
     print("\n------------------End of loop------------------\n")
     print("Waiting 10 seconds before new loop...")
-    time.sleep(perio_cycle)
+    time.sleep(10)
