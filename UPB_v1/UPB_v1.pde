@@ -34,7 +34,24 @@ void setup()
   USB.ON();
   USB.println(F("USB port started..."));
   RTC.ON();
+    CO = gas_PRO_sensor.getConc();
+    CO2 = gas_PRO_sensor.getConc();
 
+        // And print the values via USB
+    USB.println(F("***************************************"));
+    USB.print(F("Gas concentration: "));
+    USB.print(concentration);
+    USB.println(F(" ppm"));
+    USB.print(F("Temperature: "));
+    USB.print(temperature);
+    USB.println(F(" Celsius degrees"));
+    USB.print(F("RH: "));
+    USB.print(humidity);
+    USB.println(F(" %"));
+    USB.print(F("Pressure: "));
+    USB.print(pressure);
+    USB.println(F(" Pa"));
+    
 
 
 }
