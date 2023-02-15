@@ -8,6 +8,12 @@ char node_ID[] = "upb_test";
 // define file name: MUST be 8.3 SHORT FILE NAME
 char filename[] = "FILE1.TXT";
 uint8_t sd_answer, ssent;
+char *time_date; // stores curent date + time
+int cycle_time, x, b;
+uint8_t error, status = false;
+char y[3];
+
+
 
 
 Gas CO(SOCKET_B);
@@ -39,7 +45,7 @@ void BME280_thing()
 void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 {
   SD.ON();
-//  USB.ON();
+  //  USB.ON();
   USB.print(F("scriitor SD  "));
 
   long int m;
@@ -64,120 +70,120 @@ void scriitor_SD(char filename_a2[], uint8_t ssent_a = 0)
 
 
 
-}
+
 //USB.println(F("scriitor SD4"));
 
 
 
 
 
-USB.print(F("se va scrie in: "));
-USB.println(filename_a);
-i = SD.create(filename_a);
-if (i == 1)
-{
-  USB.println(F("file created since it was not present "));
-}
+  USB.print(F("se va scrie in: "));
+  USB.println(filename_a);
+  i = SD.create(filename_a);
+  if (i == 1)
+  {
+    USB.println(F("file created since it was not present "));
+  }
 
 
 
 
 
-
-int coruption = 0;
+  int coruption = 0;
 //sd_answer = SD.appendln(filename_a, "am scris aici!!!!!!!!");
 //coruption = coruption + sd_answer;
 // now storeing it locally
-time_date = RTC.getTime();
-USB.print(F("time: "));
-USB.println(time_date);
+  time_date = RTC.getTime();
+  USB.print(F("time: "));
+  USB.println(time_date);
 
-x = RTC.year;
-itoa(x, y, 10);
-if (x < 10) {
-  y[1] = y[0];
-  y[0] = '0';
-}
+  x = RTC.year;
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
 
-sd_answer = SD.append(filename_a, y);
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, ".");
-coruption = coruption + sd_answer;
-x = RTC.month;
-itoa(x, y, 10);
-if (x < 10)
-{
-  y[1] = y[0];
-  y[0] = '0';
-}
-sd_answer = SD.append(filename_a, y);
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, ".");
-coruption = coruption + sd_answer;
-x = RTC.date;
-itoa(x, y, 10);
-if (x < 10) {
-  y[1] = y[0];
-  y[0] = '0';
-}
-sd_answer = SD.append(filename_a, y);
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, ".");
-coruption = coruption + sd_answer;
-x = RTC.hour;
-itoa(x, y, 10);
-if (x < 10) {
-  y[1] = y[0];
-  y[0] = '0';
-}
-sd_answer = SD.append(filename_a, y);
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, ".");
-coruption = coruption + sd_answer;
-x = RTC.minute;
-itoa(x, y, 10);
-if (x < 10)
-{
-  y[1] = y[0];
-  y[0] = '0';
-}
-sd_answer = SD.append(filename_a, y);
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, ".");
-coruption = coruption + sd_answer;
-x = RTC.second;
-itoa(x, y, 10);
-if (x < 10)
-{
-  y[1] = y[0];
-  y[0] = '0';
-}
-sd_answer = SD.append(filename_a, y);
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, "  ");
-coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, y);
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption = coruption + sd_answer;
+  x = RTC.month;
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  sd_answer = SD.append(filename_a, y);
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption = coruption + sd_answer;
+  x = RTC.date;
+  itoa(x, y, 10);
+  if (x < 10) {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  sd_answer = SD.append(filename_a, y);
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption = coruption + sd_answer;
+  x = RTC.hour;
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  sd_answer = SD.append(filename_a, y);
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption = coruption + sd_answer;
+  x = RTC.minute;
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  sd_answer = SD.append(filename_a, y);
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, ".");
+  coruption = coruption + sd_answer;
+  x = RTC.second;
+  itoa(x, y, 10);
+  if (x < 10)
+  {
+    y[1] = y[0];
+    y[0] = '0';
+  }
+  sd_answer = SD.append(filename_a, y);
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, "  ");
+  coruption = coruption + sd_answer;
 
 
-
-sd_answer = SD.append(filename_a, frame.buffer, frame.length);  // scriere propriuzisa frame
-coruption = coruption + sd_answer;
-sd_answer = SD.append(filename_a, "  ");
-coruption = coruption + sd_answer;
-itoa(ssent_a, y, 10);
-sd_answer = SD.appendln(filename_a, y);
-coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, frame.buffer, frame.length);  // scriere propriuzisa frame
+  coruption = coruption + sd_answer;
+  sd_answer = SD.append(filename_a, "  ");
+  coruption = coruption + sd_answer;
+  itoa(ssent_a, y, 10);
+  sd_answer = SD.appendln(filename_a, y);
+  coruption = coruption + sd_answer;
 // frame is stored
 
-SD.OFF();
+  SD.OFF();
 
-if (coruption == 15)
-{
-  USB.println("SD storage done with no errors");
-} else {
-  USB.print("SD sorage done with:");
-  USB.print(15 - coruption);
-  USB.println(" errors");
-}
+  if (coruption == 15)
+  {
+    USB.println("SD storage done with no errors");
+  } else {
+    USB.print("SD sorage done with:");
+    USB.print(15 - coruption);
+    USB.println(" errors");
+  }
 }
 
 
@@ -208,7 +214,7 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-    USB.ON();
+  USB.ON();
   USB.println(F("------------------------------------------------------"));
 
   // And print the values via USB
@@ -255,3 +261,12 @@ void loop()
 
   delay(1000);
 }
+
+
+
+
+
+
+
+
+
