@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1676970294 source:c:\users\beia\documents\github\beia-\c++\tcp_receiver\main.c
+	<arpa/inet.h>
+	<netdb.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<strings.h>
+	<sys/socket.h>
+	<unistd.h>
+
